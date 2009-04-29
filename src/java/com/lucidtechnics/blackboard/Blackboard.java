@@ -39,8 +39,6 @@ import com.lucidtechnics.blackboard.config.EventConfiguration;
 import com.lucidtechnics.blackboard.util.Guard;
 import com.lucidtechnics.blackboard.util.error.ErrorManager;
 
-import org.springframework.beans.factory.xml.XmlBeanFactory;
-
 import com.db4o.Db4o;
 import com.db4o.ObjectServer;
 import com.db4o.ObjectContainer;
@@ -177,40 +175,27 @@ public class Blackboard
 		server.grantAccess(getUser(), getPassword());
 	}
 
-	public void init(XmlBeanFactory _xmlBeanFactory)
+	public void init()
 	{
 		logger.info("Blackboard Workspace Server initialization inception.");
 		logger.info("Apache 2.0 Open Source License.");
 		logger.info("Copyright Owner - Bediako George.");
 
 		initializeTargetSpacePersistentStore();
-		
-		Iterator workspaceConfigurations = getWorkspaceConfigurationSet().iterator();
 
-		while (workspaceConfigurations.hasNext() == true)
-		{
-			WorkspaceConfiguration workspaceConfiguration = (WorkspaceConfiguration) workspaceConfigurations.next();
+		//Now we go look at the workspace directory and for each
+		//directory create a new workspaceConfiguration using the
+		//directory name as the workspace name.
 
-			Set eventConfigurationSet = workspaceConfiguration.getEventConfigurationSet();
+		//We then check each workspace and see if there is a
+		//workspace.cfg.* where * could be "js" for JavaScript,
+		//"rb" for Ruby, "groovy" or "gr" for Groovy.
+		//If that file exists run it to populate the configuration
+		//otherwise just use the default WorkspaceConfiguration values.
 
-			Iterator eventConfigurations = eventConfigurationSet.iterator();
-
-			while (eventConfigurations.hasNext() == true)
-			{
-				EventConfiguration eventConfiguration = (EventConfiguration) eventConfigurations.next();
-				
-				List workspaceList = (List) getEventToWorkspaceMap().get(eventConfiguration.getEventClass());
-
-				if (workspaceList == null)
-				{
-					workspaceList = new ArrayList();
-					getEventToWorkspaceMap().put(eventConfiguration.getEventClass(), workspaceList);
-				}
-
-				workspaceList.add(workspaceConfiguration);
-				getEventConfigurationMap().put(eventConfiguration.getEventClass(), eventConfiguration);
-			}
-		}
+		//Next load the plans files paths that are declared in the workspace
+		//directory much like the config file??? Need to think about
+		//how this really works!!!!
 
 		setBlackboardExecutor(new ThreadPoolExecutor(getMaxBlackboardThread(), getMaxBlackboardThread(), 100, TimeUnit.SECONDS,
 			new LinkedBlockingQueue()));

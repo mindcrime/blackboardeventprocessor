@@ -41,7 +41,6 @@ public class TargetSpaceImpl
 		setDoNotPersistSet(new HashSet());
 		setExceptionSet(new HashSet());
 		setChangeInfoHistory(new ChangeInfoHistory());
-		setEventNameSet(new HashSet());
 	}
 	
 	public TargetSpaceImpl(String _name, Object _workspaceIdentifier)
@@ -49,11 +48,6 @@ public class TargetSpaceImpl
 		this();
 		setName(_name);
 		setWorkspaceIdentifier(_workspaceIdentifier);
-	}
-
-	protected final boolean targetIsADeclaredEvent(String _targetName)
-	{
-		return (getEventNameSet().contains(_targetName) == true);
 	}
 	
 	protected final void put(String _targetName, Object _object, Actor _actor, Intercepter _intercepter)

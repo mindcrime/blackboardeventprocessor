@@ -66,7 +66,6 @@ public abstract class TargetSpace
 	protected Map getPlanStateMap() { return planStateMap; }
 	protected Set getDoNotPersistSet() { return doNotPersistSet; }
 	protected Set getExceptionSet() { return exceptionSet; }
-	protected Set getEventNameSet() { return eventNameSet; }
 	protected ReentrantReadWriteLock getWorkspaceReadWriteLock() { return workspaceReadWriteLock; }
 	protected Lock getWorkspaceReadLock() { return workspaceReadLock; }
 	protected Lock getWorkspaceWriteLock() { return workspaceWriteLock; }
@@ -89,7 +88,6 @@ public abstract class TargetSpace
 	protected void setPlanStateMap(Map _planStateMap) { planStateMap = _planStateMap; }
 	protected void setDoNotPersistSet(Set _doNotPersistSet) { doNotPersistSet = _doNotPersistSet; }
 	protected void setExceptionSet(Set _exceptionSet) { exceptionSet = _exceptionSet; }
-	protected void setEventNameSet(Set _eventNameSet) { eventNameSet = _eventNameSet; }
 	protected void setWorkspaceReadWriteLock(ReentrantReadWriteLock _workspaceReadWriteLock) { workspaceReadWriteLock = _workspaceReadWriteLock; }
 	protected void setWorkspaceReadLock(Lock _workspaceReadLock) { workspaceReadLock = _workspaceReadLock; }
 	protected void setWorkspaceWriteLock(Lock _workspaceWriteLock) { workspaceWriteLock = _workspaceWriteLock; }

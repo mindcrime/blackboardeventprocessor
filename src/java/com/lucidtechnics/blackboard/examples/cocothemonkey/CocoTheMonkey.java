@@ -53,7 +53,7 @@ public class CocoTheMonkey
 			XmlBeanFactory xmlBeanFactory = new XmlBeanFactory(resource);
 
 			final Blackboard blackboard = (Blackboard) xmlBeanFactory.getBean("blackboard");
-			blackboard.init(xmlBeanFactory);
+			blackboard.init();
 
 			logger.info("Starting Coco The Monkey");
 			System.out.println("Starting Coco The Monkey");
