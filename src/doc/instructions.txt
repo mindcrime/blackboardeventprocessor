@@ -1,0 +1,44 @@
+Hello,
+
+Here is the link to the software project I was granted on sourceforge:
+http://sourceforge.net/projects/blkbrd/
+
+You can view the source code here:
+http://blkbrd.svn.sourceforge.net/viewvc/blkbrd/branches/release0.1/
+
+If you would like to download and run the Blackboard Workspace Server, 
+please make sure you have a subversion client on you desktop, and at the
+command line execute the following:
+
+svn co https://blkbrd.svn.sourceforge.net/svnroot/blkbrd/branches/release0.1 blackboard
+
+Once you have checked out the source, go to the blackboard directory that was just 
+created, and execute "ant redeploy".  You may also import your project into Eclipse
+and run it from there as well.
+
+After deployment is completed, the bat or shell scripts for running the
+"Coco The Monkey" example will be created in ../deploy/bin.  For Windows 
+users execute cocothemonkey.bat.
+
+Once the application is completed its run you will want to view the results. 
+The results are stored in a DB4O object oriented database. You can view the 
+results using their ObjectManager application.  You can get it from 
+http://developer.db4o.com/files/folders/objectmanager_18/entry24827.aspx.
+There may be a registration requirement, but the software is free.
+
+Finally, once the ObjectManager is installed, you can use it to open the file
+"targetSpaces.dat" in the ../deploy/bin directory. Explore the object tree to
+see the data that is stored.  Feel free to play with the configurations in blackboard.xml
+and cocothemonkey.xml.
+
+Performance
+Early results are promising. Right now on my laptop I am processing and persisting events AND
+changes to event information at a rate of about 166 events per second.  This is without
+any tuning whatsover.
+
+I would be interested to hear your comments. Please drop me a line at
+bediakogeorge@yahoo.com.  If you run into any problems please drop me a line.
+
+Regards,
+
+Bediako

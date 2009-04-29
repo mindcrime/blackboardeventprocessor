@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<!--
+
+   Log4J Configuration Quick Reference:
+   ====================================
+
+   
+   Priority order is DEBUG &lt; INFO &lt; WARN &lt; ERROR &lt; FATAL
+
+
+   PatternLayout conversion characters:
+   
+    %c   Category of the logging event
+    %C   Fully qualified class name of the caller
+    %d   Date of the logging event  (example: %d{HH:mm:ss,SSS} )
+    %F   File name where the logging request was issued (caution: extremely slow)
+    %l   Location information of the caller (caution: extremely slow)
+    %L   Line number from where the logging request was issued (caution: extremely slow)
+    %m   Application-supplied message
+    %M   Method name from where the logging request was issued (caution: extremely slow)
+    %n   Line separator
+    %p   Priority of the logging event
+    %r   Number of milliseconds since the start of the application
+    %t   Name of the thread that generated the logging event
+    %x   Nested diagnotic context associated with the thread
+    %%   A single percent sign
+
+   Format modifiers examples:
+   
+    %20c     Left pad with spaces if category is less than 20 characters long
+    %-20c    Right pad with spaces if category is less than 20 characters long
+    %.30c    Truncate from the beginning if category is more than 30 chars long
+    %20.30c  Left pad 20 chars + truncate from beginning if more than 30 chars
+    %-20.30c Right pad 20 chars + truncate from beginning if more than 30 chars
+
+   Examples:  &quot;%r [%t] %-5p %c %x - %m\n&quot;
+              &quot;%-6r [%15.15t] %-5p %30.30c %x - %m\n&quot;  
+               
+-->
+
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+  <appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{HH:mm:ss.SSS} %-5p (%F:%L) [%t][%x] - %m\n"/>
+    </layout>
+  </appender>
+  
+  <appender name="BLACKBOARD_FILE" class="org.apache.log4j.FileAppender">
+    <param name="File" value="./blackboard.log"/>
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{HH:mm:ss.SSS} %-5p (%F:%L) [%t][%x] - %m\n"/>
+    </layout>
+  </appender>
+  
+  <!--
+  <appender name="FILE" class="org.apache.log4j.DailyRollingFileAppender"> 
+    <param name="File" value="blackboard.log"/>
+    <param name="Append" value="true" />
+    <param name="DatePattern" value="'.'yyyy-dd-MM"/> 
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{HH:mm:ss.SSS} %-5p [%t][%x] - %m\n"/>
+    </layout>
+  </appender>
+
+  <appender name="ANALYZER_FILE" class="org.apache.log4j.DailyRollingFileAppender"> 
+    <param name="File" value="analyzer.log"/>
+    <param name="Append" value="true" />
+    <param name="DatePattern" value="'.'yyyy-dd-MM"/> 
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{HH:mm:ss.SSS} %-5p [%t][%x] - %m\n"/>
+    </layout>
+  </appender>
+  -->
+  <category name="com.georgetownsoftware.blackboard">
+	  <priority value="info"/>
+	  <appender-ref ref="BLACKBOARD_FILE"/>
+  </category>
+
+  <category name="org.springframework">
+	  <priority value="warn"/>
+	  <appender-ref ref="BLACKBOARD_FILE"/>
+  </category>
+  
+  <category name="com.georgetownsoftware.blackboard">
+	  <priority value="info"/>
+	  <appender-ref ref="STDOUT"/>
+  </category>
+
+  <category name="com.georgetownsoftware.examples">
+	  <priority value="info"/>
+	  <appender-ref ref="STDOUT"/>
+  </category>
+  
+  <category name="org.springframework">
+	  <priority value="warn"/>
+	  <appender-ref ref="STDOUT"/>
+  </category>
+    
+  <root>
+  </root>
+</log4j:configuration>

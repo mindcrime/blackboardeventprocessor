@@ -1,0 +1,226 @@
+<project name="blackboard" default="redeploy" basedir=".">
+
+	<description>  Blackboard build file </description>
+
+	<property file="desktop.build" />
+
+	<property name="classes" location="classes" />
+	<property name="workspace" location="workspace" />
+	<property name="dist" location="dist" />
+	<property name="junit-result" location="result" />
+	<property name="lib" location="lib" />
+	<property name="bin" location="bin" />
+	<property name="src" location="src" />
+	<property name="src.shl" location="${src}/shl" />
+	<property name="src.java" location="${src}/java" />
+	<property name="src.gen-java" location="${src}/gen-java" />
+	<property name="src.jsp" location="${src}/jsp" />
+	<property name="src.test" location="${src}/test" />
+	<property name="src.cfg" location="${src}/cfg" />
+	<property name="src.static" location="${src}/static" />
+	<property name="stage" location="stage" />
+	<property name="stage.shl" location="${stage}/shl" />
+	<property name="stage.java" location="${stage}/java" />
+	<property name="stage.gen-java" location="${stage}/gen-java" />
+	<property name="stage.jsp" location="${stage}/jsp" />
+	<property name="stage.test" location="${stage}/test" />
+	<property name="stage.cfg" location="${stage}/cfg" />
+	<property name="stage.static" location="${stage}/static" />
+
+	<property name="blackboardJar" value="blackboard-${version}.jar" />
+	<property name="blackboardTestJar" value="blackboardTest-${version}.jar" />
+
+	<path id="build.class.path">
+		<fileset dir="${lib}">
+			<include name="**/*.jar"/>
+			<include name="**/*.zip"/>
+		</fileset>
+	</path>
+
+	<path id="run.class.path">
+		<fileset dir="${blackboardDeployDir}/lib">
+			<include name="**/*.jar"/>
+			<include name="**/*.zip"/>
+		</fileset>
+		<fileset dir="${config}">
+			<include name="**/*.xml"/>
+		</fileset>
+	</path>
+
+	<path id="test.class.path">
+		<fileset dir="${lib}">
+			<include name="**/*.jar"/>
+			<include name="**/*.zip"/>
+		</fileset>
+		<fileset dir="${dist}">
+			<include name="**/*Test.jar"/>
+		</fileset>
+		<pathelement path="${config}"/>
+		<pathelement location="certs"/>
+	</path>
+
+	<!-- Clean -->
+	<target name="clean" depends="clean-classes, clean-target" />
+
+	<!-- Clean classes -->
+	<target name="clean-classes">
+		<delete dir="${classes}" />
+		<delete dir="${dist}" />
+	</target>
+
+	<!-- Clean target -->
+	<target name="clean-target">
+
+		<delete dir="${blackboardDeployDir}/bin" />
+		<delete dir="${blackboardDeployDir}/lib" />
+		<delete dir="${blackboardDeployDir}/config" />
+		<delete dir="${blackboardDeployDir}/log" />
+		<delete dir="${stage}" />
+
+	</target>
+
+	<!-- Init -->
+	<target name="init">
+
+		<mkdir dir="${stage}" />
+		<mkdir dir="${stage.shl}" />
+		<mkdir dir="${stage.cfg}/blackboard" />
+
+		<mkdir dir="${classes}" />
+		<mkdir dir="${workspace}" />
+
+		<mkdir dir="${dist}" />
+		<mkdir dir="${dist}/lib" />
+
+		<mkdir dir="${blackboardDeployDir}/config/blackboard" />
+		<mkdir dir="${blackboardDeployDir}/config/blackboard" />
+		<mkdir dir="${blackboardDeployDir}/lib" />
+		<mkdir dir="${blackboardDeployDir}/bin" />
+		<mkdir dir="${blackboardDeployDir}/log" />
+		<mkdir dir="${blackboardDeployDir}/persist" />
+		<mkdir dir="${blackboardDeployDir}/sequence" />
+		<mkdir dir="${blackboardDeployDir}/catalog" />
+		<mkdir dir="${blackboardDeployDir}/enableMedia" />
+		<mkdir dir="${blackboardDeployDir}/price" />
+
+		<mkdir dir="${junit-result}" />
+		<mkdir dir="${workspace}" />
+		<mkdir dir="${config}" />
+
+	</target>
+
+	<!-- Prepare source -->
+	<target name="prepareSource" depends="init">
+
+		<copy todir="${stage}" >
+			<fileset dir="${src}" includes="**/*.xml, **/*log4j.properties, **/*.bat, **/*.sh, **/*.0, **/*.cf, **/*.conf" />
+		</copy>
+
+		<replace dir="${stage}" propertyFile="token.properties">
+		  <include name="**/*.*"/>
+		  <replacefilter token="@DEPLOY.DIR@" property="DEPLOY.DIR"/>
+		  <replacefilter token="@LOG4J.JAR@" property="LOG4J.JAR"/>
+		  <replacefilter token="@RUNTIME.CLASSPATH@" property="LOG4J.JAR"/>
+		</replace>
+
+	</target>
+
+  	<!-- Compile -->
+	<target name="reCompile" depends="clean-classes, compile" />
+
+	<target name="compile" depends="prepareSource">
+		<property name="build.class.path" refId="build.class.path"/>
+		<echo message="${build.class.path}"/>
+
+		<javac destdir="${classes}" debug="on">
+			<classpath refid="build.class.path"/>
+			<src path="${src.java}"/>
+			<src path="${src.gen-java}"/>
+		</javac>
+
+		<javac destdir="${classes}" debug="on">
+			<classpath refid="build.class.path"/>
+			<src path="${src.test}"/>
+		</javac>
+	</target>
+
+	<!-- Jar -->
+	<target name="jar" depends="compile">
+		<jar destfile="${dist}/lib/${blackboardJar}"
+		       basedir="${classes}"
+			   excludes="**\*Test.class,**\*TestSuite.class"
+		  />
+		<jar destfile="${dist}/lib/${blackboardTestJar}"
+		       basedir="${classes}"
+		  />
+    </target>
+
+	<!-- Redeploy -->
+	<target name="redeploy" depends="clean, compile, jar, deploy" />
+	<target name="redeployJsp" depends="clean-target, prepareSource, deploy" />
+
+	<!-- Deploy -->
+	<target name="deploy">
+
+		<!-- Copy libraries, jsp, and blackboard config and bin files -->
+		<copy todir="${blackboardDeployDir}/lib" flatten="false">
+			<fileset dir="${lib}" includes="**/*.jar" excludes="build-only/**/*.jar, **/servlet-api.jar" />
+		</copy>
+
+		<copy todir="${blackboardDeployDir}/bin">
+			<fileset dir="${stage.shl}" includes="**/*.sh, **/*.bat" />
+		</copy>
+
+		<copy todir="${blackboardDeployDir}/lib">
+			<fileset dir="${dist}/lib" includes="*.jar" />
+		</copy>
+
+		<copy todir="${blackboardDeployDir}/config">
+			<fileset dir="${stage.cfg}/blackboard" includes="**/*.xml" />
+		</copy>
+
+		<!-- Make application shell scripts executable -->
+		<chmod dir="${blackboardDeployDir}/bin/" includes="**/*.sh"  perm="ugo+rx"/>
+
+		<!-- copy blackboard config files -->
+		<copy todir="${config}">
+			<fileset dir="${stage.cfg}" includes="**/*.*" />
+		</copy>
+
+		<!-- Copy log4j config files -->
+
+		<!-- Copy web application config and property files -->
+		
+	</target>
+
+	<target name="hardRedeploy"  depends="redeploy, startupBlackboard" />
+
+	<target name="hardDeploy"  depends="deploy, startupBlackboard" />
+
+	<!-- Start Blackboard -->
+	<target name="startupBlackboard">
+		<echo>Starting Blackboard server instance</echo>
+	</target>
+
+	<target name="unit-test" depends="compile, jar">
+
+		<property name="test.class.path" refId="test.class.path"/>
+		<echo message="Class path is:  ${test.class.path}"/>
+
+		<junit printsummary="yes" haltonfailure="no">
+			<!--<jvmarg value="-Xmx512m -Xmn512m"/>-->
+			<classpath>
+				<pathelement path="${test.class.path}"/>
+			</classpath>
+			<formatter type="plain"/>
+
+			<batchtest fork="yes" todir="${junit-result}">
+				<fileset dir="${src.test}">
+					<include name="**/*Test.java"/>
+					<exclude name="**/*TestSuite.java"/>
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+
+</project>
