@@ -38,6 +38,7 @@ import com.lucidtechnics.blackboard.config.EventConfiguration;
 
 import com.lucidtechnics.blackboard.util.Guard;
 import com.lucidtechnics.blackboard.util.error.ErrorManager;
+import com.lucidtechnics.blackboard.util.PropertyUtil;
 
 import com.db4o.Db4o;
 import com.db4o.ObjectServer;
@@ -139,18 +140,18 @@ public class Blackboard
 	
 	public Blackboard()
 	{
-		com.lucidtechnics.blackboard.util.PropertyUtil.getInstance().loadProperties("Blackboard.properties", "blackboard.cfg");
+		PropertyUtil.getInstance().loadProperties("/src/Blackboard.properties", "blackboard.cfg");
 
-		setMaxBlackboardThread(Integer.valueOf(com.lucidtechnics.blackboard.util.PropertyUtil.getInstance().getProperty("blackboard.cfg", "max.blackboard.thread")));
-		setMaxScheduledBlackboardThread(Integer.valueOf(com.lucidtechnics.blackboard.util.PropertyUtil.getInstance().getProperty("blackboard.cfg", "max.scheduled.blackboard.thread")));
-		setMaxWorkspaceThread(Integer.valueOf(com.lucidtechnics.blackboard.util.PropertyUtil.getInstance().getProperty("blackboard.cfg", "max.workspace.thread")));
-		setMaxPersistenceThread(Integer.valueOf(com.lucidtechnics.blackboard.util.PropertyUtil.getInstance().getProperty("blackboard.cfg", "max.persistence.thread")));
-		setMaxWorkspace(Integer.valueOf(com.lucidtechnics.blackboard.util.PropertyUtil.getInstance().getProperty("blackboard.cfg", "max.workspace")));
+		setMaxBlackboardThread(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.blackboard.thread")));
+		setMaxScheduledBlackboardThread(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.scheduled.blackboard.thread")));
+		setMaxWorkspaceThread(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.workspace.thread")));
+		setMaxPersistenceThread(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.persistence.thread")));
+		setMaxWorkspace(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.workspace")));
 
-		setHost(com.lucidtechnics.blackboard.util.PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.db.host"));
-		setPort(Integer.valueOf(com.lucidtechnics.blackboard.util.PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.db.port")));
-		setUser(com.lucidtechnics.blackboard.util.PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.db.user"));
-		setPassword(com.lucidtechnics.blackboard.util.PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.db.password"));
+		setHost(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.db.host"));
+		setPort(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.db.port")));
+		setUser(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.db.user"));
+		setPassword(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.db.password"));
 		
 		setBlackboardActor(new BlackboardActor("Blackboard"));
 		setEventToWorkspaceMap(new HashMap());
@@ -183,19 +184,31 @@ public class Blackboard
 
 		initializeTargetSpacePersistentStore();
 
-		//Now we go look at the workspace directory and for each
-		//directory create a new workspaceConfiguration using the
-		//directory name as the workspace name.
+		PropertyUtil.getInstance().loadProperties("/src/Blackboard.properties", "blackboard.cfg");
+		String workspaceHome = PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.workspace.home");
 
-		//We then check each workspace and see if there is a
-		//workspace.cfg.* where * could be "js" for JavaScript,
-		//"rb" for Ruby, "groovy" or "gr" for Groovy.
-		//If that file exists run it to populate the configuration
-		//otherwise just use the default WorkspaceConfiguration values.
+		if (workspaceHome == null ||
+		   org.apache.commons.lang.StringUtils.isWhitespace(workspaceHome) == true)
+		{
+			throw new RuntimeException("blackboard.workspace.home has not been set in the Blackboard.properties file");
+		}
 
-		//Next load the plans files paths that are declared in the workspace
-		//directory much like the config file??? Need to think about
-		//how this really works!!!!
+		java.io.File workspaceDirectory = new java.io.File(workspaceHome);
+
+		if (workspaceDirectory.isDirectory() != true)
+		{
+			throw new RuntimeException("Directory: " + workspaceHome + " as set in Blackboard.properties is not a directory");
+		}
+
+		java.io.File[] directoryFiles = workspaceDirectory.listFiles();
+
+		for (int i = 0; i < directoryFiles.length; i++)
+		{
+			if (directoryFiles[i].isDirectory() == true)
+			{
+				processEventPlans(directoryFiles[i]);
+			}
+		}
 
 		setBlackboardExecutor(new ThreadPoolExecutor(getMaxBlackboardThread(), getMaxBlackboardThread(), 100, TimeUnit.SECONDS,
 			new LinkedBlockingQueue()));
@@ -277,49 +290,46 @@ public class Blackboard
 							try
 							{
 								readOnlyWorkspaceContext = new ReadOnlyWorkspaceContext(_targetSpace);
-								PlanPredicate planPredicate = plan.getPlanPredicate();
 								activePlanSet.add(plan);
 
-								if (planPredicate.isFinished(readOnlyWorkspaceContext) == false)
+								if (_targetSpace.isFinished(plan) == false)
 								{
-									if (planPredicate.isInterested(readOnlyWorkspaceContext) == true)
+									if (logger.isDebugEnabled() == true)
 									{
-										if (logger.isDebugEnabled() == true)
-										{
-											logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() + " plan: " + plan.getName() + " is about to be executed.");
-										}
+										logger.debug("For workspace: " +
+											_targetSpace.getWorkspaceIdentifier() + " plan: " +
+											plan.getName() + " is about to be executed.");
+									}
 
-										_targetSpace.setExecuting(plan);
+									_targetSpace.setExecuting(plan);
 
-										try
-										{
-											workspaceContext = new WorkspaceContext(_targetSpace, plan);
+									try
+									{
+										workspaceContext = new WorkspaceContext(_targetSpace, plan);
 
-											_targetSpace.getWorkspaceWriteLock().lock();
-											plan.execute(workspaceContext);
-											_targetSpace.setLastActiveTime(System.currentTimeMillis());
-										}
-										finally
-										{
-											workspaceContext.expire();
+										_targetSpace.getWorkspaceWriteLock().lock();
+										_targetSpace.setPlanState(plan, plan.execute(workspaceContext));
+										_targetSpace.setLastActiveTime(System.currentTimeMillis());
+									}
+									finally
+									{
+										workspaceContext.expire();
 
-											//Keep track of the state of
-											//the workspace when this plan
-											//was finished. Later on we
-											//will check to see if the
-											//workspace had been changed by
-											//other plans since this plan
-											//was last run.
+										//Keep track of the state of
+										//the workspace when this plan
+										//was finished. Later on we
+										//will check to see if the
+										//workspace had been changed by
+										//other plans since this plan
+										//was last run.
 
-											_targetSpace.getWorkspaceWriteLock().unlock();
-										}
+										_targetSpace.getWorkspaceWriteLock().unlock();
 									}
 
 									planToChangeInfoCountMap.put(plan, new Integer(_targetSpace.getChangeInfoCount()));
 								}
 								else
 								{
-									_targetSpace.setFinished(plan);
 									activePlanSet.remove(plan);
 								}
 
@@ -348,39 +358,36 @@ public class Blackboard
 						try
 						{
 							plan = (Plan) activePlans.next();							
-							PlanPredicate planPredicate = plan.getPlanPredicate();
-							readOnlyWorkspaceContext = new ReadOnlyWorkspaceContext(_targetSpace);
 
 							if (logger.isDebugEnabled() == true)
 							{
-								logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() +  " plan: " + plan.getName() + " is an active plan.");
+								logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() +
+											 " plan: " + plan.getName() + " is an active plan.");
 							}
 							
-							if (planPredicate.isFinished(readOnlyWorkspaceContext) == true)
+							if (_targetSpace.isFinished(plan) == true)
 							{
 								if (logger.isDebugEnabled() == true)
 								{
-									logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() +  " plan: " + plan.getName() + " is now a finished plan.");
+									logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() +
+										" plan: " + plan.getName() + " is now a finished plan.");
 								}
 
-								_targetSpace.setFinished(plan);
 								activePlans.remove();
 							}
 							else
 							{
 								if (logger.isDebugEnabled() == true)
 								{
-									logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() +  " plan: " + plan.getName() + " is still an active plan.");
+									logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() +
+										" plan: " + plan.getName() + " is still an active plan.");
 								}
 								
-								_targetSpace.setActive(plan);
-
 								int planChangeCount = 0;
 								Integer planChangeCountInteger = (Integer) planToChangeInfoCountMap.get(plan);
 								planChangeCount = planChangeCountInteger.intValue();
 
-								if (planPredicate.isInterested(readOnlyWorkspaceContext) &&
-									  _targetSpace.getChangeInfoCount() > planChangeCount)
+								if (_targetSpace.getChangeInfoCount() > planChangeCount)
 								{
 									//Plan is interested in the
 									//workspace and there have been
@@ -389,7 +396,8 @@ public class Blackboard
 
 									if (logger.isDebugEnabled() == true)
 									{
-										logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() + " notifying plans for plan: " + plan.getName());
+										logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() +
+											" notifying plans for plan: " + plan.getName());
 									}
 
 									notifyPlans = true;
@@ -398,14 +406,16 @@ public class Blackboard
 								{
 									if (logger.isDebugEnabled() == true)
 									{
-										logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() + " NOT notifying plans for plan: " + plan.getName());
+										logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() +
+											" NOT notifying plans for plan: " + plan.getName());
 									}
 								}
 							}
 
 							if (logger.isDebugEnabled() == true)
 							{
-								logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() + " setting workspace as executed.");
+								logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() +
+											 " setting workspace as executed.");
 							}
 						}
 						finally
@@ -465,19 +475,6 @@ public class Blackboard
 				}
 			}
 		});
-	}
-
-	private void executeExclusively(Plan _plan, TargetSpace _targetSpace, WorkspaceContext _workspaceContext)
-	{
-		try
-		{
-			_targetSpace.getWorkspaceWriteLock().lock();
-			_plan.execute(_workspaceContext);
-		}
-		finally
-		{
-			_targetSpace.getWorkspaceWriteLock().unlock();
-		}
 	}
 
 	private void acquireBlackboardReadLock()
@@ -568,56 +565,94 @@ public class Blackboard
 		);
 	}
 
-	private void add(Object _event)
-		throws Exception
+	private String[] determineEventNames(Object _event)
 	{
-		if (logger.isDebugEnabled() == true)
-		{
-			logger.debug("Object identified by class: " + _event.getClass() + " was added on the blackboard.");
-		}
-		
-		Class[] typeArray = getAllTypes(_event.getClass());
+		Class eventClass = _event.getClass();
+		String[] nameArray = null;
 
-		boolean foundEventConfiguration = false;
-		
-		for (int i = 0; i < typeArray.length; i++)
+		if (eventClass.isAnnotationPresent(Event.class) == true)
 		{
-			EventConfiguration eventConfiguration = (EventConfiguration) getEventConfigurationMap().get(typeArray[i].getName());
+			Event event = (Event) eventClass.getAnnotation(Event.class);
 
-			if (eventConfiguration != null)
+			if (event.name() != null)
 			{
-				foundEventConfiguration = true;
+				nameArray = event.name().split(",");
+			}
+		}
 
-				String eventName = eventConfiguration.getName();
+		return nameArray;
+	}
 
+	private String determineWorkspaceIdentifierName(Object _event)
+	{
+		Class eventClass = _event.getClass();
+		String propertyName = null;
+
+		if (eventClass.isAnnotationPresent(Event.class) == true)
+		{
+			Event event = (Event) eventClass.getAnnotation(Event.class);
+
+			if (event.workspaceIdentifier() != null)
+			{
+				propertyName = event.workspaceIdentifier();
+			}
+		}
+
+		return propertyName;
+	}
+	
+	private void add(Object _event)
+	{
+		try
+		{
+			if (logger.isDebugEnabled() == true)
+			{
+				logger.debug("Object identified by class: " +
+							 _event.getClass() + " was added on the blackboard.");
+			}
+
+			boolean foundEventConfiguration = false;
+
+			String[] eventNames = determineEventNames(_event);
+
+			if (eventNames == null || eventNames.length == 0)
+			{
+				throw new RuntimeException("Unknown event: " + _event);
+			}
+
+			for (String eventName: eventNames)
+			{
 				if (logger.isDebugEnabled() == true)
 				{
 					logger.debug("Object of class: " + _event.getClass() +
-							 " as type: " + typeArray[i] + 
 								 " is event " + eventName + " .");
 				}
 
-				List workspaceConfigurationList = (List) getEventToWorkspaceMap().get(typeArray[i].getName());
+				List workspaceConfigurationList = (List) getEventToWorkspaceMap().get(eventName);
 
 				for (int j = 0; j < workspaceConfigurationList.size(); j++)
 				{
 					WorkspaceConfiguration workspaceConfiguration = (WorkspaceConfiguration) workspaceConfigurationList.get(j);
-					
-					Object workspaceIdentifier = PropertyUtils.getProperty(_event, eventConfiguration.getWorkspaceIdentifierName());
-					addToTargetSpace(workspaceConfiguration, workspaceIdentifier, eventConfiguration.getName(), _event);
+
+					Object workspaceIdentifier = PropertyUtils.getProperty(_event, determineWorkspaceIdentifierName(_event));
+					addToTargetSpace(workspaceConfiguration, workspaceIdentifier, eventName, _event);
 				}
 			}
-		}
 
-		if (foundEventConfiguration == false)
+			if (foundEventConfiguration == false)
+			{
+				logger.error("Object identified by class: " + _event.getClass() + " was not processed as it is not defined as an event.");
+			}
+		}
+		catch(Throwable t)
 		{
-			logger.error("Object identified by class: " + _event.getClass() + " was not processed as it is not defined as an event.");
+			throw new RuntimeException(t);
 		}
 	}
 
 	protected void addToTargetSpace(WorkspaceConfiguration _workspaceConfiguration,
-								  Object _workspaceIdentifier, String _eventName, Object _event)
-		throws Exception
+									Object _workspaceIdentifier, String _eventName, Object _event)
+			throws Exception
 	{
 		try
 		{
@@ -645,7 +680,7 @@ public class Blackboard
 					{
 						if (getTargetSpaceMap().keySet().contains(_workspaceIdentifier) == true)
 						{
-							targetSpace = retrieveTargetSpaceFromStore(_workspaceConfiguration.getName(), _workspaceIdentifier);
+							targetSpace = retrieveTargetSpaceFromStore(_workspaceIdentifier);
 						}
 						else if (getTargetSpaceMap().keySet().contains(_workspaceIdentifier) == false)
 						{
@@ -973,10 +1008,10 @@ public class Blackboard
 		}
 	}
 
-	private TargetSpace retrieveTargetSpaceFromStore(String _name, Object _workspaceIdentifier)
+	private TargetSpace retrieveTargetSpaceFromStore(Object _workspaceIdentifier)
 	{
 		ObjectContainer targetSpaceDatabase = null;
-		TargetSpace targetSpace = new TargetSpaceImpl(_name, _workspaceIdentifier);
+		TargetSpace targetSpace = new TargetSpaceImpl(_workspaceIdentifier);
 
 		try
 		{
@@ -985,18 +1020,17 @@ public class Blackboard
 
 			if (objectSet.size() > 1)
 			{
-				logger.warn("Retrieved more than one workspace with name: " + _name + " and identifier: " + _workspaceIdentifier);
+				logger.warn("Retrieved more than one workspace with identifier: " + _workspaceIdentifier);
 			}
 			else if (objectSet.size() == 0)
 			{
-				throw new RuntimeException("Unable to retrieve workspace with name: " + _name + " and identifier: " + _workspaceIdentifier);
+				throw new RuntimeException("Unable to retrieve workspace with identifier: " + _workspaceIdentifier);
 			}
 			else
 			{
 				if (logger.isDebugEnabled() == true)
 				{
-					logger.debug("Found exactly one workspace for retrieval identified by: " + _name +
-								 " and identifier: " + _workspaceIdentifier);
+					logger.debug("Found exactly one workspace for retrieval identified by: " + _workspaceIdentifier);
 				}
 			}
 
@@ -1004,7 +1038,7 @@ public class Blackboard
 
 			if (targetSpace == null)
 			{
-				throw new RuntimeException("Null found while retrieving workspace with name: " + _name + " and identifier: " + _workspaceIdentifier);
+				throw new RuntimeException("Null found while retrieving workspace with identifier: " + _workspaceIdentifier);
 			}
 		}
 		catch(Throwable t)
@@ -1049,5 +1083,32 @@ public class Blackboard
 	protected void releaseTargetSpace(Object _id)
 	{
 		getTargetSpaceGuard().releaseLock(_id);
+	}
+
+	protected void processEventPlans(java.io.File _eventPlanDirectory)
+	{
+		WorkspaceConfiguration workspaceConfiguration = new WorkspaceConfiguration();
+		workspaceConfiguration.setPlanSet(new java.util.HashSet<Plan>());
+		workspaceConfiguration.setDoNotPersistSet(new java.util.HashSet<String>());
+
+		java.io.File[] planArray = _eventPlanDirectory.listFiles();
+
+		for (int i = 0; i < planArray.length; i++)
+		{
+			if (planArray[i].isDirectory() == false && planArray[i].getName().endsWith(".js") == true)
+			{
+				workspaceConfiguration.getPlanSet().add(new JavaScriptPlan(planArray[i].getName()));
+			}
+		}
+
+		getEventToWorkspaceMap().put(extractEventName(_eventPlanDirectory.getName()), workspaceConfiguration);
+	}
+
+	protected String extractEventName(String _pathName)
+	{
+		String pathName = _pathName.replaceAll(java.io.File.separator + "$", "");
+		String[] tokenArray = pathName.split(java.io.File.separator);
+
+		return tokenArray[tokenArray.length - 1];
 	}
 }

@@ -19,15 +19,12 @@ package com.lucidtechnics.blackboard.config;
 public class EventConfiguration
 {
 	private String name;
-	private String eventClass;
 	private String workspaceIdentifierName;
 
 	public String getName() { return name; }
-	public String getEventClass() { return eventClass; }
 	public String getWorkspaceIdentifierName() { return workspaceIdentifierName; }
 
 	public void setName(String _name) { name = _name; }
-	public void setEventClass(String _eventClass) { eventClass = _eventClass; }
 	public void setWorkspaceIdentifierName(String _workspaceIdentifierName) { workspaceIdentifierName = _workspaceIdentifierName; }
 
 	public EventConfiguration() {}

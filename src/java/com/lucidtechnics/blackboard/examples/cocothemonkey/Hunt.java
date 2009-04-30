@@ -25,7 +25,6 @@ import com.lucidtechnics.blackboard.Workspace;
 import com.lucidtechnics.blackboard.ChangeInfo;
 
 public class Hunt
-   implements Plan
 {
 	private static Log logger = LogFactory.getLog(Hunt.class);
 

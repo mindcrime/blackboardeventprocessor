@@ -41,93 +41,82 @@ public class TargetSpaceTimeoutPlan
 
 	public String getName() { return getPlanName(); }
 
-	public void execute(Workspace _workspace)
+	public boolean execute(Workspace _workspace)
 	{
-		List targetSpaceTimeoutEventList = _workspace.getTargetHistory("Blackboard.TargetSpaceTimeoutEvent");
-
-		for (int i = 0; i < targetSpaceTimeoutEventList.size(); i++)
+		if (_workspace.has("Blackboard.TargetSpaceTimeoutEvent") == true)
 		{
-			TargetSpaceTimeoutEvent targetSpaceTimeoutEvent = (TargetSpaceTimeoutEvent) targetSpaceTimeoutEventList.get(i);
-			TargetSpace targetSpace = targetSpaceTimeoutEvent.getTargetSpace();
-			WorkspaceConfiguration workspaceConfiguration = targetSpaceTimeoutEvent.getWorkspaceConfiguration();
-			Blackboard blackboard = targetSpaceTimeoutEvent.getBlackboard();
-			
-			long currentTimeMillis = System.currentTimeMillis();
-			long timeoutTimeMillis = workspaceConfiguration.getWorkspaceTimeoutInSeconds();
-			long newTimeoutTimeMillis = currentTimeMillis + timeoutTimeMillis;
+			List targetSpaceTimeoutEventList = _workspace.getTargetHistory("Blackboard.TargetSpaceTimeoutEvent");
 
-			boolean targetSpaceGuarded = false;
-
-			try
+			for (int i = 0; i < targetSpaceTimeoutEventList.size(); i++)
 			{
-				targetSpaceGuarded = blackboard.guardTargetSpace(targetSpace.getWorkspaceIdentifier(), false);
+				TargetSpaceTimeoutEvent targetSpaceTimeoutEvent = (TargetSpaceTimeoutEvent) targetSpaceTimeoutEventList.get(i);
+				TargetSpace targetSpace = targetSpaceTimeoutEvent.getTargetSpace();
+				WorkspaceConfiguration workspaceConfiguration = targetSpaceTimeoutEvent.getWorkspaceConfiguration();
+				Blackboard blackboard = targetSpaceTimeoutEvent.getBlackboard();
 
-				if (targetSpaceGuarded == true)
+				long currentTimeMillis = System.currentTimeMillis();
+				long timeoutTimeMillis = workspaceConfiguration.getWorkspaceTimeoutInSeconds();
+				long newTimeoutTimeMillis = currentTimeMillis + timeoutTimeMillis;
+
+				boolean targetSpaceGuarded = false;
+
+				try
 				{
-					if (targetSpace.isRetired() == true ||
-						  targetSpace.isCompleted() == true ||
-						  targetSpace.isTerminated() == true)
-					{
-						//do nothing
-					}
-					else
-					{
-						long lastActiveTimeMillis = targetSpace.getLastActiveTime();
-						long inactivityTimeMillis = currentTimeMillis - lastActiveTimeMillis;
+					targetSpaceGuarded = blackboard.guardTargetSpace(targetSpace.getWorkspaceIdentifier(), false);
 
-						if (timeoutTimeMillis <= inactivityTimeMillis)
+					if (targetSpaceGuarded == true)
+					{
+						if (targetSpace.isRetired() == true ||
+							  targetSpace.isCompleted() == true ||
+							  targetSpace.isTerminated() == true)
 						{
-							targetSpace.setTerminated();
-
-							try
-							{
-								blackboard.acquireBlackboardWriteLock();
-								blackboard.removeFromBlackboard(targetSpace, false);
-							}
-							finally
-							{
-								blackboard.releaseBlackboardWriteLock();
-							}
-
-							blackboard.retireTargetSpace(targetSpace);
+							//do nothing
 						}
 						else
 						{
-							//reset timeout period
-							long remainingTimeMillis = timeoutTimeMillis - inactivityTimeMillis;
-							_workspace.schedulePlaceOnBlackboard(targetSpaceTimeoutEvent, remainingTimeMillis);
+							long lastActiveTimeMillis = targetSpace.getLastActiveTime();
+							long inactivityTimeMillis = currentTimeMillis - lastActiveTimeMillis;
+
+							if (timeoutTimeMillis <= inactivityTimeMillis)
+							{
+								targetSpace.setTerminated();
+
+								try
+								{
+									blackboard.acquireBlackboardWriteLock();
+									blackboard.removeFromBlackboard(targetSpace, false);
+								}
+								finally
+								{
+									blackboard.releaseBlackboardWriteLock();
+								}
+
+								blackboard.retireTargetSpace(targetSpace);
+							}
+							else
+							{
+								//reset timeout period
+								long remainingTimeMillis = timeoutTimeMillis - inactivityTimeMillis;
+								_workspace.schedulePlaceOnBlackboard(targetSpaceTimeoutEvent, remainingTimeMillis);
+							}
 						}
 					}
+					else
+					{
+						//this means that it is currenty active so
+						//reset timeout period
+						_workspace.schedulePlaceOnBlackboard(targetSpaceTimeoutEvent, newTimeoutTimeMillis);
+					}
 				}
-				else
+				finally
 				{
-					//this means that it is currenty active so
-					//reset timeout period
-					_workspace.schedulePlaceOnBlackboard(targetSpaceTimeoutEvent, newTimeoutTimeMillis);
+					if (targetSpaceGuarded == true) { blackboard.releaseTargetSpace(targetSpace.getWorkspaceIdentifier()); }
 				}
 			}
-			finally
-			{
-				if (targetSpaceGuarded == true) { blackboard.releaseTargetSpace(targetSpace.getWorkspaceIdentifier()); }
-			}
+
+			_workspace.clearTargetHistory("Blackboard.targetSpaceTimeoutEvent");
 		}
 
-		_workspace.clearTargetHistory("Blackboard.targetSpaceTimeoutEvent");
+		return false;
 	}
-
-	public PlanPredicate getPlanPredicate()
-	{
-		return new PlanPredicate()
-		{			
-			public boolean isInterested(Workspace _workspace)
-			{
-				return 	(_workspace.has("Blackboard.TargetSpaceTimeoutEvent") == true);
-			}
-
-			public boolean isFinished(Workspace _workspace)
-			{
-				return false;
-			}
-		};
-	}	
 }

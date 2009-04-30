@@ -16,8 +16,23 @@ package com.lucidtechnics.blackboard;
 * limitations under the License.
 */
 
-public interface Plan
-   extends Actor
+public class JavaScriptPlan
+   implements Plan
 {
-	public boolean execute(Workspace _workspace);
+	private String name;
+
+	protected JavaScriptPlan(String _name)
+	{
+		setName(_name);
+	}
+	
+	public String getName() { return name; }
+	public void setName(String _name) { name = _name; }
+	
+	public boolean execute(Workspace _workspace)
+	{
+		System.out.println("Executing Plan: " + getName());
+
+		return true;
+	}
 }

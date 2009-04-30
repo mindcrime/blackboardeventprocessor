@@ -150,6 +150,13 @@
 		       basedir="${classes}"
 			   excludes="**\*Test.class,**\*TestSuite.class"
 		  />
+		
+		<jar destfile="${dist}/lib/${blackboardJar}"
+		       basedir="${workspace}"
+			   includes="**\*\Blackboard.properties"
+			   update="true"
+		  />
+
 		<jar destfile="${dist}/lib/${blackboardTestJar}"
 		       basedir="${classes}"
 		  />

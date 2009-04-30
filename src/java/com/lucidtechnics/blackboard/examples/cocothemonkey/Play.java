@@ -24,7 +24,6 @@ import com.lucidtechnics.blackboard.PlanPredicate;
 import com.lucidtechnics.blackboard.Workspace;
 
 public class Play
-   implements Plan
 {
 	private static Log logger = LogFactory.getLog(Play.class);
 

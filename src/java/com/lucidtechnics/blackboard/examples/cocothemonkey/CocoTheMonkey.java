@@ -16,10 +16,6 @@
 
 package com.lucidtechnics.blackboard.examples.cocothemonkey;
 
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.beans.factory.xml.XmlBeanFactory;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -47,12 +43,7 @@ public class CocoTheMonkey
 	{
 		try
 		{
-			String configurationFile = _args[0];
-
-			Resource resource = new FileSystemResource(configurationFile);
-			XmlBeanFactory xmlBeanFactory = new XmlBeanFactory(resource);
-
-			final Blackboard blackboard = (Blackboard) xmlBeanFactory.getBean("blackboard");
+			final Blackboard blackboard = new Blackboard();
 			blackboard.init();
 
 			logger.info("Starting Coco The Monkey");
@@ -67,7 +58,7 @@ public class CocoTheMonkey
 						try { blackboard.wait(); } catch (InterruptedException e) {}
 					}
 
-					for (int i = 0; i < 20; i++)
+					for (int i = 0; i < 200; i++)
 					{						
 						Monkey monkey = new Monkey("Coco-1-" + i);
 						Fruit fruit = new Mango("Coco-2-" + i);
@@ -91,7 +82,7 @@ public class CocoTheMonkey
 						try { blackboard.wait(); } catch (InterruptedException e) {}
 					}
 
-					for (int i = 0; i < 20; i++)
+					for (int i = 0; i < 200; i++)
 					{
 						Monkey monkey = new Monkey("Coco-4-" + i);
 						Fruit fruit = new Mango("Coco-1-" + i);
@@ -115,7 +106,7 @@ public class CocoTheMonkey
 						try { blackboard.wait(); } catch (InterruptedException e) {}
 					}
 
-					for (int i = 0; i < 20; i++)
+					for (int i = 0; i < 200; i++)
 					{
 						Monkey monkey = new Monkey("Coco-3-" + i);
 						Fruit fruit = new Mango("Coco-4-" + i);

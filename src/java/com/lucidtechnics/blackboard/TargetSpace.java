@@ -296,6 +296,18 @@ public abstract class TargetSpace
 		getPlanStateMap().put(_plan, new Integer(PlanState.ACTIVE));
 	}
 
+	protected void setPlanState(Plan _plan, boolean _isFinished)
+	{
+		if (_isFinished == true)
+		{
+			setFinished(_plan);
+		}
+		else
+		{
+			setActive(_plan);
+		}
+	}
+
 	protected void addPlans(Set _planSet)
 	{
 		if (_planSet != null)

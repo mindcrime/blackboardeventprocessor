@@ -1,9 +1,8 @@
 #Blackboard parameters
-rootDir=..
+rootDir=.
 rootDeployDir=${rootDir}/deploy
 
 version=alpha-0.10
 blackboardDeployDir=${rootDeployDir}
-workspace=${blackboardDeployDir}/workspace
 config=${blackboardDeployDir}/cfg
 log=${blackboardDeployDir}/log

@@ -25,7 +25,6 @@ import com.lucidtechnics.blackboard.Workspace;
 import com.lucidtechnics.blackboard.Target;
 
 public class Eat
-   implements Plan
 {
 	private static Log logger = LogFactory.getLog(Eat.class);
 

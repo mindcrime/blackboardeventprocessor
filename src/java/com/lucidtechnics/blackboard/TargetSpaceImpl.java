@@ -43,10 +43,9 @@ public class TargetSpaceImpl
 		setChangeInfoHistory(new ChangeInfoHistory());
 	}
 	
-	public TargetSpaceImpl(String _name, Object _workspaceIdentifier)
+	public TargetSpaceImpl(Object _workspaceIdentifier)
 	{
 		this();
-		setName(_name);
 		setWorkspaceIdentifier(_workspaceIdentifier);
 	}
 	

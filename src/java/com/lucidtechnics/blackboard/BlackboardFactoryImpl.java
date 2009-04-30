@@ -30,20 +30,6 @@ public class BlackboardFactoryImpl
 
 	public TargetSpace createTargetSpace(WorkspaceConfiguration _workspaceConfiguration, Object _workspaceIdentifier)
 	{
-		TargetSpace targetSpace = null;
-		
-		String workspaceName = _workspaceConfiguration.getName();
-
-		if (_workspaceConfiguration.getIsTransactional() == false)
-		{
-			targetSpace = new TargetSpaceImpl(workspaceName, _workspaceIdentifier);
-		}
-		else
-		{
-			throw new RuntimeException("Transactional workspaces not supported at this time"); 
-			//TODO create a transactional supporting workspace
-		}
-
-		return targetSpace;
+		return new TargetSpaceImpl(_workspaceIdentifier);
 	}			
 }
