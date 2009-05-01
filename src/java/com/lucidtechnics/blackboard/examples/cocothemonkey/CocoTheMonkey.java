@@ -58,7 +58,7 @@ public class CocoTheMonkey
 						try { blackboard.wait(); } catch (InterruptedException e) {}
 					}
 
-					for (int i = 0; i < 200; i++)
+					for (int i = 0; i < 20; i++)
 					{						
 						Monkey monkey = new Monkey("Coco-1-" + i);
 						Fruit fruit = new Mango("Coco-2-" + i);
@@ -82,7 +82,7 @@ public class CocoTheMonkey
 						try { blackboard.wait(); } catch (InterruptedException e) {}
 					}
 
-					for (int i = 0; i < 200; i++)
+					for (int i = 0; i < 20; i++)
 					{
 						Monkey monkey = new Monkey("Coco-4-" + i);
 						Fruit fruit = new Mango("Coco-1-" + i);

@@ -153,7 +153,13 @@
 		
 		<jar destfile="${dist}/lib/${blackboardJar}"
 		       basedir="${workspace}"
-			   includes="**\*\Blackboard.properties"
+			   includes="**\Blackboard.properties"
+			   update="true"
+		  />
+
+		<jar destfile="${dist}/lib/${blackboardJar}"
+		       basedir="${src.cfg}"
+			   includes="**\log4j.xml"
 			   update="true"
 		  />
 

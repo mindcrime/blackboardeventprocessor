@@ -388,32 +388,32 @@ public abstract class TargetSpace
 	protected void setActive(Plan _plan)
 	{
 		int planState = PlanState.setActive(getPlanState(_plan));
-		getPlanStateMap().put(_plan, new Integer(planState));
+		getPlanStateMap().put(_plan, planState);
 	}
 
 	void setExecuting(Plan _plan)
 	{		
 		int planState = PlanState.setExecuting(getPlanState(_plan));
-		getPlanStateMap().put(_plan, new Integer(planState));
+		getPlanStateMap().put(_plan, planState);
 	}
 
 	protected void setExecuted(Plan _plan)
 	{
 		int planState = PlanState.setExecuted(getPlanState(_plan));
-		getPlanStateMap().put(_plan, new Integer(planState));
+		getPlanStateMap().put(_plan, planState);
 	}
 
 	protected void setFinished(Plan _plan)
 	{
 		int planState = PlanState.setFinished(getPlanState(_plan));
-		getPlanStateMap().put(_plan, new Integer(planState));
+		getPlanStateMap().put(_plan, planState);
 	}
 
 	protected void setErrored(Plan _plan, Throwable _t)
 	{
 		getExceptionSet().add(_t.toString());
 		int planState = PlanState.setErrored(getPlanState(_plan));
-		getPlanStateMap().put(_plan, new Integer(planState));
+		getPlanStateMap().put(_plan, planState);
 		if (getTerminateOnError() == true) { setTerminated(); }
 	}
 

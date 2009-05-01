@@ -75,31 +75,21 @@
     </layout>
   </appender>
   -->
-  <category name="com.georgetownsoftware.blackboard">
-	  <priority value="info"/>
-	  <appender-ref ref="BLACKBOARD_FILE"/>
-  </category>
-
-  <category name="org.springframework">
-	  <priority value="warn"/>
+  <category name="com.lucidtechnics.blackboard">
+	  <priority value="debug"/>
 	  <appender-ref ref="BLACKBOARD_FILE"/>
   </category>
   
-  <category name="com.georgetownsoftware.blackboard">
-	  <priority value="info"/>
+  <category name="com.lucidtechnics.blackboard">
+	  <priority value="debug"/>
 	  <appender-ref ref="STDOUT"/>
   </category>
 
-  <category name="com.georgetownsoftware.examples">
-	  <priority value="info"/>
+  <category name="com.lucidtechnics.examples">
+	  <priority value="debug"/>
 	  <appender-ref ref="STDOUT"/>
   </category>
-  
-  <category name="org.springframework">
-	  <priority value="warn"/>
-	  <appender-ref ref="STDOUT"/>
-  </category>
-    
+      
   <root>
   </root>
 </log4j:configuration>

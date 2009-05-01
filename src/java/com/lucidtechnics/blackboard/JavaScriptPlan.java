@@ -16,23 +16,47 @@ package com.lucidtechnics.blackboard;
 * limitations under the License.
 */
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.lucidtechnics.blackboard.util.JavascriptingUtil;
+
 public class JavaScriptPlan
    implements Plan
 {
-	private String name;
+	private static Log log = LogFactory.getLog(JavaScriptPlan.class);
 
-	protected JavaScriptPlan(String _name)
+	private String name;
+	private String path;
+
+	protected JavaScriptPlan(String _name, String _path)
 	{
 		setName(_name);
 	}
 	
 	public String getName() { return name; }
 	public void setName(String _name) { name = _name; }
+
+	public String getPath() { return path; }
+	public void setPath(String _path) { path = _path; }
 	
 	public boolean execute(Workspace _workspace)
 	{
-		System.out.println("Executing Plan: " + getName());
+		PlanContext planContext = new PlanContext();
 
-		return true;
+		JavascriptingUtil scriptingUtil = new JavascriptingUtil();
+
+		scriptingUtil.bind("PLAN_CONTEXT", planContext);
+		scriptingUtil.bind("WORKSPACE", _workspace);
+
+		String[] scriptResources = new String[1];
+
+		scriptResources[0] = getPath();
+
+		scriptingUtil.executeScriptResource(scriptResources);
+
+		log.info("Completed JavaScript  execution for plan: " + getName());
+
+		return planContext.isFinished();
 	}
 }

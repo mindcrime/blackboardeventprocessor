@@ -67,7 +67,7 @@ public class Blackboard
 	private ThreadPoolExecutor managerExecutor;
 	private ThreadPoolExecutor persistenceExecutor;
 	private Set workspaceConfigurationSet;
-	private Map eventToWorkspaceMap;
+	private Map<String, WorkspaceConfiguration> eventToWorkspaceMap;
 	private Map eventConfigurationMap;
 	private Map targetSpaceMap; //workspace identifier --> target space
 	private Guard targetSpaceGuard;
@@ -96,7 +96,7 @@ public class Blackboard
 	private ThreadPoolExecutor getWorkspaceExecutor() { return workspaceExecutor; }
 	private ThreadPoolExecutor getManagerExecutor() { return managerExecutor; }
 	private ThreadPoolExecutor getPersistenceExecutor() { return persistenceExecutor; }
-	private Map getEventToWorkspaceMap() { return eventToWorkspaceMap; }
+	private Map<String, WorkspaceConfiguration> getEventToWorkspaceMap() { return eventToWorkspaceMap; }
 	private Map getEventConfigurationMap() { return eventConfigurationMap; }
 	private ReentrantReadWriteLock getBlackboardReadWriteLock() { return blackboardReadWriteLock; }
 	private Lock getBlackboardReadLock() { return blackboardReadLock; }
@@ -124,7 +124,7 @@ public class Blackboard
 	private void setWorkspaceExecutor(ThreadPoolExecutor _workspaceExecutor) { workspaceExecutor = _workspaceExecutor; }
 	private void setManagerExecutor(ThreadPoolExecutor _managerExecutor) { managerExecutor = _managerExecutor; }
 	private void setPersistenceExecutor(ThreadPoolExecutor _persistenceExecutor) { persistenceExecutor = _persistenceExecutor; }
-	private void setEventToWorkspaceMap(Map _eventToWorkspaceMap) { eventToWorkspaceMap = _eventToWorkspaceMap; }
+	private void setEventToWorkspaceMap(Map<String, WorkspaceConfiguration> _eventToWorkspaceMap) { eventToWorkspaceMap = _eventToWorkspaceMap; }
 	private void setEventConfigurationMap(Map _eventConfigurationMap) { eventConfigurationMap = _eventConfigurationMap; }
 	private void setBlackboardReadWriteLock(ReentrantReadWriteLock _blackboardReadWriteLock) { blackboardReadWriteLock = _blackboardReadWriteLock; }
 	private void setBlackboardReadLock(Lock _blackboardReadLock) { blackboardReadLock = _blackboardReadLock; }
@@ -309,6 +309,19 @@ public class Blackboard
 
 										_targetSpace.getWorkspaceWriteLock().lock();
 										_targetSpace.setPlanState(plan, plan.execute(workspaceContext));
+
+										if (_targetSpace.isFinished(plan) == true)
+										{
+											if (logger.isDebugEnabled() == true)
+											{
+												logger.debug("For workspace: " +
+													_targetSpace.getWorkspaceIdentifier() + " plan: " +
+													plan.getName() + " ran once and is now finished Bediako.");
+
+												logger.debug("Bedsman the target space is now: " + _targetSpace);
+											}
+										}
+										
 										_targetSpace.setLastActiveTime(System.currentTimeMillis());
 									}
 									finally
@@ -330,6 +343,14 @@ public class Blackboard
 								}
 								else
 								{
+									if (logger.isDebugEnabled() == true)
+									{
+										logger.debug("For workspace: " +
+											_targetSpace.getWorkspaceIdentifier() + " plan: " +
+											plan.getName() + " is finished.");
+									}
+
+									
 									activePlanSet.remove(plan);
 								}
 
@@ -348,6 +369,12 @@ public class Blackboard
 							finally
 							{
 								_targetSpace.setExecuted(plan);
+
+								if (_targetSpace.isFinished(plan) == true && activePlanSet.contains(plan) == true)
+								{
+									activePlanSet.remove(plan);
+								}
+
 								readOnlyWorkspaceContext.expire();
 							}
 						}
@@ -628,15 +655,10 @@ public class Blackboard
 								 " is event " + eventName + " .");
 				}
 
-				List workspaceConfigurationList = (List) getEventToWorkspaceMap().get(eventName);
+				WorkspaceConfiguration workspaceConfiguration = getEventToWorkspaceMap().get(eventName);
 
-				for (int j = 0; j < workspaceConfigurationList.size(); j++)
-				{
-					WorkspaceConfiguration workspaceConfiguration = (WorkspaceConfiguration) workspaceConfigurationList.get(j);
-
-					Object workspaceIdentifier = PropertyUtils.getProperty(_event, determineWorkspaceIdentifierName(_event));
-					addToTargetSpace(workspaceConfiguration, workspaceIdentifier, eventName, _event);
-				}
+				Object workspaceIdentifier = PropertyUtils.getProperty(_event, determineWorkspaceIdentifierName(_event));
+				addToTargetSpace(workspaceConfiguration, workspaceIdentifier, eventName, _event);
 			}
 
 			if (foundEventConfiguration == false)
@@ -685,6 +707,8 @@ public class Blackboard
 						else if (getTargetSpaceMap().keySet().contains(_workspaceIdentifier) == false)
 						{
 							targetSpace = getBlackboardFactory().createTargetSpace(_workspaceConfiguration, _workspaceIdentifier);
+							String workspaceIdentifierString = (_workspaceIdentifier == null) ? "null" : _workspaceIdentifier.toString(); 
+							targetSpace.setName(_eventName + workspaceIdentifierString);
 							targetSpace.addPlans(_workspaceConfiguration.getPlanSet());
 						}
 
@@ -1004,7 +1028,7 @@ public class Blackboard
 		}
 		finally
 		{
-			targetSpaceDatabase.close();
+			if (targetSpaceDatabase != null)  { targetSpaceDatabase.close(); }
 		}
 	}
 
@@ -1097,7 +1121,7 @@ public class Blackboard
 		{
 			if (planArray[i].isDirectory() == false && planArray[i].getName().endsWith(".js") == true)
 			{
-				workspaceConfiguration.getPlanSet().add(new JavaScriptPlan(planArray[i].getName()));
+				workspaceConfiguration.getPlanSet().add(new JavaScriptPlan(planArray[i].getName(), planArray[i].getAbsolutePath()));
 			}
 		}
 

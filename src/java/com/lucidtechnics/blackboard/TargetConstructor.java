@@ -96,14 +96,14 @@ public class TargetConstructor
 
 		String[] superClassNameParts = superClassName.split("/");
 		String simpleClassName = superClassNameParts[superClassNameParts.length - 1];
-		String blackboardSubClassName = "com/georgetownsoftware/blackboard/wrapper/" + superClassName  + "Wrapper";
+		String blackboardSubClassName = "com/lucidtechnics/blackboard/wrapper/" + superClassName  + "Wrapper";
 		
 		classWriter.visit(Opcodes.V1_5,
 				  Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER,
 				  blackboardSubClassName,
 				  null,
 				  superClassName,
-				  new String[] { "com/georgetownsoftware/blackboard/Target" });
+				  new String[] { "com/lucidtechnics/blackboard/Target" });
 
 		classWriter.visitSource(simpleClassName, null);
 
@@ -113,7 +113,7 @@ public class TargetConstructor
 		}
 
 		{
-			fieldVisitor = classWriter.visitField(Opcodes.ACC_PRIVATE, "intercepter", "Lcom/georgetownsoftware/blackboard/Intercepter;", null, null);
+			fieldVisitor = classWriter.visitField(Opcodes.ACC_PRIVATE, "intercepter", "Lcom/lucidtechnics/blackboard/Intercepter;", null, null);
 			fieldVisitor.visitEnd();
 		}
 
@@ -134,12 +134,12 @@ public class TargetConstructor
 		{
 			methodVisitor = classWriter.visitMethod(Opcodes.ACC_PUBLIC,
 													"getIntercepter",
-													"()Lcom/georgetownsoftware/blackboard/Intercepter;",
+													"()Lcom/lucidtechnics/blackboard/Intercepter;",
 													null,
 													null);
 			methodVisitor.visitCode();
 			methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
-			methodVisitor.visitFieldInsn(Opcodes.GETFIELD, blackboardSubClassName, "intercepter", "Lcom/georgetownsoftware/blackboard/Intercepter;");
+			methodVisitor.visitFieldInsn(Opcodes.GETFIELD, blackboardSubClassName, "intercepter", "Lcom/lucidtechnics/blackboard/Intercepter;");
 			methodVisitor.visitInsn(Opcodes.ARETURN);
 			methodVisitor.visitMaxs(0, 0);
 			methodVisitor.visitEnd();
@@ -163,13 +163,13 @@ public class TargetConstructor
 		{
 			methodVisitor = classWriter.visitMethod(Opcodes.ACC_PUBLIC,
 													"setIntercepter",
-													"(Lcom/georgetownsoftware/blackboard/Intercepter;)V",
+													"(Lcom/lucidtechnics/blackboard/Intercepter;)V",
 													null,
 													null);
 			methodVisitor.visitCode();
 			methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
 			methodVisitor.visitVarInsn(Opcodes.ALOAD, 1);
-			methodVisitor.visitFieldInsn(Opcodes.PUTFIELD, blackboardSubClassName, "intercepter", "Lcom/georgetownsoftware/blackboard/Intercepter;");
+			methodVisitor.visitFieldInsn(Opcodes.PUTFIELD, blackboardSubClassName, "intercepter", "Lcom/lucidtechnics/blackboard/Intercepter;");
 			methodVisitor.visitInsn(Opcodes.RETURN);
 			methodVisitor.visitMaxs(0, 0);
 			methodVisitor.visitEnd();
@@ -208,7 +208,7 @@ public class TargetConstructor
 					exceptionTypeArray);
 
 				methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
-				methodVisitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, blackboardSubClassName, "getIntercepter", "()Lcom/georgetownsoftware/blackboard/Intercepter;");
+				methodVisitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, blackboardSubClassName, "getIntercepter", "()Lcom/lucidtechnics/blackboard/Intercepter;");
 				Label l1 = new Label();
 				methodVisitor.visitJumpInsn(Opcodes.IFNULL, l1);
 
@@ -216,7 +216,7 @@ public class TargetConstructor
 				methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
 				methodVisitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, blackboardSubClassName,
 								   "getIntercepter",
-								   "()Lcom/georgetownsoftware/blackboard/Intercepter;");
+								   "()Lcom/lucidtechnics/blackboard/Intercepter;");
 				
 				methodVisitor.visitLdcInsn(superClassName);
 				methodVisitor.visitLdcInsn(blackboardSubClassName);
@@ -231,7 +231,7 @@ public class TargetConstructor
 				{
 					//this is an object.
 					methodVisitor.visitMethodInsn(Opcodes.INVOKEINTERFACE,
-						"com/georgetownsoftware/blackboard/Intercepter",
+						"com/lucidtechnics/blackboard/Intercepter",
 						"monitor",
 						"(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V");
 				}
@@ -239,7 +239,7 @@ public class TargetConstructor
 				{
 					//it is a primitive.
 					methodVisitor.visitMethodInsn(Opcodes.INVOKEINTERFACE,
-						"com/georgetownsoftware/blackboard/Intercepter",
+						"com/lucidtechnics/blackboard/Intercepter",
 						"monitor",
 						"(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;" + parameterType + ")V");
 				}
@@ -334,10 +334,10 @@ public class TargetConstructor
 					exceptionTypeArray);
 
 				methodVisitor.visitCode();
-				methodVisitor.visitTypeInsn(Opcodes.NEW, "com/georgetownsoftware/blackboard/BlackboardException");
+				methodVisitor.visitTypeInsn(Opcodes.NEW, "com/lucidtechnics/blackboard/BlackboardException");
 				methodVisitor.visitInsn(Opcodes.DUP);
 				methodVisitor.visitLdcInsn("Unable to access protected methods on Blackboard object");
-				methodVisitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "com/georgetownsoftware/blackboard/BlackboardException", "<init>", "(Ljava/lang/String;)V");
+				methodVisitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "com/lucidtechnics/blackboard/BlackboardException", "<init>", "(Ljava/lang/String;)V");
 				methodVisitor.visitInsn(Opcodes.ATHROW);
 				methodVisitor.visitMaxs(0, 0);
 				methodVisitor.visitEnd();
@@ -349,7 +349,7 @@ public class TargetConstructor
 			methodVisitor.visitCode();
 			methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
 			methodVisitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, blackboardSubClassName, "getBlackboardObject", "()Ljava/lang/Object;");
-			methodVisitor.visitMethodInsn(Opcodes.INVOKESTATIC, "com/georgetownsoftware/blackboard/util/Utility", "toString", "(Ljava/lang/Object;)Ljava/lang/String;");
+			methodVisitor.visitMethodInsn(Opcodes.INVOKESTATIC, "com/lucidtechnics/blackboard/util/Utility", "toString", "(Ljava/lang/Object;)Ljava/lang/String;");
 			methodVisitor.visitInsn(getReturnOpcode("Ljava/lang/String;"));
 			methodVisitor.visitMaxs(0, 0);
 			methodVisitor.visitEnd();
