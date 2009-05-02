@@ -16,8 +16,6 @@
 
 package com.lucidtechnics.blackboard;
 
-import org.springframework.beans.factory.xml.XmlBeanFactory;
-
 import com.lucidtechnics.blackboard.config.WorkspaceConfiguration;
 
 public interface BlackboardFactory

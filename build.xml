@@ -75,6 +75,8 @@
 		<delete dir="${blackboardDeployDir}/lib" />
 		<delete dir="${blackboardDeployDir}/config" />
 		<delete dir="${blackboardDeployDir}/log" />
+		<delete dir="${blackboardHome}" />
+		<delete file="${workspace}/CocoTheMonkey.sh" />
 		<delete dir="${stage}" />
 
 	</target>
@@ -199,6 +201,18 @@
 		<copy todir="${config}">
 			<fileset dir="${stage.cfg}" includes="**/*.*" />
 		</copy>
+
+		<!-- copy blackboard example files -->
+		<copy todir="${blackboardHome}/workspaces">
+			<fileset dir="${src}/workspaces" includes="**/*" />
+		</copy>
+
+		<!-- copy blackboard example files -->
+		<copy todir="${workspace}">
+			<fileset dir="${src.shl}" includes="**/CocoTheMonkey.sh" />
+		</copy>
+
+		<chmod dir="${workspace}" includes="**/*.sh"  perm="ugo+rx"/>
 
 		<!-- Copy log4j config files -->
 

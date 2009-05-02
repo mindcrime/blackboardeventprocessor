@@ -14,15 +14,17 @@
 * limitations under the License.
 */
 
+importClass();
+
 var eagle = WORKSPACE.get("eagle");
 
 if ((WORKSPACE.has("hunter") === true) &&
 	(eagle !== undefined && eagle !== null) &&
-	  (eagle.perched === true)
+	  (eagle.perched === true))
 {
 		eagle.shot = true;
 		eagle.perched = false;
 		WORKSPACE.remove("eagle");
 
-		PLAN_CONTEXT.isFinished = (WORKSPACE.hasTargetAction("eagle", ChangeInfo.TARGET_REMOVED) === true);
+		PLAN_CONTEXT.isFinished = (WORKSPACE.hasTargetAction("eagle", TARGET_REMOVED) === true);
 }

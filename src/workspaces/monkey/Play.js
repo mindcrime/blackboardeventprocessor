@@ -14,9 +14,9 @@
 * limitations under the License.
 */
 
-if (WORKSPACE.has("monkey") == true) && (WORKSPACE.has("eagle") == false);
+if ((WORKSPACE.has("monkey") === true) && (WORKSPACE.has("eagle") === false))
 {
-	if (LOGGER.isDebugEnabled() == true)
+	if (LOGGER.isDebugEnabled() === true)
 	{
 		LOGGER.debug("Monkey playing now");
 	}

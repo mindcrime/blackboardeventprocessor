@@ -19,6 +19,7 @@ package com.lucidtechnics.blackboard;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.lucidtechnics.blackboard.ChangeInfo;
 import com.lucidtechnics.blackboard.util.JavascriptingUtil;
 
 public class JavaScriptPlan
@@ -32,6 +33,7 @@ public class JavaScriptPlan
 	protected JavaScriptPlan(String _name, String _path)
 	{
 		setName(_name);
+		setPath(_path);
 	}
 	
 	public String getName() { return name; }
@@ -48,15 +50,31 @@ public class JavaScriptPlan
 
 		scriptingUtil.bind("PLAN_CONTEXT", planContext);
 		scriptingUtil.bind("WORKSPACE", _workspace);
+		scriptingUtil.bind("LOGGER", log);
+
+		scriptingUtil.bind("WORKSPACE_CLEARED", ChangeInfo.WORKSPACE_CLEARED);
+		scriptingUtil.bind("TARGET_ADDED", ChangeInfo.TARGET_ADDED);
+		scriptingUtil.bind("TARGET_UPDATED", ChangeInfo.TARGET_UPDATED);
+		scriptingUtil.bind("TARGET_REMOVED", ChangeInfo.TARGET_REMOVED);
+		scriptingUtil.bind("ATTRIBUTE_SET", ChangeInfo.ATTRIBUTE_SET);
+		scriptingUtil.bind("NO_CHANGE", ChangeInfo.NO_CHANGE);
 
 		String[] scriptResources = new String[1];
 
 		scriptResources[0] = getPath();
 
+		if (log.isDebugEnabled() == true)
+		{
+			log.debug("JavaScript execution for plan: " + getPath());
+		}
+		
 		scriptingUtil.executeScriptResource(scriptResources);
 
-		log.info("Completed JavaScript  execution for plan: " + getName());
+		if (log.isDebugEnabled() == true)
+		{
+			log.debug("Completed JavaScript execution for plan: " + getName());
+		}
 
-		return planContext.isFinished();
+		return planContext.getIsFinished();
 	}
 }

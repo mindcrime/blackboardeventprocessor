@@ -2,7 +2,9 @@ package com.lucidtechnics.blackboard;
 
 import com.lucidtechnics.blackboard.config.WorkspaceConfiguration;
 
-public final class TargetSpaceTimeoutEvent
+@com.lucidtechnics.blackboard.Event(name="blackboard.targetspace.timeout", workspaceIdentifier="blackboardWorkspaceName")
+
+public class TargetSpaceTimeoutEvent
 {
 	private String blackboardWorkspaceName;
 	private TargetSpace targetSpace;

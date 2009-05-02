@@ -6,3 +6,4 @@ version=alpha-0.10
 blackboardDeployDir=${rootDeployDir}
 config=${blackboardDeployDir}/cfg
 log=${blackboardDeployDir}/log
+blackboardHome=./workspace/blackboard

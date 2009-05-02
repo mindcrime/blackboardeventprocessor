@@ -16,7 +16,7 @@
 
 var fruit = WORKSPACE.get("fruit");
 
-if (WORKSPACE.has("fruit") == true) && (fruit.eaten == true)
+if ((WORKSPACE.has("fruit") === true) && (fruit.eaten === true))
 {				
 	if (LOGGER.isDebugEnabled() == true)
 	{

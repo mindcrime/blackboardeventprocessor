@@ -27,9 +27,4 @@ public class PlanContext
 	
 	public boolean getIsFinished() { return isFinished; }
 	public void setIsFinished(boolean _isFinished) { isFinished = _isFinished; }
-
-	public boolean isFinished()
-	{
-		return (isFinished == true);
-	}
 }

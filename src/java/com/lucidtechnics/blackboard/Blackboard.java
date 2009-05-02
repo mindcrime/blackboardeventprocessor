@@ -55,27 +55,25 @@ public class Blackboard
 	
 	private ErrorManager errorManager;
 	private BlackboardActor blackboardActor;
-	private int maxBlackboardThread;
-	private int maxScheduledBlackboardThread;
-	private int maxWorkspaceThread;
-	private int maxPersistenceThread;
-	private int maxWorkspace;
+	private int maxBlackboardThread = 5;
+	private int maxScheduledBlackboardThread = 3;
+	private int maxWorkspaceThread = 2;
+	private int maxPersistenceThread = 5;
+	private int maxWorkspace = 10000;
 	private int activeWorkspaceCount;
 	private ThreadPoolExecutor blackboardExecutor;
 	private ScheduledThreadPoolExecutor scheduledBlackboardExecutor;
 	private ThreadPoolExecutor workspaceExecutor;
 	private ThreadPoolExecutor managerExecutor;
 	private ThreadPoolExecutor persistenceExecutor;
-	private Set workspaceConfigurationSet;
 	private Map<String, WorkspaceConfiguration> eventToWorkspaceMap;
-	private Map eventConfigurationMap;
-	private Map targetSpaceMap; //workspace identifier --> target space
+	private Map<Object, TargetSpace> targetSpaceMap; //workspace identifier --> target space
 	private Guard targetSpaceGuard;
 	private boolean managingBlackboard;
-	private String host;
-	private int port;
-	private String user;
-	private String password;
+	private String host = "localhost";
+	private int port = 28000;
+	private String user = "blackboard";
+	private String password = "blackboard";
 
 	private ReentrantReadWriteLock blackboardReadWriteLock;
 	private Lock blackboardReadLock;
@@ -90,19 +88,17 @@ public class Blackboard
 	private int getMaxPersistenceThread() { return maxPersistenceThread; }
 	private int getMaxWorkspace() { return maxWorkspace; }
 	private int getActiveWorkspaceCount() { return activeWorkspaceCount; }
-	private Set getWorkspaceConfigurationSet() { return workspaceConfigurationSet; }
 	private ThreadPoolExecutor getBlackboardExecutor() { return blackboardExecutor; }
 	private ScheduledThreadPoolExecutor getScheduledBlackboardExecutor() { return scheduledBlackboardExecutor; }
 	private ThreadPoolExecutor getWorkspaceExecutor() { return workspaceExecutor; }
 	private ThreadPoolExecutor getManagerExecutor() { return managerExecutor; }
 	private ThreadPoolExecutor getPersistenceExecutor() { return persistenceExecutor; }
 	private Map<String, WorkspaceConfiguration> getEventToWorkspaceMap() { return eventToWorkspaceMap; }
-	private Map getEventConfigurationMap() { return eventConfigurationMap; }
 	private ReentrantReadWriteLock getBlackboardReadWriteLock() { return blackboardReadWriteLock; }
 	private Lock getBlackboardReadLock() { return blackboardReadLock; }
 	private Lock getBlackboardWriteLock() { return blackboardWriteLock; }
 	private BlackboardFactory getBlackboardFactory() { return blackboardFactory; }
-	private Map getTargetSpaceMap() { return targetSpaceMap; }
+	private Map<Object, TargetSpace> getTargetSpaceMap() { return targetSpaceMap; }
 	private Guard getTargetSpaceGuard() { return targetSpaceGuard; }
 	private boolean getManagingBlackboard() { return managingBlackboard; }
 	public String getHost() { return host; }
@@ -118,19 +114,17 @@ public class Blackboard
 	public void setMaxPersistenceThread(int _maxPersistenceThread) { maxPersistenceThread = _maxPersistenceThread; }
 	public void setMaxWorkspace(int _maxWorkspace) { maxWorkspace = _maxWorkspace; }
 	private void setActiveWorkspaceCount(int _activeWorkspaceCount) { activeWorkspaceCount = _activeWorkspaceCount; }
-	public void setWorkspaceConfigurationSet(Set _workspaceConfigurationSet) { workspaceConfigurationSet = _workspaceConfigurationSet; }
 	private void setBlackboardExecutor(ThreadPoolExecutor _blackboardExecutor) { blackboardExecutor = _blackboardExecutor; }
 	private void setScheduledBlackboardExecutor(ScheduledThreadPoolExecutor _scheduledBlackboardExecutor) { scheduledBlackboardExecutor = _scheduledBlackboardExecutor; }
 	private void setWorkspaceExecutor(ThreadPoolExecutor _workspaceExecutor) { workspaceExecutor = _workspaceExecutor; }
 	private void setManagerExecutor(ThreadPoolExecutor _managerExecutor) { managerExecutor = _managerExecutor; }
 	private void setPersistenceExecutor(ThreadPoolExecutor _persistenceExecutor) { persistenceExecutor = _persistenceExecutor; }
 	private void setEventToWorkspaceMap(Map<String, WorkspaceConfiguration> _eventToWorkspaceMap) { eventToWorkspaceMap = _eventToWorkspaceMap; }
-	private void setEventConfigurationMap(Map _eventConfigurationMap) { eventConfigurationMap = _eventConfigurationMap; }
 	private void setBlackboardReadWriteLock(ReentrantReadWriteLock _blackboardReadWriteLock) { blackboardReadWriteLock = _blackboardReadWriteLock; }
 	private void setBlackboardReadLock(Lock _blackboardReadLock) { blackboardReadLock = _blackboardReadLock; }
 	private void setBlackboardWriteLock(Lock _blackboardWriteLock) { blackboardWriteLock = _blackboardWriteLock; }
 	public void setBlackboardFactory(BlackboardFactory _blackboardFactory) { blackboardFactory = _blackboardFactory; }
-	private void setTargetSpaceMap(Map _targetSpaceMap) { targetSpaceMap = _targetSpaceMap;	 }
+	private void setTargetSpaceMap(Map<Object, TargetSpace> _targetSpaceMap) { targetSpaceMap = _targetSpaceMap;	 }
 	private void setTargetSpaceGuard(Guard _targetSpaceGuard) { targetSpaceGuard = _targetSpaceGuard; }
 	private void setManagingBlackboard(boolean _managingBlackboard) { managingBlackboard = _managingBlackboard; }
 	public void setHost(String _host) { host = _host; }
@@ -140,23 +134,25 @@ public class Blackboard
 	
 	public Blackboard()
 	{
-		PropertyUtil.getInstance().loadProperties("/src/Blackboard.properties", "blackboard.cfg");
+		boolean propertyExists = PropertyUtil.getInstance().loadProperties("/src/Blackboard.properties", "blackboard.cfg", true);
 
-		setMaxBlackboardThread(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.blackboard.thread")));
-		setMaxScheduledBlackboardThread(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.scheduled.blackboard.thread")));
-		setMaxWorkspaceThread(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.workspace.thread")));
-		setMaxPersistenceThread(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.persistence.thread")));
-		setMaxWorkspace(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.workspace")));
+		if (propertyExists == true)
+		{
+			setMaxBlackboardThread(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.blackboard.thread")));
+			setMaxScheduledBlackboardThread(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.scheduled.blackboard.thread")));
+			setMaxWorkspaceThread(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.workspace.thread")));
+			setMaxPersistenceThread(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.persistence.thread")));
+			setMaxWorkspace(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.workspace")));
 
-		setHost(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.db.host"));
-		setPort(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.db.port")));
-		setUser(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.db.user"));
-		setPassword(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.db.password"));
+			setHost(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.db.host"));
+			setPort(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.db.port")));
+			setUser(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.db.user"));
+			setPassword(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.db.password"));
+		}
 		
 		setBlackboardActor(new BlackboardActor("Blackboard"));
 		setEventToWorkspaceMap(new HashMap());
-		setEventConfigurationMap(new HashMap());
-		setTargetSpaceMap(new HashMap());
+		setTargetSpaceMap(new HashMap<Object, TargetSpace>());
 		setBlackboardReadWriteLock(new ReentrantReadWriteLock());
 		setBlackboardReadLock(getBlackboardReadWriteLock().readLock());
 		setBlackboardWriteLock(getBlackboardReadWriteLock().writeLock());
@@ -165,14 +161,14 @@ public class Blackboard
 		setErrorManager(com.lucidtechnics.blackboard.util.error.ErrorManager.getInstance());
 	}
 
-	private void initializeTargetSpacePersistentStore()
+	private void initializeTargetSpacePersistentStore(String _persistenceDir)
 	{
 		Db4o.configure().allowVersionUpdates(true);
 		Db4o.configure().callConstructors(true);
 		Db4o.configure().exceptionsOnNotStorable(true);
 		Db4o.configure().objectClass(TargetSpace.class).objectField("workspaceIdentifier").indexed(true);
 
-		ObjectServer server = Db4o.openServer("/home/bgeorge/work/blackboard/workspace/cocothemonkey.db4o", getPort());
+		ObjectServer server = Db4o.openServer(_persistenceDir.replaceAll("/$", "") + "/blackboard.db4o", getPort());
 		server.grantAccess(getUser(), getPassword());
 	}
 
@@ -182,10 +178,32 @@ public class Blackboard
 		logger.info("Apache 2.0 Open Source License.");
 		logger.info("Copyright Owner - Bediako George.");
 
-		initializeTargetSpacePersistentStore();
+		String persistenceDir = "./blackboard/persistence";
+		String workspaceHome = "./blackboard/workspaces";
 
-		PropertyUtil.getInstance().loadProperties("/src/Blackboard.properties", "blackboard.cfg");
-		String workspaceHome = PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.workspace.home");
+		boolean successful = PropertyUtil.getInstance().loadProperties("/src/Blackboard.properties", "blackboard.cfg", true);
+							  
+		if (successful == true)
+		{
+			workspaceHome = PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.workspace.home", workspaceHome);
+			persistenceDir = PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.persistence.home", persistenceDir);
+		}
+
+		java.io.File file = new java.io.File(workspaceHome);
+
+		if (file.exists() == false)
+		{
+			file.mkdirs();
+		}
+
+		file = new java.io.File(persistenceDir);
+
+		if (file.exists() == false)
+		{
+			file.mkdirs();
+		}		
+
+		initializeTargetSpacePersistentStore(persistenceDir);
 
 		if (workspaceHome == null ||
 		   org.apache.commons.lang.StringUtils.isWhitespace(workspaceHome) == true)
@@ -202,6 +220,8 @@ public class Blackboard
 
 		java.io.File[] directoryFiles = workspaceDirectory.listFiles();
 
+		logger.debug("Getting events for workspaces: " + workspaceDirectory.getName());
+		
 		for (int i = 0; i < directoryFiles.length; i++)
 		{
 			if (directoryFiles[i].isDirectory() == true)
@@ -209,6 +229,8 @@ public class Blackboard
 				processEventPlans(directoryFiles[i]);
 			}
 		}
+
+		establishBlackboardPlans();
 
 		setBlackboardExecutor(new ThreadPoolExecutor(getMaxBlackboardThread(), getMaxBlackboardThread(), 100, TimeUnit.SECONDS,
 			new LinkedBlockingQueue()));
@@ -659,6 +681,7 @@ public class Blackboard
 
 				Object workspaceIdentifier = PropertyUtils.getProperty(_event, determineWorkspaceIdentifierName(_event));
 				addToTargetSpace(workspaceConfiguration, workspaceIdentifier, eventName, _event);
+				foundEventConfiguration = true;
 			}
 
 			if (foundEventConfiguration == false)
@@ -736,14 +759,15 @@ public class Blackboard
 			targetSpace.setPersistChangeInfoHistory(_workspaceConfiguration.getPersistChangeInfoHistory());
 			long currentTimeMillis = System.currentTimeMillis();
 			targetSpace.setLastActiveTime(currentTimeMillis);
-			TargetSpaceTimeoutEvent targetSpaceTimeoutEvent = new TargetSpaceTimeoutEvent();
+
+			/*TargetSpaceTimeoutEvent targetSpaceTimeoutEvent = new TargetSpaceTimeoutEvent();
 			targetSpaceTimeoutEvent.setBlackboardWorkspaceName("blackboard.Workspace");
 			targetSpaceTimeoutEvent.setTargetSpace(targetSpace);
 			targetSpaceTimeoutEvent.setBlackboard(this);
 			targetSpaceTimeoutEvent.setWorkspaceConfiguration(_workspaceConfiguration);
 			
 			schedulePlaceOnBlackboard(targetSpaceTimeoutEvent, _workspaceConfiguration.getWorkspaceTimeoutInSeconds() * 1000);
-
+*/
 			if (logger.isDebugEnabled() == true)
 			{
 				logger.debug("For workspace: " + _workspaceIdentifier + " putting event " + _eventName);
@@ -1111,21 +1135,40 @@ public class Blackboard
 
 	protected void processEventPlans(java.io.File _eventPlanDirectory)
 	{
+		logger.debug("Getting plans for event directory: " + _eventPlanDirectory.getName());
+		
 		WorkspaceConfiguration workspaceConfiguration = new WorkspaceConfiguration();
 		workspaceConfiguration.setPlanSet(new java.util.HashSet<Plan>());
 		workspaceConfiguration.setDoNotPersistSet(new java.util.HashSet<String>());
 
 		java.io.File[] planArray = _eventPlanDirectory.listFiles();
 
+		
 		for (int i = 0; i < planArray.length; i++)
 		{
 			if (planArray[i].isDirectory() == false && planArray[i].getName().endsWith(".js") == true)
 			{
+				logger.debug("Loading plan: " + planArray[i].getName());
+
 				workspaceConfiguration.getPlanSet().add(new JavaScriptPlan(planArray[i].getName(), planArray[i].getAbsolutePath()));
 			}
 		}
 
 		getEventToWorkspaceMap().put(extractEventName(_eventPlanDirectory.getName()), workspaceConfiguration);
+	}
+
+	protected void establishBlackboardPlans()
+	{
+		TargetSpaceTimeoutPlan plan = new TargetSpaceTimeoutPlan();
+		plan.setPlanName("blackboard.targetspace.timeout");
+		
+		WorkspaceConfiguration workspaceConfiguration = new WorkspaceConfiguration();
+		workspaceConfiguration.setPlanSet(new java.util.HashSet<Plan>());
+		workspaceConfiguration.setDoNotPersistSet(new java.util.HashSet<String>());
+
+		workspaceConfiguration.getPlanSet().add(plan);
+
+		getEventToWorkspaceMap().put(plan.getPlanName(), workspaceConfiguration);
 	}
 
 	protected String extractEventName(String _pathName)

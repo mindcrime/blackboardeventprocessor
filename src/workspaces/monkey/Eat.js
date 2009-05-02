@@ -16,42 +16,42 @@
 
 var fruit = WORKSPACE.get("fruit");
 
-if ((WORKSPACE.has("fruit") == true) &&
-	  (WORKSPACE.has("monkey") == true))
+if ((WORKSPACE.has("fruit") === true) &&
+	  (WORKSPACE.has("monkey") === true))
 {
-	if (LOGGER.isDebugEnabled() == true)
+	if (LOGGER.isDebugEnabled() === true)
 	{
 		LOGGER.debug("Monkey eating now");
 	}
 
 	var monkey = WORKSPACE.get("monkey");
 
-	if (LOGGER.isDebugEnabled() == true)
+	if (LOGGER.isDebugEnabled() === true)
 	{
 		LOGGER.debug("Monkey is of class: " + monkey.getClass());
 	}
 
-	if (LOGGER.isDebugEnabled() == true)
+	if (LOGGER.isDebugEnabled() === true)
 	{
 		LOGGER.debug("Fruit is of class: " + fruit.getClass());
 	}
 
-	if (LOGGER.isDebugEnabled() == true)
+	if (LOGGER.isDebugEnabled() === true)
 	{
 		LOGGER.debug("fruit.getEaten: " + fruit.eaten);
 	}
 	
-	if (LOGGER.isDebugEnabled() == true)
+	if (LOGGER.isDebugEnabled() === true)
 	{
 		LOGGER.debug("monkey.getSleeping: " + monkey.sleeping);
 	}
 	
-	if (LOGGER.isDebugEnabled() == true)
+	if (LOGGER.isDebugEnabled() === true)
 	{
 		LOGGER.debug("monkey.getPlaying: " + monkey.playing);
 	}
 	
-	if (LOGGER.isDebugEnabled() == true)
+	if (LOGGER.isDebugEnabled() === true)
 	{
 		LOGGER.debug("monkey.getEating: " + monkey.eating);
 	}
@@ -66,11 +66,11 @@ if ((WORKSPACE.has("fruit") == true) &&
 	if (LOGGER.isDebugEnabled() == true)
 	{
 		LOGGER.debug("fruit.getEaten: " + fruit.eaten);
-		LOGGER.debug("monkey.getSleeping: " + monkey.sleeping(;
+		LOGGER.debug("monkey.getSleeping: " + monkey.sleeping);
 		LOGGER.debug("monkey.getPlaying: " + monkey.playing);
 		LOGGER.debug("monkey.getEating: " + monkey.eating);
 
-		LOGGER.debug("Monkey intercepter is: " + monkey.interceptor());
+		LOGGER.debug("Monkey intercepter is: " + monkey.interceptor);
 		LOGGER.debug("Monkey intercepter class is: " + monkey.interceptor.getClass());
 		LOGGER.debug("Fruit intercepter is: " + fruit.intercepter);
 		LOGGER.debug("Fruit intercepter class is: " + fruit.intercepter().getClass());
