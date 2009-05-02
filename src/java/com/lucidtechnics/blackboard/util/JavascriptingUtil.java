@@ -109,7 +109,10 @@ public class JavascriptingUtil
 
 		try
 		{
-			log.info("Attempting to load script: " + _scriptResource);
+			if (log.isDebugEnabled() == true)
+			{
+				log.debug("Attempting to load script: " + _scriptResource);
+			}
 
 			java.io.File file = new java.io.File(_scriptResource);
 

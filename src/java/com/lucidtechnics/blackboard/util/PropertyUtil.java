@@ -65,12 +65,14 @@ public class PropertyUtil
 	{
 		try
 		{
-			log.info ("loading this property resource: " + _propertyResourceName);
-			log.info ("checking this resource map: " + resourceMap);
-
+			if (log.isDebugEnabled() == true)
+			{
+				log.debug ("loading this property resource: " + _propertyResourceName);
+				log.debug ("checking this resource map: " + resourceMap);
+			}
+			
 			if (this.resourceMap.keySet().contains(_propertyResourceName) == false)
 			{
-				log.info ("loading this property: " + _propertyResourceName);
 				Properties properties = new Properties();
 				properties.load(PropertyUtil.class.getResourceAsStream(_propertyResourceName));
 				this.propertiesMap.put(_propertyResourceName, properties);

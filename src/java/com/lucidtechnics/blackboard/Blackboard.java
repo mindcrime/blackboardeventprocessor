@@ -174,9 +174,10 @@ public class Blackboard
 
 	public void init()
 	{
-		logger.info("Blackboard Workspace Server initialization inception.");
+		logger.info("Blackboard Workspace Server Initialization Inception.");
 		logger.info("Apache 2.0 Open Source License.");
-		logger.info("Copyright Owner - Bediako George.");
+		logger.info("Copyright Owner - LucidTechnics, LLC.");
+		logger.info("Authors - Bediako Ntodi George and David Yuctan Hodge.");
 
 		String persistenceDir = "./blackboard/persistence";
 		String workspaceHome = "./blackboard/workspaces";

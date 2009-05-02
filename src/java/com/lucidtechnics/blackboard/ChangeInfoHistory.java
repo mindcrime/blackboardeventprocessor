@@ -102,7 +102,7 @@ public final class ChangeInfoHistory
 		{
 			if (logger.isDebugEnabled() == true)
 			{
-				logger.info("Change info history has target: " + _targetName + " with action: " + _action);
+				logger.debug("Change info history has target: " + _targetName + " with action: " + _action);
 			}
 		}
 		
