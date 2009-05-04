@@ -338,9 +338,7 @@ public class Blackboard
 											{
 												logger.debug("For workspace: " +
 													_targetSpace.getWorkspaceIdentifier() + " plan: " +
-													plan.getName() + " ran once and is now finished Bediako.");
-
-												logger.debug("Bedsman the target space is now: " + _targetSpace);
+													plan.getName() + " ran once and is now finished.");
 											}
 										}
 										
@@ -1142,7 +1140,6 @@ public class Blackboard
 		workspaceConfiguration.setDoNotPersistSet(new java.util.HashSet<String>());
 
 		java.io.File[] planArray = _eventPlanDirectory.listFiles();
-
 		
 		for (int i = 0; i < planArray.length; i++)
 		{

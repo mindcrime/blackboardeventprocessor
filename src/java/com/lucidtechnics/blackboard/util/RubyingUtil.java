@@ -55,6 +55,8 @@ public class RubyingUtil
 		ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
 		ScriptEngine scriptEngine = scriptEngineManager.getEngineByName("jruby");
 
+		if (scriptEngine == null) { throw new RuntimeException("Unable to create script engine for JRuby.  Is it in the classpath?"); }
+
 		setScriptEngine(scriptEngine);
 		setScriptResourceSet(new HashSet<String>());
 		setBindingsMap(new HashMap<String, Object>());

@@ -26,7 +26,7 @@ import com.lucidtechnics.blackboard.util.RubyingUtil;
 public class RubyPlan
    implements Plan
 {
-	private static Log log = LogFactory.getLog(JavaScriptPlan.class);
+	private static Log log = LogFactory.getLog(RubyPlan.class);
 
 	private String name;
 	private String path;
@@ -66,14 +66,14 @@ public class RubyPlan
 
 		if (log.isDebugEnabled() == true)
 		{
-			log.debug("JavaScript execution for plan: " + getPath());
+			log.debug("JRuby execution for plan: " + getPath());
 		}
 		
 		scriptingUtil.executeScriptResource(scriptResources);
 
 		if (log.isDebugEnabled() == true)
 		{
-			log.debug("Completed JavaScript execution for plan: " + getName());
+			log.debug("Completed JRuby execution for plan: " + getName());
 		}
 
 		return planContext.getIsFinished();
