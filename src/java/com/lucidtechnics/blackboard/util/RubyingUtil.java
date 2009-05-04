@@ -23,20 +23,20 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ContextFactory;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.lucidtechnics.blackboard.util.PropertyUtil;
 
-public class JavascriptingUtil
+public class RubyingUtil
    implements ScriptingUtil
 {
-	private static Log log = LogFactory.getLog(JavascriptingUtil.class);
+	private static Log log = LogFactory.getLog(RubyingUtil.class);
 
 	private Set<String> scriptResourceSet;
 	private Map<String, Object> bindingsMap;
@@ -50,7 +50,7 @@ public class JavascriptingUtil
 	public void setScope(Scriptable _scope) { scope = _scope; }
     public void setBindingsMap(Map<String, Object> _bindingsMap) { bindingsMap = _bindingsMap; }
 
-    public JavascriptingUtil()
+    public RubyingUtil()
 	{
 		setScriptResourceSet(new HashSet<String>());
 		setBindingsMap(new HashMap<String, Object>());
@@ -241,6 +241,25 @@ public class JavascriptingUtil
 
     public Object execute(String _script)
     {
+
+		ScriptEngineManager m = new ScriptEngineManager();
+		ScriptEngine rubyEngine = m.getEngineByName("jruby");
+		ScriptContext context = rubyEngine.getContext();
+
+		context.setAttribute("label", new Integer(4), ScriptContext.ENGINE_SCOPE);
+
+		try{
+			rubyEngine.eval("puts 2 + $label", context);
+		} catch (ScriptException e) {
+			e.printStackTrace();
+		}
+
+
+
+
+
+
+		
 		if (_script == null)
 		{
 			throw new RuntimeException("Unable to execute null script");

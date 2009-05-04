@@ -56,9 +56,9 @@ public class Blackboard
 	private ErrorManager errorManager;
 	private BlackboardActor blackboardActor;
 	private int maxBlackboardThread = 5;
-	private int maxScheduledBlackboardThread = 3;
-	private int maxWorkspaceThread = 2;
-	private int maxPersistenceThread = 5;
+	private int maxScheduledBlackboardThread = 2;
+	private int maxWorkspaceThread = 10;
+	private int maxPersistenceThread = 20;
 	private int maxWorkspace = 10000;
 	private int activeWorkspaceCount;
 	private ThreadPoolExecutor blackboardExecutor;
@@ -174,11 +174,6 @@ public class Blackboard
 
 	public void init()
 	{
-		logger.info("Blackboard Workspace Server Initialization Inception.");
-		logger.info("Apache 2.0 Open Source License.");
-		logger.info("Copyright Owner - LucidTechnics, LLC.");
-		logger.info("Authors - Bediako Ntodi George and David Yuctan Hodge.");
-
 		String persistenceDir = "./blackboard/persistence";
 		String workspaceHome = "./blackboard/workspaces";
 
@@ -247,6 +242,10 @@ public class Blackboard
 		setManagerExecutor(new ThreadPoolExecutor(1, 1, 100, TimeUnit.SECONDS,
 			new LinkedBlockingQueue()));
 
+		logger.info("Blackboard Workspace Server Initialization Inception.");
+		logger.info("Apache 2.0 Open Source License.");
+		logger.info("Copyright Owner - LucidTechnics, LLC.");
+		logger.info("Authors - Bediako Ntodi George and David Yuctan Hodge.");
 		logger.info("Initialization was successful.");
 	}
 
