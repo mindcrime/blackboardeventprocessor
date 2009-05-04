@@ -14,15 +14,8 @@
 * limitations under the License.
 */
 
-var fruit = WORKSPACE.get("fruit");
-
-if ((WORKSPACE.has("fruit") === true) && (fruit.eaten === true))
+if ((WORKSPACE.has("fruit") === true) && (WORKSPACE.get("fruit").eaten === true))
 {				
-	if (LOGGER.isDebugEnabled() == true)
-	{
-		LOGGER.debug("Monkey sleeping now");
-	}
-
 	var monkey = WORKSPACE.get("monkey");
 
 	monkey.sleeping = true;

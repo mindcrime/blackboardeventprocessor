@@ -16,11 +16,6 @@
 
 if ((WORKSPACE.has("monkey") === true) && (WORKSPACE.has("eagle") === false))
 {
-	if (LOGGER.isDebugEnabled() === true)
-	{
-		LOGGER.debug("Monkey playing now");
-	}
-
 	var monkey = WORKSPACE.get("monkey");
 	
 	monkey.playing = true;
