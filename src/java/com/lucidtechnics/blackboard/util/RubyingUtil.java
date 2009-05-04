@@ -38,20 +38,24 @@ public class RubyingUtil
 {
 	private static Log log = LogFactory.getLog(RubyingUtil.class);
 
+	private ScriptEngine scriptEngine;
 	private Set<String> scriptResourceSet;
 	private Map<String, Object> bindingsMap;
-	private Scriptable scope;
 
+	private ScriptEngine getScriptEngine() { return scriptEngine; } 
 	private Set<String> getScriptResourceSet() { return scriptResourceSet; }
-	private Scriptable getScope() { return scope; }
 	private Map<String, Object> getBindingsMap() { return bindingsMap; }
 
+	private void setScriptEngine(ScriptEngine _scriptEngine) { scriptEngine = _scriptEngine; }
 	private void setScriptResourceSet(Set<String> _scriptResourceSet) {  scriptResourceSet = _scriptResourceSet; }
-	public void setScope(Scriptable _scope) { scope = _scope; }
     public void setBindingsMap(Map<String, Object> _bindingsMap) { bindingsMap = _bindingsMap; }
 
     public RubyingUtil()
 	{
+		ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
+		ScriptEngine scriptEngine = scriptEngineManager.getEngineByName("jruby");
+
+		setScriptEngine(scriptEngine);
 		setScriptResourceSet(new HashSet<String>());
 		setBindingsMap(new HashMap<String, Object>());
     }
@@ -67,11 +71,6 @@ public class RubyingUtil
 		
 		try
 		{
-			if (Context.getCurrentContext() == null)
-			{
-				throw new RuntimeException("Cannot use loadScript outside of the scope of a call to executeScript.  A context must be present.");
-			}
-
 			inputStream = findScript(_scriptResource);
 		
 			if (getScriptResourceSet().contains(_scriptResource) == false)
@@ -80,7 +79,7 @@ public class RubyingUtil
 
 				try
 				{
-					Context.getCurrentContext().evaluateReader(getScope(), reader, _scriptResource, 1, null);
+					getScriptEngine().eval(reader, getScriptEngine().getContext());
 				}
 				catch(Throwable t)
 				{
@@ -137,30 +136,22 @@ public class RubyingUtil
 
 	private Object executeScript(String _scriptResource, Reader _reader)
 	{
-		Context context = (new ContextFactory()).enterContext();
-		context.setLanguageVersion(170);
+		ScriptContext scriptContext = getScriptEngine().getContext();
 		
 		Object result = null;
 
 		try
 		{
-			setScope(new org.mozilla.javascript.ImporterTopLevel(context, false));
-
 			for (String key: getBindingsMap().keySet())
 			{
-				Object object = Context.javaToJS(getBindingsMap().get(key), getScope());
-				ScriptableObject.putProperty(getScope(), key, object);
+				scriptContext.setAttribute(key, getBindingsMap().get(key), ScriptContext.ENGINE_SCOPE);
 			}
 
-			result = context.evaluateReader(getScope(), _reader, _scriptResource, 1, null);
+			result = getScriptEngine().eval(_reader, scriptContext);
 		}
 		catch(Throwable t)
 		{
 			throw new RuntimeException("Unable to execute script: " + _scriptResource + " for this reason: " + t.toString(), t);
-		}
-		finally
-		{
-			context.exit();
 		}
 
 		return result;
@@ -168,37 +159,27 @@ public class RubyingUtil
 
 	private Object executeScript(String[] _scriptResources, Reader[] _readers)
 	{
-		Context context = (new ContextFactory()).enterContext();
-		context.setLanguageVersion(170);
-		
+		ScriptContext scriptContext = getScriptEngine().getContext();
+
 		Object result = null;
+
 		int i = 0;
 		
 		try
 		{
-			setScope(new org.mozilla.javascript.ImporterTopLevel(context, false));
-
 			for (String key: getBindingsMap().keySet())
 			{
-				Object object = Context.javaToJS(getBindingsMap().get(key), getScope());
-				ScriptableObject.putProperty(getScope(), key, object);
+				scriptContext.setAttribute(key, getBindingsMap().get(key), ScriptContext.ENGINE_SCOPE);
 			}
 			
 			for (i = 0; i < _scriptResources.length; i++)
 			{
-				String scriptResource = _scriptResources[i];
-				Reader reader = _readers[i];
-				
-				result = context.evaluateReader(getScope(), reader, scriptResource, 1, null);
+				result = getScriptEngine().eval(_readers[i], scriptContext);
 			}
 		}
 		catch(Throwable t)
 		{
 			throw new RuntimeException("Unable to execute script: " + _scriptResources[i] + " for this reason: " + t.toString(), t);
-		}
-		finally
-		{
-			context.exit();
 		}
 
 		return result;
@@ -241,33 +222,24 @@ public class RubyingUtil
 
     public Object execute(String _script)
     {
+		Object result = null;
 
-		ScriptEngineManager m = new ScriptEngineManager();
-		ScriptEngine rubyEngine = m.getEngineByName("jruby");
-		ScriptContext context = rubyEngine.getContext();
-
-		context.setAttribute("label", new Integer(4), ScriptContext.ENGINE_SCOPE);
-
-		try{
-			rubyEngine.eval("puts 2 + $label", context);
-		} catch (ScriptException e) {
-			e.printStackTrace();
-		}
-
-
-
-
-
-
-		
 		if (_script == null)
 		{
 			throw new RuntimeException("Unable to execute null script");
 		}
 
-		Object result = null;
-		Reader reader = new StringReader(_script);
+		ScriptContext scriptContext = getScriptEngine().getContext();
 
-		return executeScript("<dynamic source>", reader);
+		try
+		{
+			result = getScriptEngine().eval(_script, scriptContext);
+		}
+		catch (Throwable t)
+		{
+			throw new RuntimeException("Unable to execute script: " + _script + " for this reason: " + t.toString(), t);
+		}
+
+		return result;
     }
 }

@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.lucidtechnics.blackboard.ChangeInfo;
+import com.lucidtechnics.blackboard.util.ScriptingUtil;
 import com.lucidtechnics.blackboard.util.RubyingUtil;
 
 public class RubyPlan

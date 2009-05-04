@@ -1152,6 +1152,11 @@ public class Blackboard
 
 				workspaceConfiguration.getPlanSet().add(new JavaScriptPlan(planArray[i].getName(), planArray[i].getAbsolutePath()));
 			}
+			else if (planArray[i].isDirectory() == false && planArray[i].getName().endsWith(".rb") == true)
+			{
+				logger.debug("Loading plan: " + planArray[i].getName());
+				workspaceConfiguration.getPlanSet().add(new RubyPlan(planArray[i].getName(), planArray[i].getAbsolutePath()));
+			}
 		}
 
 		getEventToWorkspaceMap().put(extractEventName(_eventPlanDirectory.getName()), workspaceConfiguration);
