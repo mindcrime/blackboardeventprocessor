@@ -280,7 +280,6 @@ public class Blackboard
 			public void run()
 			{						
 				WorkspaceContext workspaceContext = null;
-				ReadOnlyWorkspaceContext readOnlyWorkspaceContext = null;
 				Plan plan = null;
 				Map planToChangeInfoCountMap = new HashMap();
 				boolean notifyPlans = false;				
@@ -311,7 +310,6 @@ public class Blackboard
 						{
 							try
 							{
-								readOnlyWorkspaceContext = new ReadOnlyWorkspaceContext(_targetSpace);
 								activePlanSet.add(plan);
 
 								if (_targetSpace.isFinished(plan) == false)
@@ -394,80 +392,71 @@ public class Blackboard
 								{
 									activePlanSet.remove(plan);
 								}
-
-								readOnlyWorkspaceContext.expire();
 							}
 						}
 					}
 				
 					for (Iterator activePlans = activePlanSet.iterator(); activePlans.hasNext() == true;)
 					{
-						try
-						{
-							plan = (Plan) activePlans.next();							
+						plan = (Plan) activePlans.next();							
 
+						if (logger.isDebugEnabled() == true)
+						{
+							logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() +
+										 " plan: " + plan.getName() + " is an active plan.");
+						}
+
+						if (_targetSpace.isFinished(plan) == true)
+						{
 							if (logger.isDebugEnabled() == true)
 							{
 								logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() +
-											 " plan: " + plan.getName() + " is an active plan.");
+									" plan: " + plan.getName() + " is now a finished plan.");
 							}
-							
-							if (_targetSpace.isFinished(plan) == true)
+
+							activePlans.remove();
+						}
+						else
+						{
+							if (logger.isDebugEnabled() == true)
 							{
+								logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() +
+									" plan: " + plan.getName() + " is still an active plan.");
+							}
+
+							int planChangeCount = 0;
+							Integer planChangeCountInteger = (Integer) planToChangeInfoCountMap.get(plan);
+							planChangeCount = planChangeCountInteger.intValue();
+
+							if (_targetSpace.getChangeInfoCount() > planChangeCount)
+							{
+								//Plan is interested in the
+								//workspace and there have been
+								//changes since it was last
+								//run.
+
 								if (logger.isDebugEnabled() == true)
 								{
 									logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() +
-										" plan: " + plan.getName() + " is now a finished plan.");
+										" notifying plans for plan: " + plan.getName());
 								}
 
-								activePlans.remove();
+								notifyPlans = true;
 							}
 							else
 							{
 								if (logger.isDebugEnabled() == true)
 								{
 									logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() +
-										" plan: " + plan.getName() + " is still an active plan.");
+										" NOT notifying plans for plan: " + plan.getName());
 								}
-								
-								int planChangeCount = 0;
-								Integer planChangeCountInteger = (Integer) planToChangeInfoCountMap.get(plan);
-								planChangeCount = planChangeCountInteger.intValue();
-
-								if (_targetSpace.getChangeInfoCount() > planChangeCount)
-								{
-									//Plan is interested in the
-									//workspace and there have been
-									//changes since it was last
-									//run.
-
-									if (logger.isDebugEnabled() == true)
-									{
-										logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() +
-											" notifying plans for plan: " + plan.getName());
-									}
-
-									notifyPlans = true;
-								}
-								else
-								{
-									if (logger.isDebugEnabled() == true)
-									{
-										logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() +
-											" NOT notifying plans for plan: " + plan.getName());
-									}
-								}
-							}
-
-							if (logger.isDebugEnabled() == true)
-							{
-								logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() +
-											 " setting workspace as executed.");
 							}
 						}
-						finally
+
+						if (logger.isDebugEnabled() == true)
 						{
-							readOnlyWorkspaceContext.expire();
+							logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() +
+										 " setting workspace as executed.");
 						}
 					}
 
