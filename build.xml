@@ -100,10 +100,6 @@
 		<mkdir dir="${blackboardDeployDir}/bin" />
 		<mkdir dir="${blackboardDeployDir}/log" />
 		<mkdir dir="${blackboardDeployDir}/persist" />
-		<mkdir dir="${blackboardDeployDir}/sequence" />
-		<mkdir dir="${blackboardDeployDir}/catalog" />
-		<mkdir dir="${blackboardDeployDir}/enableMedia" />
-		<mkdir dir="${blackboardDeployDir}/price" />
 
 		<mkdir dir="${junit-result}" />
 		<mkdir dir="${workspace}" />
@@ -154,8 +150,7 @@
 		  />
 		
 		<jar destfile="${dist}/lib/${blackboardJar}"
-		       basedir="${workspace}"
-			   includes="**\Blackboard.properties"
+		       manifest="${src.cfg}/BlackboardManifest.mf"
 			   update="true"
 		  />
 
@@ -219,6 +214,35 @@
 		<!-- Copy web application config and property files -->
 		
 	</target>
+
+	<target name="project" depends="clean, compile, jar, deploy">
+
+		<!-- Copy libraries, jsp, and blackboard config and bin files -->
+		<copy todir="${dist}/blackboard/lib" flatten="true">
+			<fileset dir="${lib}" includes="**/*.jar" excludes="build-only/**/*.jar, **/servlet-api.jar" />
+		</copy>
+
+		<copy todir="${dist}/blackboard/">
+			<fileset dir="${dist}/lib" includes="*.jar" excludes="*Test*.jar" />
+		</copy>
+
+		<mkdir dir="${dist}/blackboard/blackboard/workspaces" />
+		<mkdir dir="${dist}/blackboard/blackboard/persistence" />
+
+		<copy todir="${dist}/blackboard/">
+			<fileset dir="${src}/workspaces" includes="CocoTheMonkey.js" />
+		</copy>
+
+		<copy todir="${dist}/blackboard/blackboard/workspaces/">
+			<fileset dir="${src}/workspaces" includes="*" excludes="*.*" />
+		</copy>
+
+
+		<zip destfile="${dist}/blackboard-standalone.zip">
+		   <zipfileset dir="${dist}/blackboard" prefix="blackboard"/>
+		</zip>
+		
+	</target>	
 
 	<target name="hardRedeploy"  depends="redeploy, startupBlackboard" />
 
