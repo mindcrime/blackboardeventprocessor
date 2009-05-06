@@ -58,12 +58,12 @@ public class CocoTheMonkey
 						try { blackboard.wait(); } catch (InterruptedException e) {}
 					}
 
-					for (int i = 0; i < 1; i++)
+					for (int i = 0; i < 100; i++)
 					{						
 						Monkey monkey = new Monkey("Coco-1-" + i);
 						Mango mango = new Mango("Coco-2-" + i);
 						Eagle eagle = new Eagle("Coco-3-" + i);
-						Hunter hunter = new Hunter("Coco-4-" + i);
+						Hunter hunter = new Hunter("Coco-5-" + i);
 
 						blackboard.placeOnBlackboard(eagle);
 						blackboard.placeOnBlackboard(mango);
@@ -82,11 +82,11 @@ public class CocoTheMonkey
 						try { blackboard.wait(); } catch (InterruptedException e) {}
 					}
 
-					for (int i = 0; i < 1; i++)
+					for (int i = 0; i < 100; i++)
 					{
 						Monkey monkey = new Monkey("Coco-4-" + i);
 						Mango mango = new Mango("Coco-1-" + i);
-						Eagle eagle = new Eagle("Coco-2-" + i);
+						Eagle eagle = new Eagle("Coco-5-" + i);
 						Hunter hunter = new Hunter("Coco-3-" + i);
 
 						blackboard.placeOnBlackboard(eagle);
@@ -106,11 +106,11 @@ public class CocoTheMonkey
 						try { blackboard.wait(); } catch (InterruptedException e) {}
 					}
 
-					for (int i = 0; i < 10; i++)
+					for (int i = 0; i < 100; i++)
 					{
 						Monkey monkey = new Monkey("Coco-3-" + i);
-						Mango mango = new Mango("Coco-4-" + i);
-						Eagle eagle = new Eagle("Coco-1-" + i);
+						Mango mango = new Mango("Coco-5-" + i);
+						Eagle eagle = new Eagle("Coco-4-" + i);
 						Hunter hunter = new Hunter("Coco-2-" + i);
 
 						blackboard.placeOnBlackboard(eagle);
@@ -131,12 +131,12 @@ public class CocoTheMonkey
 						try { blackboard.wait(); } catch (InterruptedException e) {}
 					}
 
-					for (int i = 0; i < 1; i++)
+					for (int i = 0; i < 100; i++)
 					{
 						Monkey monkey = new Monkey("Coco-2-" + i);
 						Mango mango = new Mango("Coco-3-" + i);
-						Eagle eagle = new Eagle("Coco-4-" + i);
-						Hunter hunter = new Hunter("Coco-1-" + i);
+						Eagle eagle = new Eagle("Coco-1-" + i);
+						Hunter hunter = new Hunter("Coco-4-" + i);
 
 						blackboard.placeOnBlackboard(eagle);
 						blackboard.placeOnBlackboard(mango);
@@ -155,11 +155,11 @@ public class CocoTheMonkey
 						try { blackboard.wait(); } catch (InterruptedException e) {}
 					}
 
-					for (int i = 0; i < 1; i++)
+					for (int i = 0; i < 100; i++)
 					{
-						Monkey monkey = new Monkey("Coco-1-" + i);
-						Mango mango = new Mango("Coco-1-" + i);
-						Eagle eagle = new Eagle("Coco-1-" + i);
+						Monkey monkey = new Monkey("Coco-5-" + i);
+						Mango mango = new Mango("Coco-4-" + i);
+						Eagle eagle = new Eagle("Coco-2-" + i);
 						Hunter hunter = new Hunter("Coco-1-" + i);
 
 						blackboard.placeOnBlackboard(eagle);

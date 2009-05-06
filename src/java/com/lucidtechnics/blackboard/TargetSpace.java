@@ -40,20 +40,20 @@ public abstract class TargetSpace
 	private Object workspaceIdentifier;
 	private Map targetMap;
 	private Map planStateMap;
-	private Set doNotPersistSet;
+	private transient Set doNotPersistSet;
 	private Set exceptionSet;
-	private Set eventNameSet;
+	private transient Set eventNameSet;
 	private transient ReentrantReadWriteLock workspaceReadWriteLock;
 	private transient Lock workspaceReadLock;
 	private transient Lock workspaceWriteLock;
 	private ChangeInfoHistory changeInfoHistory;
-	private boolean terminateOnError;
+	private transient boolean terminateOnError;
 	private int state;
 	private transient long lastUsedTimestamp;
-	private boolean persistChangeInfoHistory;
+	private transient boolean persistChangeInfoHistory;
 	private Date createDate;
 	private Date retireDate;
-	private long lastActiveTime;
+	private transient long lastActiveTime;
 	
 	private transient ReentrantReadWriteLock workspaceExclusivityReadWriteLock;
 	private transient Lock workspaceExclusivityReadLock;

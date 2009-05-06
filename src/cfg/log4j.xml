@@ -86,7 +86,7 @@
   -->
 
   <category name="com.lucidtechnics.blackboard">
-	  <priority value="debug"/>
+	  <priority value="info"/>
 	  <appender-ref ref="STDOUT"/>
   </category>
       
