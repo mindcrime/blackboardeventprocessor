@@ -36,6 +36,7 @@ public abstract class TargetSpace
 	private final static Log logger = LogFactory.getLog(TargetSpace.class);
 	
 	private String name;
+	private String appName;
 	private transient Blackboard blackboard;
 	private Object workspaceIdentifier;
 	private Map targetMap;
@@ -60,6 +61,7 @@ public abstract class TargetSpace
 	private transient Lock workspaceExclusivityWriteLock;
 
 	public String getName() { return name; }
+	public String getAppName() { return appName; }
 	protected Blackboard getBlackboard() { return blackboard; }
 	public  Object getWorkspaceIdentifier() { return workspaceIdentifier; }
 	protected Map getTargetMap() { return targetMap; }
@@ -82,6 +84,7 @@ public abstract class TargetSpace
 	protected long getLastActiveTime() { return lastActiveTime; }
 	
 	protected void setName(String _name) { name = _name; }
+	protected void setAppName(String _appName) { appName = _appName; }
 	protected void setBlackboard(Blackboard _blackboard) { blackboard = _blackboard; }
 	protected void setWorkspaceIdentifier(Object _workspaceIdentifier) { workspaceIdentifier = _workspaceIdentifier; }
 	protected void setTargetMap(Map _targetMap) { targetMap = _targetMap; }

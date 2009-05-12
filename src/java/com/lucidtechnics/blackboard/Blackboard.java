@@ -175,17 +175,17 @@ public class Blackboard
 	public void init()
 	{
 		String persistenceDir = "./blackboard/persistence";
-		String workspaceHome = "./blackboard/workspaces";
+		String appsHome = "./blackboard/apps";
 
 		boolean successful = PropertyUtil.getInstance().loadProperties("/src/Blackboard.properties", "blackboard.cfg", true);
 
 		if (successful == true)
 		{
-			workspaceHome = PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.workspace.home", workspaceHome);
+			appsHome = PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.apps.home", appsHome);
 			persistenceDir = PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.persistence.home", persistenceDir);
 		}
 
-		java.io.File file = new java.io.File(workspaceHome);
+		java.io.File file = new java.io.File(appsHome);
 
 		if (file.exists() == false)
 		{
@@ -201,28 +201,48 @@ public class Blackboard
 
 		initializeTargetSpacePersistentStore(persistenceDir);
 
-		if (workspaceHome == null ||
-		   org.apache.commons.lang.StringUtils.isWhitespace(workspaceHome) == true)
+		if (appsHome == null ||
+		   org.apache.commons.lang.StringUtils.isWhitespace(appsHome) == true)
 		{
-			throw new RuntimeException("blackboard.workspace.home has not been set in the Blackboard.properties file");
+			throw new RuntimeException("blackboard.apps.home has not been set in the Blackboard.properties file");
 		}
 
-		java.io.File workspaceDirectory = new java.io.File(workspaceHome);
+		java.io.File appsDirectory = new java.io.File(appsHome);
 
-		if (workspaceDirectory.isDirectory() != true)
+		if (appsDirectory.isDirectory() != true)
 		{
-			throw new RuntimeException("Directory: " + workspaceHome + " as set in Blackboard.properties is not a directory");
+			throw new RuntimeException("Directory: " + appsHome + " as set in blackboard.apps.home is not a directory");
 		}
 
-		java.io.File[] directoryFiles = workspaceDirectory.listFiles();
+		java.io.File[] directoryFiles = appsDirectory.listFiles();
 
-		logger.debug("Getting events for workspaces: " + workspaceDirectory.getName());
+		logger.debug("Getting events for apps: " + appsDirectory.getName());
 
 		for (int i = 0; i < directoryFiles.length; i++)
 		{
 			if (directoryFiles[i].isDirectory() == true)
 			{
-				processEventPlans(directoryFiles[i]);
+				String appName = appsDirectory.getName();
+
+				java.io.File[] workspaceDirectoryFiles = directoryFiles[i].listFiles();
+
+				for (int j = 0; j < directoryFiles.length; j++)
+				{
+					if (workspaceDirectoryFiles[j].isDirectory() == true)
+					{
+						String workspaceName = workspaceDirectoryFiles[j].getName();
+
+						java.io.File[] eventDirectoryFiles = workspaceDirectoryFiles[j].listFiles();
+
+						for (int k = 0; k < directoryFiles.length; k++)
+						{
+							if (eventDirectoryFiles[k].isDirectory() == true)
+							{
+								processEventPlans(appName, workspaceName, eventDirectoryFiles[k]);
+							}
+						}
+					}
+				}
 			}
 		}
 
@@ -709,7 +729,6 @@ public class Blackboard
 					{
 						targetSpace = getBlackboardFactory().createTargetSpace(_workspaceConfiguration, _workspaceIdentifier);
 						String workspaceIdentifierString = (_workspaceIdentifier == null) ? "null" : _workspaceIdentifier.toString();
-						targetSpace.setName(_eventName + workspaceIdentifierString);
 						targetSpace.addPlans(_workspaceConfiguration.getPlanSet());
 					}
 
@@ -1128,13 +1147,15 @@ public class Blackboard
 		getTargetSpaceGuard().releaseLock(_id);
 	}
 
-	protected void processEventPlans(java.io.File _eventPlanDirectory)
+	protected void processEventPlans(String _appName, String _workspaceName, java.io.File _eventPlanDirectory)
 	{
 		logger.debug("Getting plans for event directory: " + _eventPlanDirectory.getName());
 
 		WorkspaceConfiguration workspaceConfiguration = new WorkspaceConfiguration();
 		workspaceConfiguration.setPlanSet(new java.util.HashSet<Plan>());
 		workspaceConfiguration.setDoNotPersistSet(new java.util.HashSet<String>());
+		workspaceConfiguration.setAppName(_appName);
+		workspaceConfiguration.setWorkspaceName(_workspaceName);
 
 		java.io.File[] planArray = _eventPlanDirectory.listFiles();
 

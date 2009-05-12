@@ -21,16 +21,22 @@ import java.util.Set;
 
 public class WorkspaceConfiguration
 {
+	private String appName;
+	private String workspaceName;
 	private Set planSet;
 	private Set doNotPersistSet;
 	private boolean persistChangeInfoHistory = false;
 	private Long workspaceTimeoutInSeconds = Long.MAX_VALUE;
 
+	public String getAppName() { return appName; }
+	public String getWorkspaceName() { return workspaceName; }
 	public Set getPlanSet() { return planSet; }
 	public Set getDoNotPersistSet() { return doNotPersistSet; }
 	public boolean getPersistChangeInfoHistory() { return persistChangeInfoHistory; }
 	public Long getWorkspaceTimeoutInSeconds() { return workspaceTimeoutInSeconds; }
-			
+
+	public void setAppName(String _appName) { appName = _appName; }
+	public void setWorkspaceName(String _workspaceName) { workspaceName = _workspaceName; }
 	public void setPlanSet(Set _planSet) { planSet = _planSet; }
 	public void setDoNotPersistSet(Set _doNotPersistSet) { doNotPersistSet = _doNotPersistSet; }
 	public void setPersistChangeInfoHistory(boolean _persistChangeInfoHistory) { persistChangeInfoHistory = _persistChangeInfoHistory; }

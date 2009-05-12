@@ -57,7 +57,12 @@ public class WorkspaceContext
 	{
 		return getTargetSpace().getName();
 	}
-
+	
+	public String getAppName()
+	{
+		return getTargetSpace().getAppName();
+	}
+			
 	public Object getWorkspaceIdentifier()
 	{
 		return getTargetSpace().getWorkspaceIdentifier();

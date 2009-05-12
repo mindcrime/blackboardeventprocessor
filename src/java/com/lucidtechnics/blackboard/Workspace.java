@@ -22,6 +22,7 @@ public interface Workspace
    extends Intercepter
 {
 	public String getName();
+	public String getAppName();
 	public Object getWorkspaceIdentifier();
 	public Object get(String _targetName);
 	public boolean has(String _targetName);

@@ -30,6 +30,10 @@ public class BlackboardFactoryImpl
 
 	public TargetSpace createTargetSpace(WorkspaceConfiguration _workspaceConfiguration, Object _workspaceIdentifier)
 	{
+		TargetSpace targetSpace = new TargetSpaceImpl(_workspaceIdentifier);
+		targetSpace.setAppName(_workspaceConfiguration.getAppName());
+		targetSpace.setName(_workspaceConfiguration.getWorkspaceName());
+		
 		return new TargetSpaceImpl(_workspaceIdentifier);
 	}			
 }
