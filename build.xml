@@ -233,6 +233,10 @@
 			<fileset dir="${src}/workspaces" includes="CocoTheMonkey.js" />
 		</copy>
 
+		<copy todir="${dist}/blackboard/">
+			<fileset dir="${src}/doc" includes="README.txt" />
+		</copy>
+
 		<copy todir="${dist}/blackboard/blackboard/workspaces/">
 			<fileset dir="${src}/workspaces" includes="*" excludes="*.*" />
 		</copy>
