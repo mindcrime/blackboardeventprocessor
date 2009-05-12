@@ -198,8 +198,8 @@
 		</copy>
 
 		<!-- copy blackboard example files -->
-		<copy todir="${blackboardHome}/workspaces">
-			<fileset dir="${src}/workspaces" includes="**/*" />
+		<copy todir="${blackboardHome}/apps">
+			<fileset dir="${src}/apps" includes="**/*" />
 		</copy>
 
 		<!-- copy blackboard example files -->
