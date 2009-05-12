@@ -16,7 +16,7 @@
 
 package com.lucidtechnics.blackboard.examples.cocothemonkey;
 
-@com.lucidtechnics.blackboard.Event(name="eagle", workspaceIdentifier="lookingFor")
+@com.lucidtechnics.blackboard.Event(appName="example", workspaceName="CocoTheMonkey", name="eagle", workspaceIdentifier="lookingFor")
 
 public class Eagle
 {

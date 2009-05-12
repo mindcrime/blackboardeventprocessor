@@ -18,8 +18,8 @@ package com.lucidtechnics.blackboard;
 
 public @interface Event
 {
-	public String app() default "my.blackboard";
-	public String workspace() default "my.workspace";
+	public String appName() default "my.blackboard";
+	public String workspaceName() default "my.workspace";
 	public String name() default "my.event";
 	public String workspaceIdentifier();
 }

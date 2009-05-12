@@ -216,28 +216,30 @@ public class Blackboard
 
 		java.io.File[] directoryFiles = appsDirectory.listFiles();
 
-		logger.debug("Getting events for apps: " + appsDirectory.getName());
-
 		for (int i = 0; i < directoryFiles.length; i++)
 		{
 			if (directoryFiles[i].isDirectory() == true)
 			{
-				String appName = appsDirectory.getName();
+				String appName = directoryFiles[i].getName();
+
+				logger.info("Configuring app: " + appName);
 
 				java.io.File[] workspaceDirectoryFiles = directoryFiles[i].listFiles();
 
-				for (int j = 0; j < directoryFiles.length; j++)
+				for (int j = 0; j < workspaceDirectoryFiles.length; j++)
 				{
 					if (workspaceDirectoryFiles[j].isDirectory() == true)
 					{
 						String workspaceName = workspaceDirectoryFiles[j].getName();
 
+						logger.info("Processing workspace: " + workspaceName);
+
 						java.io.File[] eventDirectoryFiles = workspaceDirectoryFiles[j].listFiles();
 
-						for (int k = 0; k < directoryFiles.length; k++)
+						for (int k = 0; k < eventDirectoryFiles.length; k++)
 						{
 							if (eventDirectoryFiles[k].isDirectory() == true)
-							{
+							{ 
 								processEventPlans(appName, workspaceName, eventDirectoryFiles[k]);
 							}
 						}
@@ -248,6 +250,8 @@ public class Blackboard
 
 		establishBlackboardPlans();
 
+		logger.info("Loaded event configurations: " + getEventToWorkspaceMap());
+		
 		setBlackboardExecutor(new ThreadPoolExecutor(getMaxBlackboardThread(), getMaxBlackboardThread(), 100, TimeUnit.SECONDS,
 			new LinkedBlockingQueue()));
 
@@ -617,10 +621,11 @@ public class Blackboard
 		);
 	}
 
-	private String[] determineEventNames(Object _event)
+	private List<String> determineEventNames(Object _event)
 	{
+		List<String> eventNameList = new ArrayList<String>();
+		
 		Class eventClass = _event.getClass();
-		String[] nameArray = null;
 
 		if (eventClass.isAnnotationPresent(Event.class) == true)
 		{
@@ -628,11 +633,16 @@ public class Blackboard
 
 			if (event.name() != null)
 			{
-				nameArray = event.name().split(",");
+				String[] nameArray = event.name().split(",");
+
+				for (int i = 0; i < nameArray.length; i++)
+				{
+					eventNameList.add(createFullEventName(event.appName(), event.workspaceName(), nameArray[i]));
+				}
 			}
 		}
 
-		return nameArray;
+		return eventNameList;
 	}
 
 	private String determineWorkspaceIdentifierName(Object _event)
@@ -665,14 +675,14 @@ public class Blackboard
 
 			boolean foundEventConfiguration = false;
 
-			String[] eventNames = determineEventNames(_event);
+			List<String> eventNameList = determineEventNames(_event);
 
-			if (eventNames == null || eventNames.length == 0)
+			if (eventNameList.isEmpty() == true)
 			{
 				throw new RuntimeException("Unknown event: " + _event);
 			}
 
-			for (String eventName: eventNames)
+			for (String eventName: eventNameList)
 			{
 				if (logger.isDebugEnabled() == true)
 				{
@@ -1149,7 +1159,7 @@ public class Blackboard
 
 	protected void processEventPlans(String _appName, String _workspaceName, java.io.File _eventPlanDirectory)
 	{
-		logger.debug("Getting plans for event directory: " + _eventPlanDirectory.getName());
+		logger.info("Getting plans for event directory: " + _eventPlanDirectory.getName());
 
 		WorkspaceConfiguration workspaceConfiguration = new WorkspaceConfiguration();
 		workspaceConfiguration.setPlanSet(new java.util.HashSet<Plan>());
@@ -1163,18 +1173,32 @@ public class Blackboard
 		{
 			if (planArray[i].isDirectory() == false && planArray[i].getName().endsWith(".js") == true)
 			{
-				logger.debug("Loading plan: " + planArray[i].getName());
+				logger.info("Loading plan: " + planArray[i].getName());
 
 				workspaceConfiguration.getPlanSet().add(new JavaScriptPlan(planArray[i].getName(), planArray[i].getAbsolutePath()));
 			}
 			else if (planArray[i].isDirectory() == false && planArray[i].getName().endsWith(".rb") == true)
 			{
-				logger.debug("Loading plan: " + planArray[i].getName());
+				logger.info("Loading plan: " + planArray[i].getName());
 				workspaceConfiguration.getPlanSet().add(new RubyPlan(planArray[i].getName(), planArray[i].getAbsolutePath()));
 			}
 		}
 
-		getEventToWorkspaceMap().put(extractEventName(_eventPlanDirectory.getName()), workspaceConfiguration);
+		String eventName = extractEventName(_eventPlanDirectory.getName());
+		
+		getEventToWorkspaceMap().put(createFullEventName(_appName, _workspaceName, eventName), workspaceConfiguration);
+	}
+	
+	protected String createFullEventName(String _appName, String _workspaceName, String _eventName)
+	{
+		if (logger.isDebugEnabled() == true)
+		{
+			logger.debug("Creating event name from app name: " + _appName +
+						 " and workspace name: " + _workspaceName +
+						 " and event name: " + _eventName);
+		}
+		
+		return _appName + "." + _workspaceName + "." + _eventName;
 	}
 
 	protected void establishBlackboardPlans()

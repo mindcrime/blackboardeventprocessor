@@ -16,7 +16,7 @@
 
 package com.lucidtechnics.blackboard.examples.cocothemonkey;
 
-@com.lucidtechnics.blackboard.Event(name="hunter", workspaceIdentifier="inForestOf")
+@com.lucidtechnics.blackboard.Event(appName="example", workspaceName="CocoTheMonkey", name="hunter", workspaceIdentifier="inForestOf")
 
 public class Hunter
 {

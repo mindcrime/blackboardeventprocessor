@@ -226,21 +226,20 @@
 			<fileset dir="${dist}/lib" includes="*.jar" excludes="*Test*.jar" />
 		</copy>
 
-		<mkdir dir="${dist}/blackboard/blackboard/workspaces" />
+		<mkdir dir="${dist}/blackboard/blackboard/apps" />
 		<mkdir dir="${dist}/blackboard/blackboard/persistence" />
 
 		<copy todir="${dist}/blackboard/">
-			<fileset dir="${src}/workspaces" includes="CocoTheMonkey.js" />
+			<fileset dir="${src}/apps" includes="CocoTheMonkey.js" />
 		</copy>
 
 		<copy todir="${dist}/blackboard/">
 			<fileset dir="${src}/doc" includes="README.txt" />
 		</copy>
 
-		<copy todir="${dist}/blackboard/blackboard/workspaces/">
-			<fileset dir="${src}/workspaces" includes="*" excludes="*.*" />
+		<copy todir="${dist}/blackboard/blackboard/apps/">
+			<fileset dir="${src}/apps" includes="**/*" excludes="*.*" />
 		</copy>
-
 
 		<zip destfile="${dist}/blackboard-standalone.zip">
 		   <zipfileset dir="${dist}/blackboard" prefix="blackboard"/>

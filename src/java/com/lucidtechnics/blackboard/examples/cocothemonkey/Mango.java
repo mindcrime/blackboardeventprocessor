@@ -16,7 +16,7 @@
 
 package com.lucidtechnics.blackboard.examples.cocothemonkey;
 
-@com.lucidtechnics.blackboard.Event(name="mango", workspaceIdentifier="fruitFor")
+@com.lucidtechnics.blackboard.Event(appName="example", workspaceName="CocoTheMonkey", name="mango", workspaceIdentifier="fruitFor")
 
 public class Mango
    extends Fruit
