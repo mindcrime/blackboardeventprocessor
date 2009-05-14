@@ -40,11 +40,6 @@ import com.lucidtechnics.blackboard.util.Guard;
 import com.lucidtechnics.blackboard.util.error.ErrorManager;
 import com.lucidtechnics.blackboard.util.PropertyUtil;
 
-import com.db4o.Db4o;
-import com.db4o.ObjectServer;
-import com.db4o.ObjectContainer;
-import com.db4o.ObjectSet;
-
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -70,6 +65,7 @@ public class Blackboard
 	private Map<Object, TargetSpace> targetSpaceMap; //workspace identifier --> target space
 	private Guard targetSpaceGuard;
 	private boolean managingBlackboard;
+	private Persister persister;
 	private String host = "localhost";
 	private int port = 28000;
 	private String user = "blackboard";
@@ -101,6 +97,7 @@ public class Blackboard
 	private Map<Object, TargetSpace> getTargetSpaceMap() { return targetSpaceMap; }
 	private Guard getTargetSpaceGuard() { return targetSpaceGuard; }
 	private boolean getManagingBlackboard() { return managingBlackboard; }
+	private Persister getPersister() { return persister; }
 	public String getHost() { return host; }
 	public int getPort() { return port; }
 	public String getUser() { return user; }
@@ -127,6 +124,7 @@ public class Blackboard
 	private void setTargetSpaceMap(Map<Object, TargetSpace> _targetSpaceMap) { targetSpaceMap = _targetSpaceMap;	 }
 	private void setTargetSpaceGuard(Guard _targetSpaceGuard) { targetSpaceGuard = _targetSpaceGuard; }
 	private void setManagingBlackboard(boolean _managingBlackboard) { managingBlackboard = _managingBlackboard; }
+	private void setPersister(Persister _persister) { persister = _persister; } 
 	public void setHost(String _host) { host = _host; }
 	public void setPort(int _port) { port = _port; }
 	public void setUser(String _user) { user = _user; }
@@ -163,13 +161,7 @@ public class Blackboard
 
 	private void initializeTargetSpacePersistentStore(String _persistenceDir)
 	{
-		Db4o.configure().allowVersionUpdates(true);
-		Db4o.configure().callConstructors(true);
-		Db4o.configure().exceptionsOnNotStorable(true);
-		Db4o.configure().objectClass(TargetSpace.class).objectField("workspaceIdentifier").indexed(true);
-
-		ObjectServer server = Db4o.openServer(_persistenceDir.replaceAll("/$", "") + "/blackboard.db4o", getPort());
-		server.grantAccess(getUser(), getPassword());
+		setPersister(PersisterFactory.make("db4o", _persistenceDir, this));		
 	}
 
 	public void init()
@@ -1061,68 +1053,14 @@ public class Blackboard
 
 	private void persistTargetSpace(TargetSpace _targetSpace)
 	{
-		ObjectContainer targetSpaceDatabase = null;
 		TargetSpace targetSpace = _targetSpace.prepareForPersistence();
 
-		try
-		{
-			targetSpaceDatabase = Db4o.openClient(getHost(), getPort(), getUser(), getPassword());
-			targetSpaceDatabase.set(targetSpace);
-		}
-		catch(Throwable t)
-		{
-			System.out.println("Caught this exception: " + t.toString());
-			throw new RuntimeException(t);
-		}
-		finally
-		{
-			if (targetSpaceDatabase != null)  { targetSpaceDatabase.close(); }
-		}
+		getPersister().put(_targetSpace);
 	}
 
 	private TargetSpace retrieveTargetSpaceFromStore(Object _workspaceIdentifier)
 	{
-		ObjectContainer targetSpaceDatabase = null;
-		TargetSpace targetSpace = new TargetSpaceImpl(_workspaceIdentifier);
-
-		try
-		{
-			targetSpaceDatabase = Db4o.openClient(getHost(), getPort(), getUser(), getPassword());
-			ObjectSet objectSet = targetSpaceDatabase.get(targetSpace);
-
-			if (objectSet.size() > 1)
-			{
-				logger.warn("Retrieved more than one workspace with identifier: " + _workspaceIdentifier);
-			}
-			else if (objectSet.size() == 0)
-			{
-				throw new RuntimeException("Unable to retrieve workspace with identifier: " + _workspaceIdentifier);
-			}
-			else
-			{
-				if (logger.isDebugEnabled() == true)
-				{
-					logger.debug("Found exactly one workspace for retrieval identified by: " + _workspaceIdentifier);
-				}
-			}
-
-			targetSpace = (TargetSpace) objectSet.next();
-
-			if (targetSpace == null)
-			{
-				throw new RuntimeException("Null found while retrieving workspace with identifier: " + _workspaceIdentifier);
-			}
-		}
-		catch(Throwable t)
-		{
-			throw new RuntimeException(t);
-		}
-		finally
-		{
-			targetSpaceDatabase.close();
-		}
-
-		return targetSpace;
+		return getPersister().get(_workspaceIdentifier);
 	}
 
 	protected void removeFromBlackboard(TargetSpace _targetSpace, boolean _leaveEntry)
