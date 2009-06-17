@@ -32,6 +32,7 @@ public class Launcher
 		TargetSpace targetSpace = new TargetSpaceImpl();
 		targetSpace.setBlackboard(blackboard);
 
+		logger.info("the current directory is: " + currentDirectory.getName());
 		java.io.File[] generatorArray = currentDirectory.listFiles();
 
 		for (int i = 0; i < generatorArray.length; i++)
@@ -40,14 +41,14 @@ public class Launcher
 			
 			if (generatorArray[i].isDirectory() == false && generatorArray[i].getName().endsWith(".js") == true)
 			{
-				logger.debug("Executing generator: " + generatorArray[i].getName());
+				logger.info("Executing generator: " + generatorArray[i].getName());
 
 				plan = new com.lucidtechnics.blackboard.JavaScriptPlan(
 					generatorArray[i].getName(), generatorArray[i].getAbsolutePath());
 			}
 			else if (generatorArray[i].isDirectory() == false && generatorArray[i].getName().endsWith(".rb") == true)
 			{
-				logger.debug("Executing generator: " + generatorArray[i].getName());
+				logger.info("Executing generator: " + generatorArray[i].getName());
 
 				plan = new com.lucidtechnics.blackboard.RubyPlan(
 					generatorArray[i].getName(), generatorArray[i].getAbsolutePath());

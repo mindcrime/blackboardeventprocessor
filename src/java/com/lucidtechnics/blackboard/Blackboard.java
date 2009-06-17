@@ -161,7 +161,7 @@ public class Blackboard
 
 	private void initializeTargetSpacePersistentStore(String _persistenceDir)
 	{
-		setPersister(PersisterFactory.make("db4o", _persistenceDir, this));		
+		setPersister(PersisterFactory.make("other", _persistenceDir, this));		
 	}
 
 	public void init()
