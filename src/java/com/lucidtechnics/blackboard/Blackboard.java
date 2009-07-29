@@ -719,44 +719,39 @@ public class Blackboard
 
 			if (targetSpace == null)
 			{
-				targetSpace = (TargetSpace) getTargetSpaceMap().get(_workspaceIdentifier);
-
-				if (targetSpace == null)
+				if (getTargetSpaceMap().keySet().contains(_workspaceIdentifier) == true)
 				{
-					if (getTargetSpaceMap().keySet().contains(_workspaceIdentifier) == true)
-					{
-						targetSpace = retrieveTargetSpaceFromStore(_workspaceIdentifier);
-					}
-					else if (getTargetSpaceMap().keySet().contains(_workspaceIdentifier) == false)
-					{
-						targetSpace = getBlackboardFactory().createTargetSpace(_workspaceConfiguration, _workspaceIdentifier);
-						String workspaceIdentifierString = (_workspaceIdentifier == null) ? "null" : _workspaceIdentifier.toString();
-						targetSpace.addPlans(_workspaceConfiguration.getPlanSet());
-					}
+					targetSpace = retrieveTargetSpaceFromStore(_workspaceIdentifier);
+				}
+				else if (getTargetSpaceMap().keySet().contains(_workspaceIdentifier) == false)
+				{
+					targetSpace = getBlackboardFactory().createTargetSpace(_workspaceConfiguration, _workspaceIdentifier);
+					String workspaceIdentifierString = (_workspaceIdentifier == null) ? "null" : _workspaceIdentifier.toString();
+					targetSpace.addPlans(_workspaceConfiguration.getPlanSet());
+				}
 
-					if (targetSpace != null)
+				if (targetSpace != null)
+				{
+					targetSpace.initialize(this);
+
+					try
 					{
-						targetSpace.initialize(this);
+						releaseBlackboardReadLock();
+						acquireBlackboardWriteLock();
 
-						try
-						{
-							releaseBlackboardReadLock();
-							acquireBlackboardWriteLock();
+						getTargetSpaceMap().put(_workspaceIdentifier, targetSpace);
 
-							getTargetSpaceMap().put(_workspaceIdentifier, targetSpace);
-
-							incrementActiveWorkspaceCount();
-						}
-						finally
-						{
-							acquireBlackboardReadLock();
-							releaseBlackboardWriteLock();
-						}
+						incrementActiveWorkspaceCount();
 					}
-					else
+					finally
 					{
-						throw new RuntimeException("Unable to create or retrieve workspace for workspaceIdentifier: " + _workspaceIdentifier);
+						acquireBlackboardReadLock();
+						releaseBlackboardWriteLock();
 					}
+				}
+				else
+				{
+					throw new RuntimeException("Unable to create or retrieve workspace for workspaceIdentifier: " + _workspaceIdentifier);
 				}
 			}
 
@@ -783,56 +778,6 @@ public class Blackboard
 
 			releaseTargetSpace(_workspaceIdentifier);
 		}
-	}
-
-	private Class[] getAllTypes(Class _class)
-	{
-		ArrayList allTypesList = new ArrayList();
-		ArrayList searchDomainList = new ArrayList();
-		searchDomainList.add(_class);
-		allTypesList.add(_class);
-
-		allTypesList = getAllTypes(searchDomainList, allTypesList);
-
-		return (Class[]) allTypesList.toArray(new Class[allTypesList.size()]);
-	}
-
-	private ArrayList getAllTypes(ArrayList _searchDomainList, ArrayList _allTypesList)
-	{
-		for (int i = 0; i < _searchDomainList.size(); i++)
-		{
-			Class searchClass = (Class) _searchDomainList.get(i);
-			_searchDomainList.remove(searchClass);
-
-			Class superClass = searchClass.getSuperclass();
-
-			if (superClass != null && (_allTypesList.contains(superClass) == false))
-			{
-				_searchDomainList.add(superClass);
-				_allTypesList.add(superClass);
-			}
-
-			Class[] interfaceArray = searchClass.getInterfaces();
-
-			if (interfaceArray != null)
-			{
-				for (int j = 0; j < interfaceArray.length; j++)
-				{
-					if (interfaceArray[j] != null && (_allTypesList.contains(interfaceArray[j]) == false))
-					{
-						_searchDomainList.add(interfaceArray[j]);
-						_allTypesList.add(interfaceArray[j]);
-					}
-				}
-			}
-		}
-
-		if (_searchDomainList.isEmpty() == false)
-		{
-			_allTypesList = getAllTypes(_searchDomainList, _allTypesList);
-		}
-
-		return _allTypesList;
 	}
 
 	private void incrementActiveWorkspaceCount()

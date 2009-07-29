@@ -20,9 +20,61 @@ import org.apache.commons.beanutils.BeanUtils;
 
 import java.util.Map;
 import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
 
 public final class Utility
 {
+	public static Class[] getAllTypes(Class _class)
+	{
+		ArrayList allTypesList = new ArrayList();
+		ArrayList searchDomainList = new ArrayList();
+		searchDomainList.add(_class);
+		allTypesList.add(_class);
+
+		allTypesList = getAllTypes(searchDomainList, allTypesList);
+
+		return (Class[]) allTypesList.toArray(new Class[allTypesList.size()]);
+	}
+
+	public static ArrayList getAllTypes(ArrayList _searchDomainList, ArrayList _allTypesList)
+	{
+		for (int i = 0; i < _searchDomainList.size(); i++)
+		{
+			Class searchClass = (Class) _searchDomainList.get(i);
+			_searchDomainList.remove(searchClass);
+
+			Class superClass = searchClass.getSuperclass();
+
+			if (superClass != null && (_allTypesList.contains(superClass) == false))
+			{
+				_searchDomainList.add(superClass);
+				_allTypesList.add(superClass);
+			}
+
+			Class[] interfaceArray = searchClass.getInterfaces();
+
+			if (interfaceArray != null)
+			{
+				for (int j = 0; j < interfaceArray.length; j++)
+				{
+					if (interfaceArray[j] != null && (_allTypesList.contains(interfaceArray[j]) == false))
+					{
+						_searchDomainList.add(interfaceArray[j]);
+						_allTypesList.add(interfaceArray[j]);
+					}
+				}
+			}
+		}
+
+		if (_searchDomainList.isEmpty() == false)
+		{
+			_allTypesList = getAllTypes(_searchDomainList, _allTypesList);
+		}
+
+		return _allTypesList;
+	}
+
 	public static String toString(Object _object)
 	{
 		StringBuffer stringBuffer = new StringBuffer();
