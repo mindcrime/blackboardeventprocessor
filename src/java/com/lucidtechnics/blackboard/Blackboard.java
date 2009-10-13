@@ -228,11 +228,13 @@ public class Blackboard
 
 						java.io.File[] eventDirectoryFiles = workspaceDirectoryFiles[j].listFiles();
 
+						WorkspaceConfiguration workspaceConfiguration = configureWorkspace(appName, workspaceName, workspaceDirectoryFiles[j]);
+						
 						for (int k = 0; k < eventDirectoryFiles.length; k++)
 						{
 							if (eventDirectoryFiles[k].isDirectory() == true)
 							{ 
-								processEventPlans(appName, workspaceName, eventDirectoryFiles[k]);
+								processEventPlans(appName, workspaceName, workspaceConfiguration, eventDirectoryFiles[k]);
 							}
 						}
 					}
@@ -1040,15 +1042,12 @@ public class Blackboard
 		getTargetSpaceGuard().releaseLock(_id);
 	}
 
-	protected void processEventPlans(String _appName, String _workspaceName, java.io.File _eventPlanDirectory)
+	protected void processEventPlans(String _appName, String _workspaceName, WorkspaceConfiguration _workspaceConfiguration, java.io.File _eventPlanDirectory)
 	{
-		logger.info("Getting plans for event directory: " + _eventPlanDirectory.getName());
+		logger.info("Getting plans from event directory: " + _eventPlanDirectory.getName());
 
-		WorkspaceConfiguration workspaceConfiguration = new WorkspaceConfiguration();
-		workspaceConfiguration.setPlanSet(new java.util.HashSet<Plan>());
-		workspaceConfiguration.setDoNotPersistSet(new java.util.HashSet<String>());
-		workspaceConfiguration.setAppName(_appName);
-		workspaceConfiguration.setWorkspaceName(_workspaceName);
+		//execute workspace configuration returns workspace
+		//configuration for this workspace.
 
 		java.io.File[] planArray = _eventPlanDirectory.listFiles();
 
@@ -1058,18 +1057,59 @@ public class Blackboard
 			{
 				logger.info("Loading plan: " + planArray[i].getName());
 
-				workspaceConfiguration.getPlanSet().add(new JavaScriptPlan(planArray[i].getName(), planArray[i].getAbsolutePath()));
+				_workspaceConfiguration.getPlanSet().add(new JavaScriptPlan(planArray[i].getName(), planArray[i].getAbsolutePath()));
 			}
 			else if (planArray[i].isDirectory() == false && planArray[i].getName().endsWith(".rb") == true)
 			{
 				logger.info("Loading plan: " + planArray[i].getName());
-				workspaceConfiguration.getPlanSet().add(new RubyPlan(planArray[i].getName(), planArray[i].getAbsolutePath()));
+				_workspaceConfiguration.getPlanSet().add(new RubyPlan(planArray[i].getName(), planArray[i].getAbsolutePath()));
 			}
 		}
 
 		String eventName = extractEventName(_eventPlanDirectory.getName());
 		
-		getEventToWorkspaceMap().put(createFullEventName(_appName, _workspaceName, eventName), workspaceConfiguration);
+		getEventToWorkspaceMap().put(createFullEventName(_appName, _workspaceName, eventName), _workspaceConfiguration);
+	}
+
+	protected WorkspaceConfiguration configureWorkspace(String _appName, String _workspaceName, java.io.File _eventPlanDirectory)
+	{
+		WorkspaceConfiguration workspaceConfiguration = new WorkspaceConfiguration();
+		workspaceConfiguration.setPlanSet(new java.util.HashSet<Plan>());
+		workspaceConfiguration.setDoNotPersistSet(new java.util.HashSet<String>());
+		workspaceConfiguration.setAppName(_appName);
+		workspaceConfiguration.setWorkspaceName(_workspaceName);
+
+		java.io.File[] configurationFileArray = _eventPlanDirectory.listFiles();
+		Configurator configurator = null;
+		String configuratorPath = null;
+		
+		for (int i = 0; i < configurationFileArray.length; i++)
+		{
+			if (configurationFileArray[i].isDirectory() == false && configurationFileArray[i].getName().endsWith("workspaceConfiguration.js") == true)
+			{
+				logger.info("Loading configuration: " + configurationFileArray[i].getName());
+				configurator = new JavaScriptConfigurator();
+				configuratorPath = configurationFileArray[i].getAbsolutePath();
+			}
+			else if (configurationFileArray[i].isDirectory() == false && configurationFileArray[i].getName().endsWith("workspaceConfiguration.rb") == true)
+			{
+				logger.info("Loading configuration: " + configurationFileArray[i].getName());
+				configurator = new RubyConfigurator();
+				configuratorPath = configurationFileArray[i].getAbsolutePath();
+			}
+		}
+
+		if (configuratorPath != null)
+		{
+			logger.info("Executing this configuration: " + configuratorPath);
+			configurator.execute(workspaceConfiguration, configuratorPath);
+		}
+		else
+		{
+			logger.info("No workspaceConfiguration.js/rb file found for directory: " + _eventPlanDirectory + ".");
+		}
+
+		return workspaceConfiguration;
 	}
 	
 	protected String createFullEventName(String _appName, String _workspaceName, String _eventName)

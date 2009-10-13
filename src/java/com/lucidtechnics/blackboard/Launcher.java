@@ -25,6 +25,8 @@ public class Launcher
 
 	public static final void main(String[] _args)
 	{
+		loadJars();
+		
 		final Blackboard blackboard = new Blackboard();
 		blackboard.init();
 
@@ -67,6 +69,33 @@ public class Launcher
 		synchronized(object)
 		{
 			try { object.wait(); } catch (InterruptedException e) {}
+		}
+	}
+
+	public static void loadJars()
+	{
+		logger.info("Loading jar files");
+		
+		java.net.URL urls [] = {};
+
+		JarFileLoader jarFileLoader = new JarFileLoader (urls);
+
+		java.io.File jarFileDirectory = new java.io.File("./lib/");
+
+		java.io.File[] fileArray = jarFileDirectory.listFiles();
+
+		for (int i = 0; i < fileArray.length; i++)
+		{
+			if (fileArray[i].isDirectory() == false)
+			{
+				String jarFileName = fileArray[i].getName();
+				
+				if (jarFileName.endsWith(".jar") == true)
+				{
+					logger.info("Loading jar files: " + jarFileName);
+					jarFileLoader.addFile(jarFileName);
+				}
+			}
 		}
 	}
 }
