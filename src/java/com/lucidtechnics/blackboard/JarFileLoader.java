@@ -28,11 +28,32 @@ public class JarFileLoader
 	{
 		try
 		{
+			boolean alreadyLoadedJar = false;
 			String urlPath = "jar:file://" + _path + "!/";
-			addURL(new java.net.URL (urlPath));
+			java.net.URL url = new java.net.URL(urlPath);
+
+			java.net.URLClassLoader systemClassLoader = (java.net.URLClassLoader) ClassLoader.getSystemClassLoader();
+			java.net.URL[] urlArray = systemClassLoader.getURLs();
+			
+			for (int i = 0; i < urlArray.length; i++)
+			{
+				if (org.apache.commons.lang.StringUtils.equalsIgnoreCase(urlArray[i].toString(), url.toString()) == true)
+				{
+					alreadyLoadedJar = true;
+				}
+			}
+
+			if (alreadyLoadedJar == false)
+			{
+				Class urlClassLoaderClass = java.net.URLClassLoader.class;
+				java.lang.reflect.Method method = urlClassLoaderClass.getDeclaredMethod("addURL", java.net.URL.class);
+				method.setAccessible(true);
+				method.invoke(systemClassLoader, url);
+			}
 		}
 		catch(Throwable t)
 		{
+			t.printStackTrace();
 			throw new RuntimeException(t);
 		}
 	}
