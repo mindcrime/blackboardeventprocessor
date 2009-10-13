@@ -88,7 +88,7 @@ public class Launcher
 		{
 			if (fileArray[i].isDirectory() == false)
 			{
-				String jarFileName = fileArray[i].getName();
+				String jarFileName = fileArray[i].getAbsolutePath();
 				
 				if (jarFileName.endsWith(".jar") == true)
 				{

@@ -16,9 +16,14 @@
 
 package com.lucidtechnics.blackboard;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class JarFileLoader
    extends java.net.URLClassLoader
 {
+	private static Log log = LogFactory.getLog(JarFileLoader.class);
+
 	public JarFileLoader(java.net.URL[] urls)
 	{
 		super (urls);
@@ -49,6 +54,10 @@ public class JarFileLoader
 				java.lang.reflect.Method method = urlClassLoaderClass.getDeclaredMethod("addURL", java.net.URL.class);
 				method.setAccessible(true);
 				method.invoke(systemClassLoader, url);
+			}
+			else
+			{
+				log.info("Already loaded: " + url.toString());
 			}
 		}
 		catch(Throwable t)
