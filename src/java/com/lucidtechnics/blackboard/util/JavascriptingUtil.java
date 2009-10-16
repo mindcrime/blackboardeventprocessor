@@ -38,21 +38,21 @@ public class JavascriptingUtil
 {
 	private static Log log = LogFactory.getLog(JavascriptingUtil.class);
 
-	private Set<String> scriptResourceSet;
+	private Map<String, byte[]> scriptResourceMap;
 	private Map<String, Object> bindingsMap;
 	private Scriptable scope;
 
-	private Set<String> getScriptResourceSet() { return scriptResourceSet; }
+	private Map<String, byte[]> getScriptResourceMap() { return scriptResourceMap; }
 	private Scriptable getScope() { return scope; }
 	private Map<String, Object> getBindingsMap() { return bindingsMap; }
 
-	private void setScriptResourceSet(Set<String> _scriptResourceSet) {  scriptResourceSet = _scriptResourceSet; }
+	private void setScriptResourceMap(Map<String, byte[]> _scriptResourceMap) {  scriptResourceMap = _scriptResourceMap; }
 	public void setScope(Scriptable _scope) { scope = _scope; }
     public void setBindingsMap(Map<String, Object> _bindingsMap) { bindingsMap = _bindingsMap; }
 
     public JavascriptingUtil()
 	{
-		setScriptResourceSet(new HashSet<String>());
+		setScriptResourceMap(new HashMap<String, byte[]>());
 		setBindingsMap(new HashMap<String, Object>());
     }
 
@@ -74,7 +74,7 @@ public class JavascriptingUtil
 
 			inputStream = findScript(_scriptResource);
 		
-			if (getScriptResourceSet().contains(_scriptResource) == false)
+			if (getScriptResourceMap().containsKey(_scriptResource) == false)
 			{
 				Reader reader = new InputStreamReader(inputStream);
 
@@ -88,7 +88,7 @@ public class JavascriptingUtil
 					throw new RuntimeException("Unable to execute script: " + _scriptResource + " for this reason: " + t.toString(), t);
 				}
 
-				getScriptResourceSet().add(_scriptResource);
+				getScriptResourceMap().put(_scriptResource, convertStreamtoByteArray(inputStream));
 			}
 		}
 		catch(Throwable t)
@@ -103,36 +103,74 @@ public class JavascriptingUtil
 		}
 	}
 
-	private InputStream findScript(String _scriptResource)
+	private byte[] convertStreamtoByteArray(InputStream _inputStream)
 	{
-		String rapidDeploy = "no";
-		InputStream inputStream = null;
-
+		java.io.ByteArrayOutputStream byteArrayOutputStream = new java.io.ByteArrayOutputStream();
+		
 		try
 		{
-			if (log.isDebugEnabled() == true)
+			byte[] byteArray = new byte[1024];
+			int bytesRead = 0;
+			
+			do
 			{
-				log.debug("Attempting to load script: " + _scriptResource);
+				byteArrayOutputStream.write(byteArray, 0, bytesRead);
+				bytesRead = _inputStream.read(byteArray);
+			}
+			while (bytesRead >= 0);
+		}
+		catch(Throwable t)
+		{
+			
+		}
+
+		return byteArrayOutputStream.toByteArray();
+	}
+	
+	private InputStream findScript(String _scriptResource)
+	{
+		java.io.ByteArrayInputStream byteArrayInputStream = null;
+		
+		try
+		{
+			if (getScriptResourceMap().containsKey(_scriptResource) == false)
+			{
+				synchronized(getScriptResourceMap())
+				{
+					if (getScriptResourceMap().containsKey(_scriptResource) == false)
+					{
+						if (log.isDebugEnabled() == true)
+						{
+							log.debug("Attempting to load script: " + _scriptResource);
+						}
+
+						java.io.File file = new java.io.File(_scriptResource);
+
+						if (file.exists() == true)
+						{
+							getScriptResourceMap().put(_scriptResource, convertStreamtoByteArray(new java.io.FileInputStream(file)));
+						}
+						else
+						{
+							throw new RuntimeException("Script: " + _scriptResource + " is not found");
+						}
+					}
+				}
 			}
 
-			java.io.File file = new java.io.File(_scriptResource);
-
-			if (file.exists() == true)
-			{
-				inputStream = new java.io.FileInputStream(file);
-			}
+			byteArrayInputStream = new java.io.ByteArrayInputStream(getScriptResourceMap().get(_scriptResource));
 		}
 		catch(Throwable t)
 		{
 			throw new RuntimeException(t);
 		}
 
-		if (inputStream == null)
+		if (byteArrayInputStream == null)
 		{
 			throw new RuntimeException("Unable to find script file. Make sure that this: " + _scriptResource + " exists.");
 		}
 
-		return inputStream;
+		return byteArrayInputStream;
 	}
 
 	private Object executeScript(String _scriptResource, Reader _reader)

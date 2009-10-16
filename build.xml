@@ -84,6 +84,8 @@
 	<!-- Init -->
 	<target name="init">
 
+	    <tstamp/>
+	    <echo message="Current date and time is: ${DSTAMP} ${TSTAMP}" />
 		<mkdir dir="${stage}" />
 		<mkdir dir="${stage.shl}" />
 		<mkdir dir="${stage.cfg}/blackboard" />

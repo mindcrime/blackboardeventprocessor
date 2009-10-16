@@ -70,6 +70,7 @@ public class Blackboard
 	private int port = 28000;
 	private String user = "blackboard";
 	private String password = "blackboard";
+	private boolean timePlans = true;
 
 	private ReentrantReadWriteLock blackboardReadWriteLock;
 	private Lock blackboardReadLock;
@@ -102,7 +103,8 @@ public class Blackboard
 	public int getPort() { return port; }
 	public String getUser() { return user; }
 	public String getPassword() { return password; }
-
+	public boolean getTimePlans() { return timePlans; }
+	
 	public void setErrorManager(ErrorManager _errorManager) { errorManager = _errorManager; }
 	private void setBlackboardActor(BlackboardActor _blackboardActor) { blackboardActor = _blackboardActor; }
 	public void setMaxBlackboardThread(int _maxBlackboardThread) { maxBlackboardThread = _maxBlackboardThread; }
@@ -129,13 +131,15 @@ public class Blackboard
 	public void setPort(int _port) { port = _port; }
 	public void setUser(String _user) { user = _user; }
 	public void setPassword(String _password) { password = _password; }
-
+	public void setTimePlans(boolean _timePlans) { timePlans = _timePlans; }
+	
 	public Blackboard()
 	{
 		boolean propertyExists = PropertyUtil.getInstance().loadProperties("/src/Blackboard.properties", "blackboard.cfg", true);
 
 		if (propertyExists == true)
 		{
+			setTimePlans(Boolean.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.time.plans")));
 			setMaxBlackboardThread(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.blackboard.thread")));
 			setMaxScheduledBlackboardThread(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.scheduled.blackboard.thread")));
 			setMaxWorkspaceThread(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.workspace.thread")));
@@ -297,6 +301,14 @@ public class Blackboard
 		getWorkspaceExecutor().execute(new Runnable() {
 			public void run()
 			{
+				long startWorkspaceRun = 0l;
+				long endWorkspaceRun = 0l;
+				
+				if (getTimePlans() == true)
+				{
+					startWorkspaceRun = System.currentTimeMillis();
+				}
+				
 				WorkspaceContext workspaceContext = null;
 				Plan plan = null;
 				Map planToChangeInfoCountMap = new HashMap();
@@ -346,7 +358,24 @@ public class Blackboard
 										workspaceContext = new WorkspaceContext(_targetSpace, plan);
 
 										_targetSpace.getWorkspaceWriteLock().lock();
+
+										long startTime = 0l;
+										long endTime = 0l;
+										long totalTime = 0l;
+										
+										if (getTimePlans() == true)
+										{
+											startTime = System.currentTimeMillis();
+										}
+										
 										_targetSpace.setPlanState(plan, plan.execute(workspaceContext));
+
+										if (getTimePlans() == true)
+										{
+											endTime = System.currentTimeMillis();
+											totalTime = endTime - startTime;
+											logger.info("Plan: " + plan.getName() + " executed in: " + totalTime);
+										}
 
 										if (_targetSpace.isFinished(plan) == true)
 										{
@@ -526,6 +555,12 @@ public class Blackboard
 					}
 
 					releaseTargetSpace(_targetSpace.getWorkspaceIdentifier());
+				}
+
+				if (getTimePlans() == true)
+				{
+					endWorkspaceRun = System.currentTimeMillis();
+					logger.info("Processing target space time: " + (endWorkspaceRun - startWorkspaceRun));
 				}
 			}
 		});
