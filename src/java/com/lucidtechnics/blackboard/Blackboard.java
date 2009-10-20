@@ -143,7 +143,7 @@ public class Blackboard
 			setMaxBlackboardThread(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.blackboard.thread")));
 			setMaxScheduledBlackboardThread(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.scheduled.blackboard.thread")));
 			setMaxWorkspaceThread(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.workspace.thread")));
-			setMaxPersistenceThread(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.persistence.thread")));
+			setMaxPersistenceThread(1);
 			setMaxWorkspace(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.workspace")));
 
 			setHost(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.db.host"));
@@ -165,7 +165,7 @@ public class Blackboard
 
 	private void initializeTargetSpacePersistentStore(String _persistenceDir)
 	{
-		setPersister(PersisterFactory.make("other", _persistenceDir, this));		
+		setPersister(PersisterFactory.make("inkwell", _persistenceDir, this));	
 	}
 
 	public void init()
@@ -218,7 +218,10 @@ public class Blackboard
 			{
 				String appName = directoryFiles[i].getName();
 
-				logger.info("Configuring app: " + appName);
+				if (logger.isInfoEnabled() == true)
+				{
+					logger.info("Configuring app: " + appName);
+				}
 
 				java.io.File[] workspaceDirectoryFiles = directoryFiles[i].listFiles();
 
@@ -228,7 +231,10 @@ public class Blackboard
 					{
 						String workspaceName = workspaceDirectoryFiles[j].getName();
 
-						logger.info("Processing workspace: " + workspaceName);
+						if (logger.isInfoEnabled() == true)
+						{
+							logger.info("Processing workspace: " + workspaceName);
+						}
 
 						java.io.File[] eventDirectoryFiles = workspaceDirectoryFiles[j].listFiles();
 
@@ -248,7 +254,10 @@ public class Blackboard
 
 		establishBlackboardPlans();
 
-		logger.info("Loaded event configurations: " + getEventToWorkspaceMap());
+		if (logger.isInfoEnabled() == true)
+		{
+			logger.info("Loaded event configurations: " + getEventToWorkspaceMap());
+		}
 		
 		setBlackboardExecutor(new ThreadPoolExecutor(getMaxBlackboardThread(), getMaxBlackboardThread(), 100, TimeUnit.SECONDS,
 			new LinkedBlockingQueue()));
@@ -264,11 +273,14 @@ public class Blackboard
 		setManagerExecutor(new ThreadPoolExecutor(1, 1, 100, TimeUnit.SECONDS,
 			new LinkedBlockingQueue()));
 
-		logger.info("Blackboard Workspace Server Initialization Inception.");
-		logger.info("Apache 2.0 Open Source License.");
-		logger.info("Copyright Owner - LucidTechnics, LLC.");
-		logger.info("Authors - Bediako Ntodi George and David Yuctan Hodge.");
-		logger.info("Initialization was successful.");
+		if (logger.isInfoEnabled() == true)
+		{
+			logger.info("Blackboard Workspace Server Initialization Inception.");
+			logger.info("Apache 2.0 Open Source License.");
+			logger.info("Copyright Owner - LucidTechnics, LLC.");
+			logger.info("Authors - Bediako Ntodi George and David Yuctan Hodge.");
+			logger.info("Initialization was successful.");
+		}
 	}
 
 	private void restoreToBlackboard(TargetSpace _targetSpace)
@@ -374,7 +386,11 @@ public class Blackboard
 										{
 											endTime = System.currentTimeMillis();
 											totalTime = endTime - startTime;
-											logger.info("Plan: " + plan.getName() + " executed in: " + totalTime);
+
+											if (logger.isDebugEnabled() == true)
+											{
+												logger.debug("Plan: " + plan.getName() + " executed in: " + totalTime);
+											}
 										}
 
 										if (_targetSpace.isFinished(plan) == true)
@@ -560,7 +576,11 @@ public class Blackboard
 				if (getTimePlans() == true)
 				{
 					endWorkspaceRun = System.currentTimeMillis();
-					logger.info("Processing target space time: " + (endWorkspaceRun - startWorkspaceRun));
+
+					if (logger.isDebugEnabled() == true)
+					{
+						logger.debug("Processing target space time: " + (endWorkspaceRun - startWorkspaceRun));
+					}
 				}
 			}
 		});
@@ -608,9 +628,9 @@ public class Blackboard
 			{
 				try
 				{
-					if (logger.isInfoEnabled() == true)
+					if (logger.isDebugEnabled() == true)
 					{
-						logger.info("o");
+						logger.debug("o");
 					}
 
 					add(_event);
@@ -833,9 +853,9 @@ public class Blackboard
 			}
 		}
 
-		if (logger.isInfoEnabled() == true)
+		if (logger.isDebugEnabled() == true)
 		{
-			logger.info(getActiveWorkspaceCount());
+			logger.debug(getActiveWorkspaceCount());
 		}
 	}
 
@@ -855,9 +875,9 @@ public class Blackboard
 			}
 		}
 
-		if (logger.isInfoEnabled() == true)
+		if (logger.isDebugEnabled() == true)
 		{
-			logger.info(getActiveWorkspaceCount());
+			logger.debug(getActiveWorkspaceCount());
 		}
 	}
 
@@ -910,9 +930,9 @@ public class Blackboard
 								  targetSpace.isTerminated() == false &&
 								  targetSpace.getLastUsedTimestamp() < timestamp)
 							{
-								if (logger.isInfoEnabled() == true)
+								if (logger.isDebugEnabled() == true)
 								{
-									logger.info("p");
+									logger.debug("p");
 								}
 
 								targetSpace.setPersisted();
@@ -987,9 +1007,9 @@ public class Blackboard
 		getPersistenceExecutor().execute(new Runnable() {
 			public void run()
 			{
-				if (logger.isInfoEnabled() == true)
+				if (logger.isDebugEnabled() == true)
 				{
-					logger.info("x");
+					logger.debug("x");
 				}
 
 				if (logger.isDebugEnabled() == true)
@@ -1079,7 +1099,10 @@ public class Blackboard
 
 	protected void processEventPlans(String _appName, String _workspaceName, WorkspaceConfiguration _workspaceConfiguration, java.io.File _eventPlanDirectory)
 	{
-		logger.info("Getting plans from event directory: " + _eventPlanDirectory.getName());
+		if (logger.isDebugEnabled() == true)
+		{
+			logger.debug("Getting plans from event directory: " + _eventPlanDirectory.getName());
+		}
 
 		//execute workspace configuration returns workspace
 		//configuration for this workspace.
@@ -1090,13 +1113,19 @@ public class Blackboard
 		{
 			if (planArray[i].isDirectory() == false && planArray[i].getName().endsWith(".js") == true)
 			{
-				logger.info("Loading plan: " + planArray[i].getName());
+				if (logger.isInfoEnabled() == true)
+				{
+					logger.info("Loading plan: " + planArray[i].getName());
+				}
 
 				_workspaceConfiguration.getPlanSet().add(new JavaScriptPlan(planArray[i].getName(), planArray[i].getAbsolutePath()));
 			}
 			else if (planArray[i].isDirectory() == false && planArray[i].getName().endsWith(".rb") == true)
 			{
-				logger.info("Loading plan: " + planArray[i].getName());
+				if (logger.isInfoEnabled() == true)
+				{
+					logger.info("Loading plan: " + planArray[i].getName());
+				}
 				_workspaceConfiguration.getPlanSet().add(new RubyPlan(planArray[i].getName(), planArray[i].getAbsolutePath()));
 			}
 		}
@@ -1122,13 +1151,21 @@ public class Blackboard
 		{
 			if (configurationFileArray[i].isDirectory() == false && configurationFileArray[i].getName().endsWith("workspaceConfiguration.js") == true)
 			{
-				logger.info("Loading configuration: " + configurationFileArray[i].getName());
+				if (logger.isInfoEnabled() == true)
+				{
+					logger.info("Loading configuration: " + configurationFileArray[i].getName());
+				}
+				
 				configurator = new JavaScriptConfigurator();
 				configuratorPath = configurationFileArray[i].getAbsolutePath();
 			}
 			else if (configurationFileArray[i].isDirectory() == false && configurationFileArray[i].getName().endsWith("workspaceConfiguration.rb") == true)
 			{
-				logger.info("Loading configuration: " + configurationFileArray[i].getName());
+				if (logger.isInfoEnabled() == true)
+				{
+					logger.info("Loading configuration: " + configurationFileArray[i].getName());
+				}
+				
 				configurator = new RubyConfigurator();
 				configuratorPath = configurationFileArray[i].getAbsolutePath();
 			}
@@ -1136,12 +1173,19 @@ public class Blackboard
 
 		if (configuratorPath != null)
 		{
-			logger.info("Executing this configuration: " + configuratorPath);
+			if (logger.isInfoEnabled() == true)
+			{
+				logger.info("Executing this configuration: " + configuratorPath);
+			}
+			
 			configurator.execute(workspaceConfiguration, configuratorPath);
 		}
 		else
 		{
-			logger.info("No workspaceConfiguration.js/rb file found for directory: " + _eventPlanDirectory + ".");
+			if (logger.isInfoEnabled() == true)
+			{
+				logger.info("No workspaceConfiguration.js/rb file found for directory: " + _eventPlanDirectory + ".");
+			}
 		}
 
 		return workspaceConfiguration;

@@ -11,6 +11,11 @@ public class PersisterFactory
 			persister = new Db4oPersister(_blackboard, _persistenceDir);
 			persister.init();
 		}
+		else if ("inkwell".equalsIgnoreCase(_type) == true)
+		{
+			persister = new InkwellPersister(_blackboard, _persistenceDir);
+			persister.init();
+		}			
 		else
 		{
 			persister = new BlackboardPersister(_blackboard, _persistenceDir);

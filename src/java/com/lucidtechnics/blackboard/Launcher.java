@@ -62,7 +62,7 @@ public class Launcher
 			}
 		}
 
-		logger.info("Plan execution is completed");
+		logger.info("Driver execution is completed. Plans may still be processing.");
 		
 		Object object = new Object();
 		
