@@ -171,7 +171,7 @@ public class Blackboard
 	public void init()
 	{
 		String persistenceDir = "." + java.io.File.separator + "blackboard" + java.io.File.separator + "persistence";
-		String appsHome = "." + java.io.File.separator " blackboard" + java.io.File.separator + "apps";
+		String appsHome = "." + java.io.File.separator + "blackboard" + java.io.File.separator + "apps";
 
 		boolean successful = PropertyUtil.getInstance().loadProperties(java.io.File.separator + "src" + java.io.File.separator + "Blackboard.properties", "blackboard.cfg", true);
 
