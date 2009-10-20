@@ -1,10 +1,5 @@
 package com.lucidtechnics.blackboard;
 
-import com.db4o.Db4o;
-import com.db4o.ObjectServer;
-import com.db4o.ObjectContainer;
-import com.db4o.ObjectSet;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
