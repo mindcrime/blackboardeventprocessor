@@ -135,7 +135,7 @@ public class Blackboard
 	
 	public Blackboard()
 	{
-		boolean propertyExists = PropertyUtil.getInstance().loadProperties("/src/Blackboard.properties", "blackboard.cfg", true);
+		boolean propertyExists = PropertyUtil.getInstance().loadProperties(java.io.File.separator + "src" + java.io.File.separator + "Blackboard.properties", "blackboard.cfg", true);
 
 		if (propertyExists == true)
 		{
@@ -170,10 +170,10 @@ public class Blackboard
 
 	public void init()
 	{
-		String persistenceDir = "./blackboard/persistence";
-		String appsHome = "./blackboard/apps";
+		String persistenceDir = "." + java.io.File.separator + "blackboard" + java.io.File.separator + "persistence";
+		String appsHome = "." + java.io.File.separator " blackboard" + java.io.File.separator + "apps";
 
-		boolean successful = PropertyUtil.getInstance().loadProperties("/src/Blackboard.properties", "blackboard.cfg", true);
+		boolean successful = PropertyUtil.getInstance().loadProperties(java.io.File.separator + "src" + java.io.File.separator + "Blackboard.properties", "blackboard.cfg", true);
 
 		if (successful == true)
 		{
