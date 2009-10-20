@@ -1,1 +1,0 @@
-java -classpath %@RUNTIME_CLASSPATH@% com.synclogic.blackboard.examples.cocothemonkey.CocoTheMonkey F:\Georgetown\work\blackboard\trunk\src\cfg\blackboard.xml
