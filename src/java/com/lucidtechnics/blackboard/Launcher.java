@@ -80,7 +80,11 @@ public class Launcher
 
 		JarFileLoader jarFileLoader = new JarFileLoader (urls);
 
-		java.io.File jarFileDirectory = new java.io.File("./lib/");
+		String libDir = "." + java.io.File.separator + "lib" + java.io.File.separator;
+
+		System.out.println("Lib dir is: " + libDir);
+		
+		java.io.File jarFileDirectory = new java.io.File(libDir);
 
 		java.io.File[] fileArray = jarFileDirectory.listFiles();
 
