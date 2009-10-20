@@ -380,6 +380,7 @@ public class Blackboard
 											startTime = System.currentTimeMillis();
 										}
 
+										//Execute the plan
 										_targetSpace.setPlanState(plan, plan.execute(workspaceContext));
 
 										if (getTimePlans() == true)
@@ -399,7 +400,7 @@ public class Blackboard
 											{
 												logger.debug("For workspace: " +
 													_targetSpace.getWorkspaceIdentifier() + " plan: " +
-													plan.getName() + " ran once and is now finished.");
+													plan.getName() + " ran and is now finished.");
 											}
 										}
 
@@ -430,7 +431,6 @@ public class Blackboard
 											_targetSpace.getWorkspaceIdentifier() + " plan: " +
 											plan.getName() + " is finished.");
 									}
-
 
 									activePlanSet.remove(plan);
 								}
@@ -551,8 +551,8 @@ public class Blackboard
 						{
 							logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() + " execute plan will notify plans.");
 						}
+						
 						_targetSpace.setActive();
-
 						_targetSpace.notifyPlans();
 					}
 					else
@@ -703,7 +703,7 @@ public class Blackboard
 		{
 			Event event = (Event) eventClass.getAnnotation(Event.class);
 
-			if (event.workspaceIdentifier() != null)
+			if (event.workspaceIdentifier() != null	)
 			{
 				propertyName = event.workspaceIdentifier();
 			}
@@ -811,7 +811,7 @@ public class Blackboard
 					throw new RuntimeException("Unable to create or retrieve workspace for workspaceIdentifier: " + _workspaceIdentifier);
 				}
 			}
-
+			
 			targetSpace.setDoNotPersistSet(_workspaceConfiguration.getDoNotPersistSet());
 			targetSpace.setPersistChangeInfoHistory(_workspaceConfiguration.getPersistChangeInfoHistory());
 			long currentTimeMillis = System.currentTimeMillis();
@@ -917,7 +917,7 @@ public class Blackboard
 				if (targetSpace.isPersisted() == false &&
 					  targetSpace.isCompleted() == false &&
 					  targetSpace.isTerminated() == false &&
-					  targetSpace.isExecuting() == false	)
+					  targetSpace.isExecuting() == false)
 				{
 					boolean acquiredLock = guardTargetSpace(targetSpace.getWorkspaceIdentifier(), false);
 
@@ -1043,7 +1043,7 @@ public class Blackboard
 
 					releaseTargetSpace(_targetSpace.getWorkspaceIdentifier());
 				}
-
+				
 				if (logger.isDebugEnabled() == true)
 				{
 					logger.debug("Target space identified by name: " + _targetSpace.getName() + " and id: " +
@@ -1058,6 +1058,8 @@ public class Blackboard
 		TargetSpace targetSpace = _targetSpace.prepareForPersistence();
 
 		getPersister().put(_targetSpace);
+
+		
 	}
 
 	private TargetSpace retrieveTargetSpaceFromStore(Object _workspaceIdentifier)
