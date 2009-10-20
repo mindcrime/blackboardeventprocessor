@@ -14,15 +14,15 @@
 * limitations under the License.
 */
 
-if ((WORKSPACE.has("fruit") === true) && (WORKSPACE.get("fruit").eaten === true))
-{				
-	var monkey = WORKSPACE.get("monkey");
+if ((WORKSPACE.has("example.CocoTheMonkey.mango") === true) && (WORKSPACE.get("example.CocoTheMonkey.mango").eaten === true))
+{
+	var monkey = WORKSPACE.get("example.CocoTheMonkey.monkey");
 
 	monkey.sleeping = true;
 	monkey.playing = false;
 	monkey.eating = false;
 
-	WORKSPACE.putOnWorkspace("slept");
+	WORKSPACE.putOnWorkspace("example.CocoTheMonkey.slept");
 
 	PLAN_CONTEXT.isFinished = true;
 }

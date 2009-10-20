@@ -14,17 +14,15 @@
 * limitations under the License.
 */
 
-importClass();
+var eagle = WORKSPACE.get("example.CocoTheMonkey.eagle");
 
-var eagle = WORKSPACE.get("eagle");
-
-if ((WORKSPACE.has("hunter") === true) &&
+if ((WORKSPACE.has("example.CocoTheMonkey.hunter") === true) &&
 	(eagle !== undefined && eagle !== null) &&
 	  (eagle.perched === true))
-{
-		eagle.shot = true;
-		eagle.perched = false;
-		WORKSPACE.remove("eagle");
+{	
+	eagle.shot = true;
+	eagle.perched = false;
+	WORKSPACE.remove("example.CocoTheMonkey.eagle");
 
-		PLAN_CONTEXT.isFinished = (WORKSPACE.hasTargetAction("eagle", TARGET_REMOVED) === true);
+	PLAN_CONTEXT.isFinished = (WORKSPACE.hasTargetAction("example.CocoTheMonkey.eagle", TARGET_REMOVED) === true);
 }

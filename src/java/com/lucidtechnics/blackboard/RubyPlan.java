@@ -45,7 +45,7 @@ public class RubyPlan
 	
 	public boolean execute(Workspace _workspace)
 	{
-		PlanContext planContext = new PlanContext();
+		PlanContext planContext = new PlanContext(getName());
 
 		ScriptingUtil scriptingUtil = new RubyingUtil();
 

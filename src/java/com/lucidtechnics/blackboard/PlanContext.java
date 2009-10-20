@@ -18,13 +18,17 @@ package com.lucidtechnics.blackboard;
 
 public class PlanContext
 {
+	private String name;
 	private boolean isFinished;
 
-	protected PlanContext()
+	protected PlanContext(String _name)
 	{
-		setIsFinished(true);
+		setName(_name);
+		setIsFinished(false);
 	}
-	
+
+	public String getName() { return name; }
+	public void setName(String _name) { name = _name; }
 	public boolean getIsFinished() { return isFinished; }
-	public void setIsFinished(boolean _isFinished) { isFinished = _isFinished; }
+	public void setIsFinished(boolean _isFinished) { isFinished = _isFinished	; }
 }

@@ -233,6 +233,23 @@ public abstract class TargetSpace
 		return isEmpty;
 	}
 
+	protected int size()
+	{
+		int size = 0;
+
+		try
+		{
+			getWorkspaceReadLock().lock();
+			size =  getTargetMap().keySet().size();
+		}
+		finally
+		{
+			getWorkspaceReadLock().unlock();
+		}
+
+		return size;
+	}
+
 	protected boolean hasTarget(String _targetName)
 	{
 		boolean hasTarget = true;

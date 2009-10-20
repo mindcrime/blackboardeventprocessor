@@ -44,7 +44,7 @@ public class JavaScriptPlan
 	
 	public boolean execute(Workspace _workspace)
 	{
-		PlanContext planContext = new PlanContext();
+		PlanContext planContext = new PlanContext(getName());
 
 		JavascriptingUtil scriptingUtil = new JavascriptingUtil();
 

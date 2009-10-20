@@ -53,8 +53,8 @@ public class Blackboard
 	private int maxBlackboardThread = 1;
 	private int maxScheduledBlackboardThread = 1;
 	private int maxWorkspaceThread = 20;
-	private int maxPersistenceThread = 40;
-	private int maxWorkspace = 10000;
+	private int maxPersistenceThread = 1;
+	private int maxWorkspace = 100000;
 	private int activeWorkspaceCount;
 	private ThreadPoolExecutor blackboardExecutor;
 	private ScheduledThreadPoolExecutor scheduledBlackboardExecutor;
@@ -268,7 +268,7 @@ public class Blackboard
 			new LinkedBlockingQueue()));
 
 		setPersistenceExecutor(new ThreadPoolExecutor(getMaxPersistenceThread(), getMaxPersistenceThread(), 100, TimeUnit.SECONDS,
-			new LinkedBlockingQueue()));
+			new LinkedBlockingQueue(	)));
 
 		setManagerExecutor(new ThreadPoolExecutor(1, 1, 100, TimeUnit.SECONDS,
 			new LinkedBlockingQueue()));
@@ -379,7 +379,7 @@ public class Blackboard
 										{
 											startTime = System.currentTimeMillis();
 										}
-										
+
 										_targetSpace.setPlanState(plan, plan.execute(workspaceContext));
 
 										if (getTimePlans() == true)
