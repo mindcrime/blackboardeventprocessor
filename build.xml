@@ -29,7 +29,8 @@
 
 	<property name="blackboardJar" value="blackboard-${version}.jar" />
 	<property name="blackboardTestJar" value="blackboardTest-${version}.jar" />
-
+	<property name="blackboardExamplesJar" value="blackboardExamples-${version}.jar" />
+	
 	<path id="build.class.path">
 		<fileset dir="${lib}">
 			<include name="**/*.jar"/>
@@ -148,7 +149,7 @@
 	<target name="jar" depends="compile">
 		<jar destfile="${dist}/lib/${blackboardJar}"
 		       basedir="${classes}"
-			   excludes="**\*Test.class,**\*TestSuite.class"
+			   excludes="**\*Test.class,**\*TestSuite.class, **\examples"
 		  />
 		
 		<jar destfile="${dist}/lib/${blackboardJar}"
@@ -160,6 +161,11 @@
 		       basedir="${src.cfg}"
 			   includes="**\log4j.xml"
 			   update="true"
+		  />
+
+		<jar destfile="${dist}/lib/${blackboardExamplesJar}"
+			   basedir="${classes}"
+			   includes="**\examples\**\*.jar"
 		  />
 
 		<jar destfile="${dist}/lib/${blackboardTestJar}"
