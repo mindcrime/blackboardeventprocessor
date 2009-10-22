@@ -16,17 +16,37 @@
 
 package com.lucidtechnics.blackboard;
 
+import xeus.jcl.JarClassLoader;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+
 public class Launcher
 {
+	static
+	{
+		try
+		{
+			JarClassLoader jarClassLoader = new JarClassLoader();
+			jarClassLoader.add("./lib/core"); //Recursively load all jar files in the folder/sub-folder(s)
+			jarClassLoader.add("./lib/ext"); //Recursively load all jar files in the folder/sub-folder(s)
+			classLoader = jarClassLoader;
+		}
+		catch(Throwable t)
+		{
+			throw new RuntimeException(t);
+		}
+	}
+
 	private static Log logger = LogFactory.getLog(Launcher.class);
 
+	private static JarClassLoader classLoader;
+
+	public static JarClassLoader getClassLoader() { return classLoader; }
+			
 	public static final void main(String[] _args)
-	{
-		loadJars();
-		
+	{		
 		final Blackboard blackboard = new Blackboard();
 		blackboard.init();
 
@@ -69,37 +89,6 @@ public class Launcher
 		synchronized(object)
 		{
 			try { object.wait(); } catch (InterruptedException e) {}
-		}
-	}
-
-	public static void loadJars()
-	{
-		logger.info("Loading jar files");
-		
-		java.net.URL urls [] = {};
-
-		JarFileLoader jarFileLoader = new JarFileLoader (urls);
-
-		String libDir = "lib" + java.io.File.separator;
-
-		System.out.println("Lib dir is: " + libDir);
-		
-		java.io.File jarFileDirectory = new java.io.File(libDir);
-
-		java.io.File[] fileArray = jarFileDirectory.listFiles();
-
-		for (int i = 0; i < fileArray.length; i++)
-		{
-			if (fileArray[i].isDirectory() == false)
-			{
-				String jarFileName = fileArray[i].getAbsolutePath();
-				
-				if (jarFileName.endsWith(".jar") == true)
-				{
-					logger.info("Loading jar files: " + jarFileName);
-					jarFileLoader.addFile(jarFileName);
-				}
-			}
 		}
 	}
 }

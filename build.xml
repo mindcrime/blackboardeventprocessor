@@ -220,14 +220,19 @@
 	<target name="project" depends="clean, compile, jar, deploy">
 
 		<!-- Copy libraries, jsp, and blackboard config and bin files -->
-		<copy todir="${dist}/blackboard/lib" flatten="true">
-			<fileset dir="${lib}" includes="**/*.jar" excludes="build-only/**/*.jar, **/servlet-api.jar" />
+		<copy todir="${dist}/blackboard/lib/core" flatten="true">
+			<fileset dir="${lib}" includes="**/*.jar" excludes="build-only/**/*.jar, **/servlet-api.jar, **/js.jar" />
+		</copy>
+
+		<copy todir="${dist}/blackboard/lib/scripting" flatten="true">
+			<fileset dir="${lib}" includes="**/js.jar" />
 		</copy>
 
 		<copy todir="${dist}/blackboard/">
 			<fileset dir="${dist}/lib" includes="*.jar" excludes="*Test*.jar" />
 		</copy>
 
+		<mkdir dir="${dist}/blackboard/lib/ext" />
 		<mkdir dir="${dist}/blackboard/blackboard/apps" />
 		<mkdir dir="${dist}/blackboard/blackboard/persistence" />
 

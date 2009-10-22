@@ -175,8 +175,7 @@ public class JavascriptingUtil
 
 	private Object executeScript(String _scriptResource, Reader _reader)
 	{
-		Context context = (new ContextFactory()).enterContext();
-		context.setLanguageVersion(170);
+		Context context = createContext();
 		
 		Object result = null;
 
@@ -206,8 +205,7 @@ public class JavascriptingUtil
 
 	private Object executeScript(String[] _scriptResources, Reader[] _readers)
 	{
-		Context context = (new ContextFactory()).enterContext();
-		context.setLanguageVersion(170);
+		Context context = createContext();
 		
 		Object result = null;
 		int i = 0;
@@ -288,5 +286,14 @@ public class JavascriptingUtil
 		Reader reader = new StringReader(_script);
 
 		return executeScript("<dynamic source>", reader);
-    }
+	}
+
+	private Context createContext()
+	{
+		Context context = (new ContextFactory()).enterContext();
+		context.setLanguageVersion(170);
+		context.setApplicationClassLoader(com.lucidtechnics.blackboard.Launcher.getClassLoader());
+
+		return context;
+	}
 }
