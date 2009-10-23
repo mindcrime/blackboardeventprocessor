@@ -292,7 +292,6 @@ public class JavascriptingUtil
 	{
 		Context context = (new ContextFactory()).enterContext();
 		context.setLanguageVersion(170);
-		context.setApplicationClassLoader(com.lucidtechnics.blackboard.Launcher.getClassLoader());
 
 		return context;
 	}

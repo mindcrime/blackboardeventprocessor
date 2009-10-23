@@ -76,8 +76,6 @@
 		<delete dir="${blackboardDeployDir}/lib" />
 		<delete dir="${blackboardDeployDir}/config" />
 		<delete dir="${blackboardDeployDir}/log" />
-		<delete dir="${blackboardHome}" />
-		<delete file="${workspace}/CocoTheMonkey.sh" />
 		<delete dir="${stage}" />
 
 	</target>
@@ -149,14 +147,9 @@
 	<target name="jar" depends="compile">
 		<jar destfile="${dist}/lib/${blackboardJar}"
 		       basedir="${classes}"
-			   excludes="**\*Test.class,**\*TestSuite.class, **\examples"
+			   excludes="**\*Test.class,**\*TestSuite.class, **\examples\**\*.class, **\Bootstrap.class"
 		  />
 		
-		<jar destfile="${dist}/lib/${blackboardJar}"
-		       manifest="${src.cfg}/BlackboardManifest.mf"
-			   update="true"
-		  />
-
 		<jar destfile="${dist}/lib/${blackboardJar}"
 		       basedir="${src.cfg}"
 			   includes="**\log4j.xml"
@@ -165,7 +158,17 @@
 
 		<jar destfile="${dist}/lib/${blackboardExamplesJar}"
 			   basedir="${classes}"
-			   includes="**\examples\**\*.jar"
+			   includes="**\examples\**\*.class"
+		  />
+
+		<jar destfile="${dist}/lib/Bootstrap.jar"
+			   basedir="${classes}"
+			   includes="**\Bootstrap.class"
+		 />
+
+		<jar destfile="${dist}/lib/Bootstrap.jar"
+		       manifest="${src.cfg}/BlackboardManifest.mf"
+			   update="true"
 		  />
 
 		<jar destfile="${dist}/lib/${blackboardTestJar}"
@@ -204,38 +207,30 @@
 		<copy todir="${config}">
 			<fileset dir="${stage.cfg}" includes="**/*.*" />
 		</copy>
-
-		<!-- copy blackboard example files -->
-		<copy todir="${blackboardHome}/apps">
-			<fileset dir="${src}/apps" includes="**/*" />
-		</copy>
-
-		<!-- copy blackboard example files -->
-		<copy todir="${workspace}">
-			<fileset dir="${src.shl}" includes="**/CocoTheMonkey.sh" />
-		</copy>
-
-		<chmod dir="${workspace}" includes="**/*.sh"  perm="ugo+rx"/>
-
-		<!-- Copy log4j config files -->
-
-		<!-- Copy web application config and property files -->
 		
 	</target>
 
-	<target name="project" depends="clean, compile, jar, deploy">
+	<target name="project" depends="redeploy">
 
 		<!-- Copy libraries, jsp, and blackboard config and bin files -->
 		<copy todir="${dist}/blackboard/lib/core" flatten="true">
-			<fileset dir="${lib}" includes="**/*.jar" excludes="build-only/**/*.jar, **/servlet-api.jar, **/js.jar" />
+			<fileset dir="${lib}" includes="**/*.jar" excludes="build-only/**/*.jar, **/servlet-api.jar, **/jcl.jar, **/commons-logging.jar, **/log4j-1.2.15.jar" />
 		</copy>
 
-		<copy todir="${dist}/blackboard/lib/scripting" flatten="true">
-			<fileset dir="${lib}" includes="**/js.jar" />
+		<copy todir="${dist}/blackboard/lib/bootstrap" flatten="true">
+			<fileset dir="${lib}" includes="**/js.jar, **/jcl.jar, **/commons-logging.jar, **/log4j-1.2.15.jar" />
+		</copy>
+
+		<copy todir="${dist}/blackboard/lib/ext" flatten="true">
+			<fileset dir="${dist}/lib" includes="*Example*.jar" />
 		</copy>
 
 		<copy todir="${dist}/blackboard/">
-			<fileset dir="${dist}/lib" includes="*.jar" excludes="*Test*.jar" />
+			<fileset dir="${dist}/lib" includes="*Bootstrap*.jar" />
+		</copy>
+
+		<copy todir="${dist}/blackboard/lib/core">
+			<fileset dir="${dist}/lib" includes="*.jar" excludes="*Test*.jar, *Example*.jar, *Bootstrap*.jar" />
 		</copy>
 
 		<mkdir dir="${dist}/blackboard/lib/ext" />
@@ -257,9 +252,16 @@
 		<zip destfile="${dist}/blackboard-standalone.zip">
 		   <zipfileset dir="${dist}/blackboard" prefix="blackboard"/>
 		</zip>
-		
+
 	</target>	
 
+	<target name="deployProject" depends="project">   
+		<delete dir="${workspace}/blackboard" />
+		<mkdir dir="${workspace}/blackboard" />
+		
+		<unzip src="${dist}/blackboard-standalone.zip" dest="${workspace}/blackboard"/>
+	</target>
+		
 	<target name="hardRedeploy"  depends="redeploy, startupBlackboard" />
 
 	<target name="hardDeploy"  depends="deploy, startupBlackboard" />

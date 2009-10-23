@@ -30,6 +30,8 @@ public class JavaScriptPlan
 	private String name;
 	private String path;
 
+	protected JavaScriptPlan() {}
+	
 	protected JavaScriptPlan(String _name, String _path)
 	{
 		setName(_name);

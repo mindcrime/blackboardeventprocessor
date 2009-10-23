@@ -37,6 +37,9 @@ public class TargetSpaceTimeoutPlan
 	public String getPlanName() { return planName; }
 	public void setPlanName(String _planName) { planName = _planName; }
 
+	public void setName(String _name) { setPlanName(_name); }
+	public void setPath(String _path) {  } //nothing to do
+
 	public TargetSpaceTimeoutPlan() {}
 
 	public String getName() { return getPlanName(); }

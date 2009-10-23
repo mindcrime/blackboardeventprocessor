@@ -31,6 +31,8 @@ public class RubyPlan
 	private String name;
 	private String path;
 
+	protected RubyPlan() {}
+	
 	protected RubyPlan(String _name, String _path)
 	{
 		setName(_name);

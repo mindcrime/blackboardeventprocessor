@@ -20,4 +20,6 @@ public interface Plan
    extends Actor
 {
 	public boolean execute(Workspace _workspace);
+	public void setName(String _name);
+	public void setPath(String _path);
 }

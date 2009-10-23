@@ -1,2 +1,2 @@
-Main-Class: com.lucidtechnics.blackboard.Launcher
-Class-Path: lib/scripting/js.jar lib/core/asm-all-2.2.2.jar lib/core/bsh-2.0b4.jar lib/core/cglib-2.2_beta1.jar lib/core/commons-beanutils-core/.jar lib/core/commons-beanutils.jar lib/core/commons-lang-2.4.jar lib/core/commons-logging.jar lib/core/gson-1.4.jar lib/core/inkwell-lucidlabs-alpha-0.10.jar lib/core/jruby-engine.jar lib/core/jruby.jar lib/core/log4j-1.2.15.jar lib/core/jcl.jar
+Main-Class: com.lucidtechnics.blackboard.Bootstrap
+Class-Path: lib/bootstrap/jcl.jar lib/bootstrap/commons-logging.jar lib/bootstrap/log4j-1.2.15.jar lib/ext/log4j.properties lib/ext/log4j.xml

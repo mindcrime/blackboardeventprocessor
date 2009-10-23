@@ -17,6 +17,7 @@
 package com.lucidtechnics.blackboard;
 
 import xeus.jcl.JarClassLoader;
+import xeus.jcl.JclObjectFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,29 +25,10 @@ import org.apache.commons.logging.LogFactory;
 
 public class Launcher
 {
-	static
-	{
-		try
-		{
-			JarClassLoader jarClassLoader = new JarClassLoader();
-			jarClassLoader.add("./lib/core"); //Recursively load all jar files in the folder/sub-folder(s)
-			jarClassLoader.add("./lib/ext"); //Recursively load all jar files in the folder/sub-folder(s)
-			classLoader = jarClassLoader;
-		}
-		catch(Throwable t)
-		{
-			throw new RuntimeException(t);
-		}
-	}
-
 	private static Log logger = LogFactory.getLog(Launcher.class);
 
-	private static JarClassLoader classLoader;
-
-	public static JarClassLoader getClassLoader() { return classLoader; }
-			
-	public static final void main(String[] _args)
-	{		
+	public void launch()
+	{
 		final Blackboard blackboard = new Blackboard();
 		blackboard.init();
 
@@ -60,35 +42,34 @@ public class Launcher
 		for (int i = 0; i < generatorArray.length; i++)
 		{
 			com.lucidtechnics.blackboard.Plan plan = null;
-			
+
 			if (generatorArray[i].isDirectory() == false && generatorArray[i].getName().endsWith(".js") == true)
 			{
 				logger.info("Executing generator: " + generatorArray[i].getName());
 
-				plan = new com.lucidtechnics.blackboard.JavaScriptPlan(
-					generatorArray[i].getName(), generatorArray[i].getAbsolutePath());
+				plan = new JavaScriptPlan();
 			}
 			else if (generatorArray[i].isDirectory() == false && generatorArray[i].getName().endsWith(".rb") == true)
 			{
 				logger.info("Executing generator: " + generatorArray[i].getName());
-
-				plan = new com.lucidtechnics.blackboard.RubyPlan(
-					generatorArray[i].getName(), generatorArray[i].getAbsolutePath());
+				plan = new RubyPlan();
 			}
 
 			if (plan != null)
 			{
+				plan.setName(generatorArray[i].getName());
+				plan.setPath(generatorArray[i].getAbsolutePath());
 				plan.execute(new com.lucidtechnics.blackboard.WorkspaceContext(targetSpace, plan));
 			}
 		}
 
 		logger.info("Driver execution is completed. Plans may still be processing.");
-		
+
 		Object object = new Object();
-		
+
 		synchronized(object)
 		{
 			try { object.wait(); } catch (InterruptedException e) {}
 		}
-	}
+	}	
 }
