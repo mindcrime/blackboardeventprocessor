@@ -1,2 +1,2 @@
 Main-Class: com.lucidtechnics.blackboard.Bootstrap
-Class-Path: lib/bootstrap/jcl.jar lib/bootstrap/commons-logging.jar lib/bootstrap/log4j-1.2.15.jar lib/ext/log4j.properties lib/ext/log4j.xml
+Class-Path: lib/bootstrap/jcl.jar lib/bootstrap/commons-logging.jar lib/bootstrap/log4j-1.2.15.jar lib/bootstrap

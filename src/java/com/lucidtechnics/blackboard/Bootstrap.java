@@ -19,10 +19,6 @@ package com.lucidtechnics.blackboard;
 import xeus.jcl.JarClassLoader;
 import xeus.jcl.JclObjectFactory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-
 public class Bootstrap
 {
 	static
@@ -41,8 +37,6 @@ public class Bootstrap
 			throw new RuntimeException(t);
 		}
 	}
-
-	private static Log logger = LogFactory.getLog(Bootstrap.class);
 
 	private static JarClassLoader classLoader;
 

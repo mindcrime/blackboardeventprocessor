@@ -171,6 +171,12 @@
 			   update="true"
 		  />
 
+		<jar destfile="${dist}/lib/Bootstrap.jar"
+			   basedir="${src}/apps/example/CocoTheMonkey"
+			   includes="**\log4j.properties"
+			   update="true"
+		  />
+
 		<jar destfile="${dist}/lib/${blackboardTestJar}"
 		       basedir="${classes}"
 		  />
@@ -214,11 +220,15 @@
 
 		<!-- Copy libraries, jsp, and blackboard config and bin files -->
 		<copy todir="${dist}/blackboard/lib/core" flatten="true">
-			<fileset dir="${lib}" includes="**/*.jar" excludes="build-only/**/*.jar, **/servlet-api.jar, **/jcl.jar, **/commons-logging.jar, **/log4j-1.2.15.jar" />
+			<fileset dir="${lib}" includes="**/*.jar" excludes="build-only/**/*.jar, **/servlet-api.jar, **/jcl.jar" />
 		</copy>
 
 		<copy todir="${dist}/blackboard/lib/bootstrap" flatten="true">
-			<fileset dir="${lib}" includes="**/js.jar, **/jcl.jar, **/commons-logging.jar, **/log4j-1.2.15.jar" />
+			<fileset dir="${lib}" includes="**/js.jar, **/jcl.jar" />
+		</copy>
+
+		<copy todir="${dist}/blackboard/lib/bootstrap" flatten="true">
+			<fileset dir="${src}/apps" includes="**/log4j.properties" />
 		</copy>
 
 		<copy todir="${dist}/blackboard/lib/ext" flatten="true">

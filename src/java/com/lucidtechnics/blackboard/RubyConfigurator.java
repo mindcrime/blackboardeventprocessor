@@ -44,7 +44,7 @@ public class RubyConfigurator
 			log.debug("JRuby execution for workspace configuration: " + _path);
 		}
 		
-		scriptingUtil.executeScriptResource(scriptResources);
+		scriptingUtil.executeScript(scriptResources);
 
 		if (log.isDebugEnabled() == true)
 		{

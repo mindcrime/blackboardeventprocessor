@@ -18,7 +18,6 @@ public interface ScriptingUtil
 {
     public void bind(String _name, Object _value);
 	public void loadScript(String _scriptResource);
-	public Object executeScriptResource(String[] _scriptResources);
-    public Object executeScriptResource(String _scriptResource);
-    public Object execute(String _script);
+	public Object executeScript(String[] _scriptResources);
+    public Object executeScript(String _scriptResource);
 }

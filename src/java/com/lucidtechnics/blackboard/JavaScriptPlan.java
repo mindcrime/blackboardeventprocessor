@@ -70,7 +70,7 @@ public class JavaScriptPlan
 			log.debug("JavaScript execution for plan: " + getPath());
 		}
 		
-		scriptingUtil.executeScriptResource(scriptResources);
+		scriptingUtil.executeScript(scriptResources);
 
 		if (log.isDebugEnabled() == true)
 		{

@@ -136,7 +136,7 @@ public class RubyingUtil
 		return inputStream;
 	}
 
-	private Object executeScript(String _scriptResource, Reader _reader)
+	public Object executeScript(String _scriptResource)
 	{
 		ScriptContext scriptContext = getScriptEngine().getContext();
 		
@@ -149,7 +149,7 @@ public class RubyingUtil
 				scriptContext.setAttribute(key, getBindingsMap().get(key), ScriptContext.ENGINE_SCOPE);
 			}
 
-			result = getScriptEngine().eval(_reader, scriptContext);
+			result = getScriptEngine().eval(new InputStreamReader(findScript(_scriptResource)), scriptContext);
 		}
 		catch(Throwable t)
 		{
@@ -159,7 +159,7 @@ public class RubyingUtil
 		return result;
 	}
 
-	private Object executeScript(String[] _scriptResources, Reader[] _readers)
+	public Object executeScript(String[] _scriptResources)
 	{
 		ScriptContext scriptContext = getScriptEngine().getContext();
 
@@ -176,7 +176,7 @@ public class RubyingUtil
 			
 			for (i = 0; i < _scriptResources.length; i++)
 			{
-				result = getScriptEngine().eval(_readers[i], scriptContext);
+				result = getScriptEngine().eval(new InputStreamReader(findScript(_scriptResources[i])), scriptContext);
 			}
 		}
 		catch(Throwable t)
@@ -186,41 +186,6 @@ public class RubyingUtil
 
 		return result;
 	}
-
-	public Object executeScriptResource(String[] _scriptResources)
-	{
-		if (_scriptResources == null)
-		{
-			throw new RuntimeException("Cannot execute a null script");
-		}
-
-		Reader[] readers = new Reader[_scriptResources.length];
-		int i = 0;
-		
-		for (String scriptResource : _scriptResources)
-		{
-			InputStream inputStream = findScript(scriptResource);
-
-			readers[i] = new InputStreamReader(inputStream);
-			i++;
-		}
-
-		return executeScript(_scriptResources, readers);
-	}
-	
-    public Object executeScriptResource(String _scriptResource)
-	{
-		if (_scriptResource == null)
-		{
-			throw new RuntimeException("Cannot execute a null script");
-		}
-
-		InputStream inputStream = findScript(_scriptResource);
-
-		Reader reader = new InputStreamReader(inputStream);
-
-		return executeScript(_scriptResource, reader);
-    }
 
     public Object execute(String _script)
     {

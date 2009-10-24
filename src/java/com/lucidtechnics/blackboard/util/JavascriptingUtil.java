@@ -25,6 +25,7 @@ import java.util.HashMap;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
+import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
@@ -38,21 +39,19 @@ public class JavascriptingUtil
 {
 	private static Log log = LogFactory.getLog(JavascriptingUtil.class);
 
-	private Map<String, byte[]> scriptResourceMap;
+	private static final Map<String, Script> scriptResourceMap = new HashMap<String, Script>();
 	private Map<String, Object> bindingsMap;
 	private Scriptable scope;
 
-	private Map<String, byte[]> getScriptResourceMap() { return scriptResourceMap; }
+	private Map<String, Script> getScriptResourceMap() { return scriptResourceMap; }
 	private Scriptable getScope() { return scope; }
 	private Map<String, Object> getBindingsMap() { return bindingsMap; }
 
-	private void setScriptResourceMap(Map<String, byte[]> _scriptResourceMap) {  scriptResourceMap = _scriptResourceMap; }
 	public void setScope(Scriptable _scope) { scope = _scope; }
     public void setBindingsMap(Map<String, Object> _bindingsMap) { bindingsMap = _bindingsMap; }
 
     public JavascriptingUtil()
 	{
-		setScriptResourceMap(new HashMap<String, byte[]>());
 		setBindingsMap(new HashMap<String, Object>());
     }
 
@@ -61,10 +60,38 @@ public class JavascriptingUtil
 		getBindingsMap().put(_name, _value);
 	}
 
+	public Script compileScript(String _scriptResource)
+	{
+		Reader reader = null;
+				
+		try
+		{
+			if (getScriptResourceMap().containsKey(_scriptResource) == false)
+			{
+				reader = new InputStreamReader(findScript(_scriptResource));
+
+				Script script = Context.getCurrentContext().compileReader(reader, _scriptResource, 0, null);
+
+				synchronized(getScriptResourceMap())
+				{
+					getScriptResourceMap().put(_scriptResource, script);
+				}
+			}
+		}
+		catch(Throwable t)
+		{
+			throw new RuntimeException(t);
+		}
+		finally
+		{
+			if (reader != null) { try { reader.close(); } catch(Throwable t) {} }
+		}
+
+		return getScriptResourceMap().get(_scriptResource);
+	}
+	
 	public void loadScript(String _scriptResource)
 	{
-		InputStream inputStream = null;
-		
 		try
 		{
 			if (Context.getCurrentContext() == null)
@@ -72,23 +99,14 @@ public class JavascriptingUtil
 				throw new RuntimeException("Cannot use loadScript outside of the scope of a call to executeScript.  A context must be present.");
 			}
 
-			inputStream = findScript(_scriptResource);
-		
-			if (getScriptResourceMap().containsKey(_scriptResource) == false)
+			try
 			{
-				Reader reader = new InputStreamReader(inputStream);
-
-				try
-				{
-					Context.getCurrentContext().evaluateReader(getScope(), reader, _scriptResource, 1, null);
-				}
-				catch(Throwable t)
-				{
-					t.printStackTrace();
-					throw new RuntimeException("Unable to execute script: " + _scriptResource + " for this reason: " + t.toString(), t);
-				}
-
-				getScriptResourceMap().put(_scriptResource, convertStreamtoByteArray(inputStream));
+				compileScript(_scriptResource).exec(Context.getCurrentContext(), getScope());
+			}
+			catch(Throwable t)
+			{
+				t.printStackTrace();
+				throw new RuntimeException("Unable to execute script: " + _scriptResource + " for this reason: " + t.toString(), t);
 			}
 		}
 		catch(Throwable t)
@@ -96,10 +114,6 @@ public class JavascriptingUtil
 			t.printStackTrace();
 			log.error(t.toString());
 			throw new RuntimeException(t);
-		}
-		finally
-		{
-			if (inputStream != null) { try { inputStream.close(); } catch (Throwable t) {} }
 		}
 	}
 
@@ -129,54 +143,33 @@ public class JavascriptingUtil
 	
 	private InputStream findScript(String _scriptResource)
 	{
-		java.io.ByteArrayInputStream byteArrayInputStream = null;
+		InputStream inputStream = null;
 		
 		try
 		{
-			if (getScriptResourceMap().containsKey(_scriptResource) == false)
+			java.io.File file = new java.io.File(_scriptResource);
+
+			if (file.exists() == true)
 			{
-				synchronized(getScriptResourceMap())
-				{
-					if (getScriptResourceMap().containsKey(_scriptResource) == false)
-					{
-						if (log.isDebugEnabled() == true)
-						{
-							log.debug("Attempting to load script: " + _scriptResource);
-						}
-
-						java.io.File file = new java.io.File(_scriptResource);
-
-						if (file.exists() == true)
-						{
-							getScriptResourceMap().put(_scriptResource, convertStreamtoByteArray(new java.io.FileInputStream(file)));
-						}
-						else
-						{
-							throw new RuntimeException("Script: " + _scriptResource + " is not found");
-						}
-					}
-				}
+				inputStream = new java.io.FileInputStream(file);
 			}
-
-			byteArrayInputStream = new java.io.ByteArrayInputStream(getScriptResourceMap().get(_scriptResource));
+			else
+			{
+				throw new RuntimeException("Script: " + _scriptResource + " is not found");
+			}
 		}
 		catch(Throwable t)
 		{
 			throw new RuntimeException(t);
 		}
 
-		if (byteArrayInputStream == null)
-		{
-			throw new RuntimeException("Unable to find script file. Make sure that this: " + _scriptResource + " exists.");
-		}
-
-		return byteArrayInputStream;
+		return inputStream;
 	}
 
-	private Object executeScript(String _scriptResource, Reader _reader)
+	public Object executeScript(String _scriptResource)
 	{
 		Context context = createContext();
-		
+
 		Object result = null;
 
 		try
@@ -189,7 +182,7 @@ public class JavascriptingUtil
 				ScriptableObject.putProperty(getScope(), key, object);
 			}
 
-			result = context.evaluateReader(getScope(), _reader, _scriptResource, 1, null);
+			result = compileScript(_scriptResource).exec(context, scope);
 		}
 		catch(Throwable t)
 		{
@@ -203,7 +196,7 @@ public class JavascriptingUtil
 		return result;
 	}
 
-	private Object executeScript(String[] _scriptResources, Reader[] _readers)
+	public Object executeScript(String[] _scriptResources)
 	{
 		Context context = createContext();
 		
@@ -222,10 +215,7 @@ public class JavascriptingUtil
 			
 			for (i = 0; i < _scriptResources.length; i++)
 			{
-				String scriptResource = _scriptResources[i];
-				Reader reader = _readers[i];
-				
-				result = context.evaluateReader(getScope(), reader, scriptResource, 1, null);
+				result = compileScript(_scriptResources[i]).exec(context, getScope());
 			}
 		}
 		catch(Throwable t)
@@ -238,54 +228,6 @@ public class JavascriptingUtil
 		}
 
 		return result;
-	}
-
-	public Object executeScriptResource(String[] _scriptResources)
-	{
-		if (_scriptResources == null)
-		{
-			throw new RuntimeException("Cannot execute a null script");
-		}
-
-		Reader[] readers = new Reader[_scriptResources.length];
-		int i = 0;
-		
-		for (String scriptResource : _scriptResources)
-		{
-			InputStream inputStream = findScript(scriptResource);
-
-			readers[i] = new InputStreamReader(inputStream);
-			i++;
-		}
-
-		return executeScript(_scriptResources, readers);
-	}
-	
-    public Object executeScriptResource(String _scriptResource)
-	{
-		if (_scriptResource == null)
-		{
-			throw new RuntimeException("Cannot execute a null script");
-		}
-
-		InputStream inputStream = findScript(_scriptResource);
-
-		Reader reader = new InputStreamReader(inputStream);
-
-		return executeScript(_scriptResource, reader);
-    }
-
-    public Object execute(String _script)
-    {
-		if (_script == null)
-		{
-			throw new RuntimeException("Unable to execute null script");
-		}
-
-		Object result = null;
-		Reader reader = new StringReader(_script);
-
-		return executeScript("<dynamic source>", reader);
 	}
 
 	private Context createContext()

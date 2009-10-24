@@ -71,7 +71,7 @@ public class RubyPlan
 			log.debug("JRuby execution for plan: " + getPath());
 		}
 		
-		scriptingUtil.executeScriptResource(scriptResources);
+		scriptingUtil.executeScript(scriptResources);
 
 		if (log.isDebugEnabled() == true)
 		{

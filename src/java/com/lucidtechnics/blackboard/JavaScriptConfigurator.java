@@ -45,7 +45,7 @@ public class JavaScriptConfigurator
 			log.debug("JavaScript execution for workspace configuration: " + _path);
 		}
 		
-		scriptingUtil.executeScriptResource(scriptResources);
+		scriptingUtil.executeScript(scriptResources);
 
 		if (log.isDebugEnabled() == true)
 		{
