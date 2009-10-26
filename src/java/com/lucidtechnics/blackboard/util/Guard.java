@@ -114,7 +114,10 @@ public final class Guard
 		}
 		else
 		{
-			throw new RuntimeException("Release attempted but guard was not attained for id: " + _id);
+			if (logger.isWarnEnabled() == true)
+			{
+				logger.warn("Guard is still in place for id: " + _id);
+			}
 		}
 	}
 

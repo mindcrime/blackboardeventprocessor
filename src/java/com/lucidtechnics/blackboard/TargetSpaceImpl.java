@@ -75,10 +75,10 @@ public class TargetSpaceImpl
 			//directly.  There might be some virtue to marking these
 			//classes somehow.  Or maybe we shouldn't even handle them?
 
-			//Need to handle ths case after I merge with the
+			//Need to handle the case after I merge with the
 			//other code base.
 
-			throw new RuntimeException("Cannot add null targets or targets of type array, enum, or targets that are final classes: " + _object.getClass());
+			throw new RuntimeException("Cannot add targets of type array, enum, or targets that are final classes: " + _object.getClass());
 		}
 	}
 
