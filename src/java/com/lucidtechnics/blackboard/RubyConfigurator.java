@@ -56,7 +56,7 @@ public class RubyConfigurator
 	{
 		ScriptingUtil scriptingUtil = new RubyingUtil();
 
-		scriptingUtil.bind("BLACKBOARD_CONFIGURATION", _blackboardConfiguration);
+		scriptingUtil.bind("CONFIGURATION", _blackboardConfiguration);
 		scriptingUtil.bind("LOGGER", log);
 
 		String[] scriptResources = new String[1];

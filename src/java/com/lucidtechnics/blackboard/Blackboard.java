@@ -153,7 +153,7 @@ public class Blackboard
 		{
 			JavaScriptConfigurator configurator = new JavaScriptConfigurator();
 			String configuratorPath = blackboardConfigurationFile.getAbsolutePath();
-			configurator.execute(_blackboardConfiguration , configuratorPath);
+			configurator.execute(_blackboardConfiguration, configuratorPath);
 		}
 		
 		this.setErrorManager(_blackboardConfiguration.getErrorManager());

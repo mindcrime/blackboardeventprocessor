@@ -57,7 +57,7 @@ public class JavaScriptConfigurator
 	{
 		JavascriptingUtil scriptingUtil = new JavascriptingUtil();
 
-		scriptingUtil.bind("BLACKBOARD", _blackboardConfiguration);
+		scriptingUtil.bind("CONFIGURATION", _blackboardConfiguration);
 		scriptingUtil.bind("LOGGER", log);
 
 		String[] scriptResources = new String[1];

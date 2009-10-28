@@ -42,23 +42,26 @@ public class Launcher
 		{
 			com.lucidtechnics.blackboard.Plan plan = null;
 
-			if (generatorArray[i].isDirectory() == false && generatorArray[i].getName().endsWith(".js") == true)
+			if (generatorArray[i].isDirectory() == false && generatorArray[i].getName().endsWith("blackboard.configuration.js") == false)
 			{
-				logger.info("Executing generator: " + generatorArray[i].getName());
+				if (generatorArray[i].isDirectory() == false && generatorArray[i].getName().endsWith(".js") == true)
+				{
+					logger.info("Executing generator: " + generatorArray[i].getName());
 
-				plan = new JavaScriptPlan();
-			}
-			else if (generatorArray[i].isDirectory() == false && generatorArray[i].getName().endsWith(".rb") == true)
-			{
-				logger.info("Executing generator: " + generatorArray[i].getName());
-				plan = new RubyPlan();
-			}
+					plan = new JavaScriptPlan();
+				}
+				else if (generatorArray[i].isDirectory() == false && generatorArray[i].getName().endsWith(".rb") == true)
+				{
+					logger.info("Executing generator: " + generatorArray[i].getName());
+					plan = new RubyPlan();
+				}
 
-			if (plan != null)
-			{
-				plan.setName(generatorArray[i].getName());
-				plan.setPath(generatorArray[i].getAbsolutePath());
-				plan.execute(new com.lucidtechnics.blackboard.WorkspaceContext(targetSpace, plan));
+				if (plan != null)
+				{
+					plan.setName(generatorArray[i].getName());
+					plan.setPath(generatorArray[i].getAbsolutePath());
+					plan.execute(new com.lucidtechnics.blackboard.WorkspaceContext(targetSpace, plan));
+				}
 			}
 		}
 
