@@ -44,7 +44,6 @@ public class CocoTheMonkey
 		try
 		{
 			final Blackboard blackboard = new Blackboard();
-			blackboard.init();
 
 			logger.info("Starting Coco The Monkey");
 			System.out.println("Starting Coco The Monkey");

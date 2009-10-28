@@ -51,4 +51,28 @@ public class RubyConfigurator
 			log.debug("Completed JRuby execution for workspace configuration: " + _path);
 		}
 	}
+
+	public void execute(BlackboardConfiguration _blackboardConfiguration, String _path)
+	{
+		ScriptingUtil scriptingUtil = new RubyingUtil();
+
+		scriptingUtil.bind("BLACKBOARD_CONFIGURATION", _blackboardConfiguration);
+		scriptingUtil.bind("LOGGER", log);
+
+		String[] scriptResources = new String[1];
+
+		scriptResources[0] = _path;
+
+		if (log.isDebugEnabled() == true)
+		{
+			log.debug("JRuby execution for blackboard configuration: " + _path);
+		}
+
+		scriptingUtil.executeScript(scriptResources);
+
+		if (log.isDebugEnabled() == true)
+		{
+			log.debug("Completed JRuby execution for blackboard configuration: " + _path);
+		}
+	}
 }

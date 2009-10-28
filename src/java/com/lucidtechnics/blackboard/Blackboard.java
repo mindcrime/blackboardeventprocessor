@@ -50,11 +50,11 @@ public class Blackboard
 
 	private ErrorManager errorManager;
 	private BlackboardActor blackboardActor;
-	private int maxBlackboardThread = 1;
-	private int maxScheduledBlackboardThread = 1;
-	private int maxWorkspaceThread = 40;
-	private int maxPersistenceThread = 1;
-	private int maxWorkspace = 100000;
+	private int maxBlackboardThread;
+	private int maxScheduledBlackboardThread;
+	private int maxWorkspaceThread;
+	private int maxPersistenceThread;
+	private int maxWorkspace;
 	private int activeWorkspaceCount;
 	private ThreadPoolExecutor blackboardExecutor;
 	private ScheduledThreadPoolExecutor scheduledBlackboardExecutor;
@@ -66,21 +66,18 @@ public class Blackboard
 	private Guard targetSpaceGuard;
 	private boolean managingBlackboard;
 	private Persister persister;
-	private String host = "localhost";
-	private int port = 28000;
-	private String user = "blackboard";
-	private String password = "blackboard";
-	private boolean timePlans = true;
+	private boolean timePlans;
+	private String appsHome;
 
 	private ReentrantReadWriteLock blackboardReadWriteLock;
 	private Lock blackboardReadLock;
 	private Lock blackboardWriteLock;
 	private BlackboardFactory blackboardFactory;
 
-	public ErrorManager getErrorManager() { return errorManager; }
+	private ErrorManager getErrorManager() { return errorManager; }
 	private BlackboardActor getBlackboardActor() { return blackboardActor; }
 	private int getMaxBlackboardThread() { return maxBlackboardThread; }
-	public int getMaxScheduledBlackboardThread() { return maxScheduledBlackboardThread; }
+	private int getMaxScheduledBlackboardThread() { return maxScheduledBlackboardThread; }
 	private int getMaxWorkspaceThread() { return maxWorkspaceThread; }
 	private int getMaxPersistenceThread() { return maxPersistenceThread; }
 	private int getMaxWorkspace() { return maxWorkspace; }
@@ -99,19 +96,16 @@ public class Blackboard
 	private Guard getTargetSpaceGuard() { return targetSpaceGuard; }
 	private boolean getManagingBlackboard() { return managingBlackboard; }
 	private Persister getPersister() { return persister; }
-	public String getHost() { return host; }
-	public int getPort() { return port; }
-	public String getUser() { return user; }
-	public String getPassword() { return password; }
-	public boolean getTimePlans() { return timePlans; }
+	private boolean getTimePlans() { return timePlans; }
+	private String getAppsHome() { return appsHome; }
 	
-	public void setErrorManager(ErrorManager _errorManager) { errorManager = _errorManager; }
+	private void setErrorManager(ErrorManager _errorManager) { errorManager = _errorManager; }
 	private void setBlackboardActor(BlackboardActor _blackboardActor) { blackboardActor = _blackboardActor; }
-	public void setMaxBlackboardThread(int _maxBlackboardThread) { maxBlackboardThread = _maxBlackboardThread; }
-	public void setMaxScheduledBlackboardThread(int _maxScheduledBlackboardThread) { maxScheduledBlackboardThread = _maxScheduledBlackboardThread; }
-	public void setMaxWorkspaceThread(int _maxWorkspaceThread) { maxWorkspaceThread = _maxWorkspaceThread; }
-	public void setMaxPersistenceThread(int _maxPersistenceThread) { maxPersistenceThread = _maxPersistenceThread; }
-	public void setMaxWorkspace(int _maxWorkspace) { maxWorkspace = _maxWorkspace; }
+	private void setMaxBlackboardThread(int _maxBlackboardThread) { maxBlackboardThread = _maxBlackboardThread; }
+	private void setMaxScheduledBlackboardThread(int _maxScheduledBlackboardThread) { maxScheduledBlackboardThread = _maxScheduledBlackboardThread; }
+	private void setMaxWorkspaceThread(int _maxWorkspaceThread) { maxWorkspaceThread = _maxWorkspaceThread; }
+	private void setMaxPersistenceThread(int _maxPersistenceThread) { maxPersistenceThread = _maxPersistenceThread; }
+	private void setMaxWorkspace(int _maxWorkspace) { maxWorkspace = _maxWorkspace; }
 	private void setActiveWorkspaceCount(int _activeWorkspaceCount) { activeWorkspaceCount = _activeWorkspaceCount; }
 	private void setBlackboardExecutor(ThreadPoolExecutor _blackboardExecutor) { blackboardExecutor = _blackboardExecutor; }
 	private void setScheduledBlackboardExecutor(ScheduledThreadPoolExecutor _scheduledBlackboardExecutor) { scheduledBlackboardExecutor = _scheduledBlackboardExecutor; }
@@ -122,35 +116,17 @@ public class Blackboard
 	private void setBlackboardReadWriteLock(ReentrantReadWriteLock _blackboardReadWriteLock) { blackboardReadWriteLock = _blackboardReadWriteLock; }
 	private void setBlackboardReadLock(Lock _blackboardReadLock) { blackboardReadLock = _blackboardReadLock; }
 	private void setBlackboardWriteLock(Lock _blackboardWriteLock) { blackboardWriteLock = _blackboardWriteLock; }
-	public void setBlackboardFactory(BlackboardFactory _blackboardFactory) { blackboardFactory = _blackboardFactory; }
+	private void setBlackboardFactory(BlackboardFactory _blackboardFactory) { blackboardFactory = _blackboardFactory; }
 	private void setTargetSpaceMap(Map<Object, TargetSpace> _targetSpaceMap) { targetSpaceMap = _targetSpaceMap;	 }
 	private void setTargetSpaceGuard(Guard _targetSpaceGuard) { targetSpaceGuard = _targetSpaceGuard; }
 	private void setManagingBlackboard(boolean _managingBlackboard) { managingBlackboard = _managingBlackboard; }
 	private void setPersister(Persister _persister) { persister = _persister; } 
-	public void setHost(String _host) { host = _host; }
-	public void setPort(int _port) { port = _port; }
-	public void setUser(String _user) { user = _user; }
-	public void setPassword(String _password) { password = _password; }
-	public void setTimePlans(boolean _timePlans) { timePlans = _timePlans; }
-	
-	public Blackboard()
+	private void setTimePlans(boolean _timePlans) { timePlans = _timePlans; }
+	private void setAppsHome(String _appsHome) { appsHome = _appsHome; }
+
+	public Blackboard(BlackboardConfiguration _blackboardConfiguration)
 	{
-		boolean propertyExists = PropertyUtil.getInstance().loadProperties(java.io.File.separator + "src" + java.io.File.separator + "Blackboard.properties", "blackboard.cfg", true);
-
-		if (propertyExists == true)
-		{
-			setTimePlans(Boolean.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.time.plans")));
-			setMaxBlackboardThread(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.blackboard.thread")));
-			setMaxScheduledBlackboardThread(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.scheduled.blackboard.thread")));
-			setMaxWorkspaceThread(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.workspace.thread")));
-			setMaxPersistenceThread(1);
-			setMaxWorkspace(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.max.workspace")));
-
-			setHost(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.db.host"));
-			setPort(Integer.valueOf(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.db.port")));
-			setUser(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.db.user"));
-			setPassword(PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.db.password"));
-		}
+		configureBlackboard(_blackboardConfiguration);
 
 		setBlackboardActor(new BlackboardActor("Blackboard"));
 		setEventToWorkspaceMap(new HashMap());
@@ -160,54 +136,51 @@ public class Blackboard
 		setBlackboardWriteLock(getBlackboardReadWriteLock().writeLock());
 		setBlackboardFactory(new BlackboardFactoryImpl());
 		setTargetSpaceGuard(new Guard());
-		setErrorManager(com.lucidtechnics.blackboard.util.error.ErrorManager.getInstance());
+
+		init();
 	}
 
-	private void initializeTargetSpacePersistentStore(String _persistenceDir)
+	public Blackboard()
 	{
-		setPersister(PersisterFactory.make("inkwell", _persistenceDir, this));	
+		this(new BlackboardConfiguration());
 	}
 
-	public void init()
-	{
-		String persistenceDir = "." + java.io.File.separator + "blackboard" + java.io.File.separator + "persistence";
-		String appsHome = "." + java.io.File.separator + "blackboard" + java.io.File.separator + "apps";
+	private void configureBlackboard(BlackboardConfiguration _blackboardConfiguration)
+	{		
+		java.io.File blackboardConfigurationFile = new java.io.File("." + java.io.File.separator + "blackboard.configuration.js");
 
-		boolean successful = PropertyUtil.getInstance().loadProperties(java.io.File.separator + "src" + java.io.File.separator + "Blackboard.properties", "blackboard.cfg", true);
-
-		if (successful == true)
+		if (blackboardConfigurationFile.exists() == true)
 		{
-			appsHome = PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.apps.home", appsHome);
-			persistenceDir = PropertyUtil.getInstance().getProperty("blackboard.cfg", "blackboard.persistence.home", persistenceDir);
+			JavaScriptConfigurator configurator = new JavaScriptConfigurator();
+			String configuratorPath = blackboardConfigurationFile.getAbsolutePath();
+			configurator.execute(_blackboardConfiguration , configuratorPath);
 		}
-
-		java.io.File file = new java.io.File(appsHome);
+		
+		this.setErrorManager(_blackboardConfiguration.getErrorManager());
+		this.setMaxBlackboardThread(_blackboardConfiguration.getMaxBlackboardThread());
+		this.setMaxScheduledBlackboardThread(_blackboardConfiguration.getMaxScheduledBlackboardThread());
+		this.setMaxWorkspaceThread(_blackboardConfiguration.getMaxWorkspaceThread());
+		this.setMaxPersistenceThread(_blackboardConfiguration.getMaxPersistenceThread());
+		this.setMaxWorkspace(_blackboardConfiguration.getMaxWorkspace());
+		this.setPersister(_blackboardConfiguration.getPersister());
+		this.setTimePlans(_blackboardConfiguration.getTimePlans());
+		this.setAppsHome(_blackboardConfiguration.getAppsHome());
+	}
+	
+	private void init()
+	{		
+		java.io.File file = new java.io.File(getAppsHome());
 
 		if (file.exists() == false)
 		{
 			file.mkdirs();
 		}
 
-		file = new java.io.File(persistenceDir);
-
-		if (file.exists() == false)
-		{
-			file.mkdirs();
-		}
-
-		initializeTargetSpacePersistentStore(persistenceDir);
-
-		if (appsHome == null ||
-		   org.apache.commons.lang.StringUtils.isWhitespace(appsHome) == true)
-		{
-			throw new RuntimeException("blackboard.apps.home has not been set in the Blackboard.properties file");
-		}
-
-		java.io.File appsDirectory = new java.io.File(appsHome);
+		java.io.File appsDirectory = new java.io.File(getAppsHome());
 
 		if (appsDirectory.isDirectory() != true)
 		{
-			throw new RuntimeException("Directory: " + appsHome + " as set in blackboard.apps.home is not a directory");
+			throw new RuntimeException("Directory: " + getAppsHome() + " as set in blackboard.apps.home is not a directory");
 		}
 
 		java.io.File[] directoryFiles = appsDirectory.listFiles();
@@ -806,6 +779,15 @@ public class Blackboard
 
 				WorkspaceConfiguration workspaceConfiguration = getEventToWorkspaceMap().get(eventName);
 
+				if (workspaceConfiguration == null)
+				{
+					throw new RuntimeException("Unable to find the workspace configuration for eventName: " + eventName +
+											   ". Please check your com.lucidtechnics.blackboard.Event annotation " +
+											   " as it is defined in the class: " + _event.getClass() + 
+											   " and make sure the Event annotation attributes appName, workspaceName, and name " +
+											   " maps to the path under blackboard's \"apps\" directory <appName>/<workspaceName>/<name>");
+				}
+
 				Object workspaceIdentifier = PropertyUtils.getProperty(_event, determineWorkspaceIdentifierName(_event));
 				addToTargetSpace(workspaceConfiguration, workspaceIdentifier, eventName, _event);
 				foundEventConfiguration = true;
@@ -902,7 +884,7 @@ public class Blackboard
 		}
 	}
 
-	/*protected void addToTargetSpace(WorkspaceConfiguration _workspaceConfiguration,
+/*	protected void addToTargetSpace(WorkspaceConfiguration _workspaceConfiguration,
 									Object _workspaceIdentifier, String _eventName, Object _event)
 			throws Exception
 	{
@@ -915,15 +897,8 @@ public class Blackboard
 
 			acquireBlackboardReadLock();
 
-			TargetSpace targetSpace = (TargetSpace) getTargetSpaceMap().get(_workspaceIdentifier);
+			TargetSpace targetSpace = (TargetSpace) getTargetSpace(_workspaceIdentifier);
 
-			if (targetSpace == null && getTargetSpaceMap().keySet().contains(_workspaceIdentifier) == true)
-			{
-				//target space is on disk ...				
-				targetSpace = retrieveTargetSpaceFromStore(_workspaceIdentifier);
-			}
-			else
-			{
 				//first time seeing this target space ever ...
 				if (getTargetSpaceMap().keySet().contains(_workspaceIdentifier) == false)
 				{
@@ -996,8 +971,8 @@ public class Blackboard
 
 			releaseTargetSpace(_workspaceIdentifier);
 		}
-	}*/
-	
+	}
+	*/
 	private void incrementActiveWorkspaceCount()
 	{
 		setActiveWorkspaceCount(getActiveWorkspaceCount() + 1);
@@ -1217,10 +1192,7 @@ public class Blackboard
 	private void persistTargetSpace(TargetSpace _targetSpace)
 	{
 		TargetSpace targetSpace = _targetSpace.prepareForPersistence();
-
-		getPersister().put(_targetSpace);
-
-		
+		getPersister().put(_targetSpace);		
 	}
 
 	private TargetSpace retrieveTargetSpaceFromStore(Object _workspaceIdentifier)

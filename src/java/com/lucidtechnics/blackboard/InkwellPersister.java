@@ -17,10 +17,17 @@ public class InkwellPersister
 	private com.lucidlabs.inkwell.Inkwell getDatabase() { return database; }
 	private void setDatabase(com.lucidlabs.inkwell.Inkwell _database) { database = _database; }
 	
-	public InkwellPersister(Blackboard _blackboard, String _persistenceDir)
+	public InkwellPersister(String _persistenceDir)
 	{
 		setDatabase(new com.lucidlabs.inkwell.Inkwell(_persistenceDir, "blackboard"));
 		setPersistenceDir(_persistenceDir);
+
+		java.io.File file = new java.io.File(_persistenceDir);
+
+		if (file.exists() == false)
+		{
+			file.mkdirs();
+		}
 	}
 
 	public void init() {}

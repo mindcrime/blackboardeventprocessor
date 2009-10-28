@@ -18,5 +18,6 @@ package com.lucidtechnics.blackboard;
 
 public interface Configurator
 {
+	public void execute(BlackboardConfiguration _blackboardConfiguration, String _path);
 	public void execute(com.lucidtechnics.blackboard.config.WorkspaceConfiguration _workspaceConfiguration, String _path);
 }

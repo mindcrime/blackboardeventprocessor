@@ -52,4 +52,28 @@ public class JavaScriptConfigurator
 			log.debug("Completed JavaScript execution for workspace configuration: " + _path);
 		}
 	}
+
+	public void execute(BlackboardConfiguration _blackboardConfiguration, String _path)
+	{
+		JavascriptingUtil scriptingUtil = new JavascriptingUtil();
+
+		scriptingUtil.bind("BLACKBOARD", _blackboardConfiguration);
+		scriptingUtil.bind("LOGGER", log);
+
+		String[] scriptResources = new String[1];
+
+		scriptResources[0] = _path;
+
+		if (log.isDebugEnabled() == true)
+		{
+			log.debug("JavaScript execution for blackboard configuration: " + _path);
+		}
+
+		scriptingUtil.executeScript(scriptResources);
+
+		if (log.isDebugEnabled() == true)
+		{
+			log.debug("Completed JavaScript execution for blackboard configuration: " + _path);
+		}
+	}
 }

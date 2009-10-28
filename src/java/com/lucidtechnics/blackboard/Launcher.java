@@ -30,7 +30,6 @@ public class Launcher
 	public void launch()
 	{
 		final Blackboard blackboard = new Blackboard();
-		blackboard.init();
 
 		java.io.File currentDirectory = new java.io.File(".");
 		TargetSpace targetSpace = new TargetSpaceImpl();
