@@ -21,43 +21,388 @@ import java.util.List;
 public interface Workspace
    extends Intercepter
 {
+	/**
+	 * Returns the name of this workspace.  This was derived from the
+	 * event whose arrival caused the creation of this workspace and is
+	 * taken from the value of the workspaceName attribute of the
+	 * event's {@link Event} annotation.
+	 * 
+	 * @return the name of this workspace.
+	 * @see Event
+	 */
+
 	public String getName();
+
+	/**
+	 * Returns the name of the application this workspace belongs to.  This was
+	 * derived from the event whose arrival caused the creation of this
+	 * workspace and is taken from the value of the appName attribute of the
+	 * event's {@link Event} annotation.
+	 * 
+	 * @return the name of application this workspace belongs to.
+	 * @see Event
+	 */
+
 	public String getAppName();
+
+	/**
+	 * Returns the value of the identifier that uniquely identifies this workspace.
+	 * This was derived from the event whose arrival caused the creation of this
+	 * workspace and is taken from the value of the workspaceIdentifier attribute
+	 * of the event's {@link Event} annotation.
+	 * 
+	 * @return the value of the identifier that uniquely identifies
+	 * this workspace.
+	 * @see Event
+	 */
+
 	public Object getWorkspaceIdentifier();
+
+
+	/**
+	 * Returns the target or event with the given name. In the case of
+	 * an event, it retrieves the most recent value of that event.
+	 *
+	 * @param the name of the target or event to be retrieved.
+	 * @return the target or event identified by _targetName on this workspace.
+	 */
+
 	public Object get(String _targetName);
+
+
+	/**
+	 * Returns whether or not this workspace has this target or event.
+	 *
+	 * @param the name of the target or event.
+	 * @return true iff this workspace has a target with name
+	 * _targetName. returns false otherwise.
+	 */
+
 	public boolean has(String _targetName);
-	
+
+
+	/**
+	 * Puts an object on the workspace named by _targetName.  Objects
+	 * that are not already target's are wrapped by an {link
+	 * Intercepter} object that records changes to the object via its
+	 * mutator methods.  The wrapper will be a subtype of this object.
+	 * Object's that are placed on the workspace are visible to all
+	 * the other plans that are active on in this workspace.
+	 *
+	 * @param the name of the object or event to be put on the workspace.
+	 * @param the Object to be put on the workspace.
+	 */
+
 	public void putOnWorkspace(String _targetName, Object _object);
+
+
+	/**
+	 * Puts target on the workspace named by _targetName.
+	 * Targets that are placed on the workspace are visible to all
+	 * the other plans that are active on in this workspace.
+	 *
+	 * @param the name of the target to be put on the workspace.
+	 * @param the Target to be put on the workspace.
+	 */
+
 	public void putOnWorkspace(String _targetName, Target _target);
+
+
+	/**
+	 * Puts a String on the workspace named by _targetName.
+	 * Strings that are placed on the workspace are visible to all
+	 * the other plans that are active on in this workspace.
+	 *
+	 * @param the name of the String to be put on the workspace.
+	 * @param the String to be put on the workspace.
+	 */
+
 	public void putOnWorkspace(String _targetName, String _object);
+
+
+	/**
+	 * Puts a Float on the workspace named by _targetName.
+	 * Floats that are placed on the workspace are visible to all
+	 * the other plans that are active on in this workspace.
+	 *
+	 * @param the name of the Float to be put on the workspace.
+	 * @param the Float to be put on the workspace.
+	 */
+
 	public void putOnWorkspace(String _targetName, Float _object);
+
+
+	/**
+	 * Puts a Double on the workspace named by _targetName.
+	 * Doubles that are placed on the workspace are visible to all
+	 * the other plans that are active on in this workspace.
+	 *
+	 * @param the name of the Double to be put on the workspace.
+	 * @param the Double to be put on the workspace.
+	 */
+
 	public void putOnWorkspace(String _targetName, Double _object);
+
+
+	/**
+	 * Puts a Long on the workspace named by _targetName.
+	 * Longs that are placed on the workspace are visible to all
+	 * the other plans that are active on in this workspace.
+	 *
+	 * @param the name of the Long to be put on the workspace.
+	 * @param the Long to be put on the workspace.
+	 */
+
 	public void putOnWorkspace(String _targetName, Long _object);
+
+	/**
+	 * Puts a Integer on the workspace named by _targetName.
+	 * Integers that are placed on the workspace are visible to all
+	 * the other plans that are active on in this workspace.
+	 *
+	 * @param the name of the Integer to be put on the workspace.
+	 * @param the Integer to be put on the workspace.
+	 */
+
 	public void putOnWorkspace(String _targetName, Integer _object);
+
+	/**
+	 * Puts a Byte on the workspace named by _targetName.
+	 * Bytes that are placed on the workspace are visible to all
+	 * the other plans that are active on in this workspace.
+	 *
+	 * @param the name of the Byte to be put on the workspace.
+	 * @param the Byte to be put on the workspace.
+	 */
+
 	public void putOnWorkspace(String _targetName, Byte _object);
+
+	/**
+	 * Puts a Boolean on the workspace named by _targetName.
+	 * Booleans that are placed on the workspace are visible to all
+	 * the other plans that are active on in this workspace.
+	 *
+	 * @param the name of the Boolean to be put on the workspace.
+	 * @param the Boolean to be put on the workspace.
+	 */
+
 	public void putOnWorkspace(String _targetName, Boolean _object);
+
+	/**
+	 * Puts a Short on the workspace named by _targetName.
+	 * Shortss that are placed on the workspace are visible to all
+	 * the other plans that are active on in this workspace.
+	 *
+	 * @param the name of the Short to be put on the workspace.
+	 * @param the Short to be put on the workspace.
+	 */
+
+
 	public void putOnWorkspace(String _targetName, Short _object);
+
+	/**
+	 * Puts a Character on the workspace named by _targetName.
+	 * Characters that are placed on the workspace are visible to all
+	 * the other plans that are active on in this workspace.
+	 *
+	 * @param the name of the Character to be put on the workspace.
+	 * @param the Character to be put on the workspace.
+	 */
+
 	public void putOnWorkspace(String _targetName, Character _object);
 
+	/**
+	 * Creates a target with no value on the workspace.  This method
+	 * can be used as a simple message passer for plan's.  For instance
+	 * if Plan 9 wanted to let other plan's know that it is completed
+	 * the target "plan9isCompleted" could be placed on the workspace
+	 * using this method.
+	 *
+	 * Puts a null value on the workspace named by  _targetName.
+	 * null values that are placed on the workspace are visible to all
+	 * the other plans that are active on in this workspace.
+	 *
+	 * @param the name of the null value to be put on the workspace.
+	 */
+
 	public void putOnWorkspace(String _targetName);
-	
+
+	/**
+	 * Places an object on directly on the Blackboard.  The object must
+	 * have a {@link Event} annotation or the Blackboard will
+	 * eventually throw an Exception.
+	 *
+	 * Developer's can use this method to effectively create a whole
+	 * new workspace.  It the appName, workspaceName, name and the
+	 * value of the workspace identifier are the same as that of the
+	 * event that caused this workspace creation, if this workspace is
+	 * still active at the time of _object's arrival, the _object will
+	 * appear on this workspace.  If any of those values are different
+	 * the _object will appear on another workspace.
+	 * 
+	 * @see Event
+	 */
+
 	public void placeOnBlackboard(Object _object);
+
+
+	/**
+	 * Places an object on directly on the Blackboard in the same
+	 * manner as placeOnBlackboard(Object _object) except that it
+	 * delays the arrival of that _object until _delay milliseconds has
+	 * passed.  The object must
+	 * have a {@link Event} annotation or the Blackboard will
+	 * eventually throw an Exception.
+	 * 
+	 */
+
 	public void schedulePlaceOnBlackboard(Object _object, long _delay);
+
+
+	/**
+	 * Removes a target from the workspace.
+	 *
+	 * Puts a null value on the workspace named by  _targetName.
+	 * Targets that are removed from the workspace are no longer
+	 * visible on the workspace to all the other plans that are
+	 * active on in this workspace.  Also the workspace will cease to
+	 * record changes to this target via its mutator methods.
+	 *
+	 * @param the name of the target to be removed on the workspace.
+	 * @return the target removed from the workspace.
+	 */
+
 	public Object remove(String _targetName);
+
+	/**
+	 * Clears this workspace of all targets and events.
+	 */
+
 	public void clear();
+
+
+	/**
+	 * Clears this workspace of the history of changes to all targets
+	 * and events.
+	 */
+
 	public void clearAllHistory();
+
+
+	/**
+	 * Clears this workspace of the history of changes to all targets
+	 * and events of the name _targetName
+	 *
+	 * @param the name of the target who's history is to be cleared
+	 * from this workspace.
+	 */
+
 	public void clearTargetHistory(String _targetName);
+
+
+	/**
+	 * Clears this workspace of the history of changes to all attribute
+	 * with the name _attributeName belonging to targets
+	 * and events of the name _targetName.
+	 * 
+	 * @param the name of the target or event attribute who's history is to be cleared
+	 * from this workspace.
+	 * 
+	 * @param the name of the target or event that has aforementioned
+	 * attribute.
+	 */
+
 	public void clearAttributeHistory(String _targetName, String _attributeName);
+
+	/**
+	 * Checks to see if this workspace has any targets.
+	 * 
+	 * @return true iff this workspace is empty. 
+	 */
+
 	public boolean isEmpty();
+
+	/**
+	 * Returns whether or not this workspace has this target.
+	 *
+	 * @param the name of the target.
+	 * @return true iff this workspace has a target with name
+	 * _targetName. returns false otherwise.
+	 */
+
 	public boolean hasTarget(String _targetName);
+
+	/**
+	 * Checks to see if a type of change was applied to a workspace for
+	 * a target.  Workspace actions include clearing a workspace, the
+	 * addition, update, or removal of a target, the setting of an
+	 * attribute, or no change. 
+	 *
+	 * @param the name of the target
+	 * @param the type of change that was applied. See {link ChangeInfo} 
+	 * @return true iff and only if the action was applied to the target
+	 */
+
 	public boolean hasTargetAction(String _targetName, int _action);
+
+	/**
+	 * Checks to see if a change was applied to a target's
+	 * attribute.
+	 *
+	 * @param the name of the target
+	 * @param the name of the target's attribute.
+	 * @return true iff and only if the target's attribute was changed.
+	 */
+
 	public boolean hasAttributeAction(String _targetName, String _attributeName);
+
+
+	/**
+	 * Returns a list detailing the history of changes to this target.
+	 *
+	 * @param the name of the target.
+	 * @return a list of ChangeInfo for this target.
+	 */
+	
 	public List getTargetHistory(String _targetName);
+
+
+	/**
+	 * Returns a list detailing the history of changes to this target's
+	 * attribute.
+	 *
+	 * @param the name of the attribute.
+	 * @param the name of the target.
+	 * 
+	 * @return a list of ChangeInfo for this target.
+	 */
+
 	public List getAttributeHistory(String _targetName, String _attributeName);
+
+
+	/**
+	 * Returns a list detailing the history of changes to every target
+	 * ever placed on this workspace.
+	 *
+	 * 
+	 * @return an array of all ChangeInfo ever recorded for this workspace.
+	 */
+
 	public ChangeInfo[] getChangeInfoHistory();
+
+	/**
+	 * Returns a string representation of this workspace
+	 * 
+	 * @return a string representation of this workspace
+	 */
+
 	public String toString();
-	public boolean isCompleted();
-	public boolean supportsTransactions();
-	public void commit();
-	public void rollback();	
+
+	/**
+	 * Returns a Json string representation of this workspace
+	 * 
+	 * @return a Json string representation of this workspace
+	 */
+
+	public String toJson();
 }

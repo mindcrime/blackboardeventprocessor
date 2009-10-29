@@ -39,7 +39,6 @@ public class InkwellPersister
 
 	public void put(TargetSpace _targetSpace)
 	{
-		String json = new com.google.gson.Gson().toJson(_targetSpace);
-		getDatabase().insert(_targetSpace.getWorkspaceIdentifier().toString(), json);
+		getDatabase().insert(_targetSpace.getWorkspaceIdentifier().toString(), _targetSpace.toJson());
 	}
 }

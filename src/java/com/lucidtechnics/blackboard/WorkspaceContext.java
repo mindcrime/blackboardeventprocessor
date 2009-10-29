@@ -57,12 +57,12 @@ public class WorkspaceContext
 	{
 		return getTargetSpace().getName();
 	}
-	
+
 	public String getAppName()
 	{
 		return getTargetSpace().getAppName();
 	}
-			
+
 	public Object getWorkspaceIdentifier()
 	{
 		return getTargetSpace().getWorkspaceIdentifier();
@@ -98,7 +98,7 @@ public class WorkspaceContext
 	{
 		getTargetSpace().schedulePlaceOnBlackboard(_object, _delay);
 	}
-		
+
 	public Object get(String _targetName)
 	{
 		checkIfExpired();
@@ -126,7 +126,7 @@ public class WorkspaceContext
 		checkIfExpired();
 		return getTargetSpace().has(_targetName);
 	}
-	
+
 	public void putOnWorkspace(String _targetName, Object _object)
 	{
 		if (_targetName == null) { throw new RuntimeException("Null target names are not allowed"); }
@@ -165,7 +165,7 @@ public class WorkspaceContext
 		checkIfExpired();
 		getTargetSpace().put(_targetName, _object, getPlan());
 	}
-	
+
 	public void putOnWorkspace(String _targetName, Double _object)
 	{
 		{
@@ -175,7 +175,7 @@ public class WorkspaceContext
 			getTargetSpace().put(_targetName, _object, getPlan());
 		}
 	}
-	
+
 	public void putOnWorkspace(String _targetName, Long _object)
 	{
 		if (_targetName == null) { throw new RuntimeException("Null target names are not allowed"); }
@@ -191,6 +191,7 @@ public class WorkspaceContext
 		checkIfExpired();
 		getTargetSpace().put(_targetName, _object, getPlan());
 	}
+
 
 	public void putOnWorkspace(String _targetName, Byte _object)
 	{
@@ -231,7 +232,7 @@ public class WorkspaceContext
 		checkIfExpired();
 		getTargetSpace().putNull(_targetName, getPlan());
 	}
-	
+
 	public Object remove(String _targetName)
 	{
 		checkIfExpired();
@@ -267,7 +268,7 @@ public class WorkspaceContext
 	{
 		getTargetSpace().clearAttributeHistory(_targetName, _attributeName);
 	}
-	
+
 	public boolean isEmpty()
 	{
 		checkIfExpired();
@@ -462,6 +463,11 @@ public class WorkspaceContext
 		stringBuffer.append("Current executing plan is: " + getPlan().getName() + ".\n");
 
 		return stringBuffer.toString();
+	}
+
+	public String toJson()
+	{
+		return getTargetSpace().toJson();
 	}
 
 	public boolean hasTargetAction(String _targetName, int _action)

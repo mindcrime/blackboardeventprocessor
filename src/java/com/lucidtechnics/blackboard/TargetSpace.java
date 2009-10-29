@@ -540,6 +540,11 @@ public abstract class TargetSpace
 
 		return stringBuffer.toString();
 	}
+
+	public String toJson()
+	{
+		return new com.google.gson.Gson().toJson(this);
+	}
 	
 	Set getTargets()
 	{

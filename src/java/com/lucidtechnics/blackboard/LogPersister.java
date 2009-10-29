@@ -19,8 +19,7 @@ public class LogPersister
 	{
 		if (logger.isInfoEnabled() == true)
 		{
-			String json = new com.google.gson.Gson().toJson(_targetSpace);
-			logger.info(json);
+			logger.info(_targetSpace.toJson());
 		}
 	}
 }
