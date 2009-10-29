@@ -63,7 +63,7 @@ public interface Workspace
 	 * Returns the target or event with the given name. In the case of
 	 * an event, it retrieves the most recent value of that event.
 	 *
-	 * @param the name of the target or event to be retrieved.
+	 * @param _targetName the name of the target or event to be retrieved.
 	 * @return the target or event identified by _targetName on this workspace.
 	 */
 
@@ -73,7 +73,7 @@ public interface Workspace
 	/**
 	 * Returns whether or not this workspace has this target or event.
 	 *
-	 * @param the name of the target or event.
+	 * @param _targetName the name of the target or event.
 	 * @return true iff this workspace has a target with name
 	 * _targetName. returns false otherwise.
 	 */
@@ -89,8 +89,8 @@ public interface Workspace
 	 * Object's that are placed on the workspace are visible to all
 	 * the other plans that are active on in this workspace.
 	 *
-	 * @param the name of the object or event to be put on the workspace.
-	 * @param the Object to be put on the workspace.
+	 * @param _targetName the name of the object or event to be put on the workspace.
+	 * @param _object the Object to be put on the workspace.
 	 */
 
 	public void putOnWorkspace(String _targetName, Object _object);
@@ -101,8 +101,8 @@ public interface Workspace
 	 * Targets that are placed on the workspace are visible to all
 	 * the other plans that are active on in this workspace.
 	 *
-	 * @param the name of the target to be put on the workspace.
-	 * @param the Target to be put on the workspace.
+	 * @param _targetName the name of the target to be put on the workspace.
+	 * @param _target the Target to be put on the workspace.
 	 */
 
 	public void putOnWorkspace(String _targetName, Target _target);
@@ -113,23 +113,22 @@ public interface Workspace
 	 * Strings that are placed on the workspace are visible to all
 	 * the other plans that are active on in this workspace.
 	 *
-	 * @param the name of the String to be put on the workspace.
-	 * @param the String to be put on the workspace.
+	 * @param _targetName the name of the String to be put on the workspace.
+	 * @param _string the String to be put on the workspace.
 	 */
 
-	public void putOnWorkspace(String _targetName, String _object);
-
+	public void putOnWorkspace(String _targetName, String _string);
 
 	/**
 	 * Puts a Float on the workspace named by _targetName.
 	 * Floats that are placed on the workspace are visible to all
 	 * the other plans that are active on in this workspace.
 	 *
-	 * @param the name of the Float to be put on the workspace.
-	 * @param the Float to be put on the workspace.
+	 * @param _targetName the name of the Float to be put on the workspace.
+	 * @param _float the Float to be put on the workspace.
 	 */
 
-	public void putOnWorkspace(String _targetName, Float _object);
+	public void putOnWorkspace(String _targetName, Float _float);
 
 
 	/**
@@ -137,11 +136,11 @@ public interface Workspace
 	 * Doubles that are placed on the workspace are visible to all
 	 * the other plans that are active on in this workspace.
 	 *
-	 * @param the name of the Double to be put on the workspace.
-	 * @param the Double to be put on the workspace.
+	 * @param _targetName the name of the Double to be put on the workspace.
+	 * @param _double the Double to be put on the workspace.
 	 */
 
-	public void putOnWorkspace(String _targetName, Double _object);
+	public void putOnWorkspace(String _targetName, Double _double);
 
 
 	/**
@@ -149,67 +148,66 @@ public interface Workspace
 	 * Longs that are placed on the workspace are visible to all
 	 * the other plans that are active on in this workspace.
 	 *
-	 * @param the name of the Long to be put on the workspace.
-	 * @param the Long to be put on the workspace.
+	 * @param _targetName the name of the Long to be put on the workspace.
+	 * @param _long the Long to be put on the workspace.
 	 */
 
-	public void putOnWorkspace(String _targetName, Long _object);
+	public void putOnWorkspace(String _targetName, Long _long);
 
 	/**
 	 * Puts an Integer on the workspace named by _targetName.
 	 * Integers that are placed on the workspace are visible to all
 	 * the other plans that are active on in this workspace.
 	 *
-	 * @param the name of the Integer to be put on the workspace.
-	 * @param the Integer to be put on the workspace.
+	 * @param _targetName the name of the Integer to be put on the workspace.
+	 * @param _integer the Integer to be put on the workspace.
 	 */
 
-	public void putOnWorkspace(String _targetName, Integer _object);
+	public void putOnWorkspace(String _targetName, Integer _integer);
 
 	/**
 	 * Puts a Byte on the workspace named by _targetName.
 	 * Bytes that are placed on the workspace are visible to all
 	 * the other plans that are active on in this workspace.
 	 *
-	 * @param the name of the Byte to be put on the workspace.
-	 * @param the Byte to be put on the workspace.
+	 * @param _targetName the name of the Byte to be put on the workspace.
+	 * @param _byte the Byte to be put on the workspace.
 	 */
 
-	public void putOnWorkspace(String _targetName, Byte _object);
+	public void putOnWorkspace(String _targetName, Byte _byte);
 
 	/**
 	 * Puts a Boolean on the workspace named by _targetName.
 	 * Booleans that are placed on the workspace are visible to all
 	 * the other plans that are active on in this workspace.
 	 *
-	 * @param the name of the Boolean to be put on the workspace.
-	 * @param the Boolean to be put on the workspace.
+	 * @param _targetName the name of the Boolean to be put on the workspace.
+	 * @param _boolean the Boolean to be put on the workspace.
 	 */
 
-	public void putOnWorkspace(String _targetName, Boolean _object);
+	public void putOnWorkspace(String _targetName, Boolean _boolean);
 
 	/**
 	 * Puts a Short on the workspace named by _targetName.
 	 * Shortss that are placed on the workspace are visible to all
 	 * the other plans that are active on in this workspace.
 	 *
-	 * @param the name of the Short to be put on the workspace.
-	 * @param the Short to be put on the workspace.
+	 * @param _targetName the name of the Short to be put on the workspace.
+	 * @param _short the Short to be put on the workspace.
 	 */
 
-
-	public void putOnWorkspace(String _targetName, Short _object);
+	public void putOnWorkspace(String _targetName, Short _short);
 
 	/**
 	 * Puts a Character on the workspace named by _targetName.
 	 * Characters that are placed on the workspace are visible to all
 	 * the other plans that are active on in this workspace.
 	 *
-	 * @param the name of the Character to be put on the workspace.
-	 * @param the Character to be put on the workspace.
+	 * @param _targetName the name of the Character to be put on the workspace.
+	 * @param _character the Character to be put on the workspace.
 	 */
 
-	public void putOnWorkspace(String _targetName, Character _object);
+	public void putOnWorkspace(String _targetName, Character _character);
 
 	/**
 	 * Creates a target with no value on the workspace.  This method
@@ -222,7 +220,7 @@ public interface Workspace
 	 * null values that are placed on the workspace are visible to all
 	 * the other plans that are active on in this workspace.
 	 *
-	 * @param the name of the null value to be put on the workspace.
+	 * @param _targetName the name of the null value to be put on the workspace.
 	 */
 
 	public void putOnWorkspace(String _targetName);
@@ -239,8 +237,10 @@ public interface Workspace
 	 * still active at the time of _object's arrival, the _object will
 	 * appear on this workspace.  If any of those values are different
 	 * the _object will appear on another workspace.
-	 * 
+	 *
+	 * @param _object the name of the target to be placed on the workspace.
 	 * @see Event
+	 * 
 	 */
 
 	public void placeOnBlackboard(Object _object);
@@ -254,6 +254,9 @@ public interface Workspace
 	 * have a {@link Event} annotation or the Blackboard will
 	 * eventually throw an Exception.
 	 * 
+	 * @param _object the name of the target to be placed on the workspace.
+	 * @param _delay the time in milliseconds that must pass before
+	 * event appears on workspace.
 	 */
 
 	public void schedulePlaceOnBlackboard(Object _object, long _delay);
@@ -268,7 +271,7 @@ public interface Workspace
 	 * active on in this workspace.  Also the workspace will cease to
 	 * record changes to this target via its mutator methods.
 	 *
-	 * @param the name of the target to be removed on the workspace.
+	 * @param _targetName the name of the target to be removed on the workspace.
 	 * @return the target removed from the workspace.
 	 */
 
@@ -293,7 +296,7 @@ public interface Workspace
 	 * Clears this workspace of the history of changes to all targets
 	 * and events of the name _targetName
 	 *
-	 * @param the name of the target who's history is to be cleared
+	 * @param _targetName the name of the target who's history is to be cleared
 	 * from this workspace.
 	 */
 
@@ -305,10 +308,10 @@ public interface Workspace
 	 * with the name _attributeName belonging to targets
 	 * and events of the name _targetName.
 	 * 
-	 * @param the name of the target or event attribute who's history is to be cleared
+	 * @param _targetName the name of the target or event attribute who's history is to be cleared
 	 * from this workspace.
 	 * 
-	 * @param the name of the target or event that has aforementioned
+	 * @param _attributeName the name of the target or event that has aforementioned
 	 * attribute.
 	 */
 
@@ -325,7 +328,7 @@ public interface Workspace
 	/**
 	 * Returns whether or not this workspace has this target.
 	 *
-	 * @param the name of the target.
+	 * @param _targetName the name of the target.
 	 * @return true iff this workspace has a target with name
 	 * _targetName. returns false otherwise.
 	 */
@@ -338,8 +341,8 @@ public interface Workspace
 	 * addition, update, or removal of a target, the setting of an
 	 * attribute, or no change. 
 	 *
-	 * @param the name of the target
-	 * @param the type of change that was applied. See {link ChangeInfo} 
+	 * @param _targetName the name of the target
+	 * @param _action the type of change that was applied. See {link ChangeInfo} 
 	 * @return true iff and only if the action was applied to the target
 	 */
 
@@ -349,8 +352,8 @@ public interface Workspace
 	 * Checks to see if a change was applied to a target's
 	 * attribute.
 	 *
-	 * @param the name of the target
-	 * @param the name of the target's attribute.
+	 * @param _targetName the name of the target
+	 * @param _attributeName the name of the target's attribute.
 	 * @return true iff and only if the target's attribute was changed.
 	 */
 
@@ -360,7 +363,7 @@ public interface Workspace
 	/**
 	 * Returns a list detailing the history of changes to this target.
 	 *
-	 * @param the name of the target.
+	 * @param _targetName the name of the target.
 	 * @return a list of ChangeInfo for this target.
 	 */
 	
@@ -371,8 +374,8 @@ public interface Workspace
 	 * Returns a list detailing the history of changes to this target's
 	 * attribute.
 	 *
-	 * @param the name of the attribute.
-	 * @param the name of the target.
+	 * @param _targetName the name of the attribute.
+	 * @param _attributeName the name of the target.
 	 * 
 	 * @return a list of ChangeInfo for this target.
 	 */
