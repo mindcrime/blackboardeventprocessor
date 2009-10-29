@@ -17,6 +17,7 @@
 	<property name="src.jsp" location="${src}/jsp" />
 	<property name="src.test" location="${src}/test" />
 	<property name="src.cfg" location="${src}/cfg" />
+	<property name="src.doc" location="${src}/doc" />
 	<property name="src.static" location="${src}/static" />
 	<property name="stage" location="stage" />
 	<property name="stage.shl" location="${stage}/shl" />
@@ -300,6 +301,26 @@
 				</fileset>
 			</batchtest>
 		</junit>
+	</target>
+
+	<target name="javadoc">
+	   <javadoc
+           destdir="${src.doc}/javadoc"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="${appName} Java API documentation">
+
+		<classpath refid="test.class.path"/>
+
+		<fileset dir="${src.java}" defaultexcludes="yes" />
+
+		<doctitle><![CDATA[<h1>${appName}</h1>]]></doctitle>
+		<bottom><![CDATA[<i>${javadoc.footer.tag.info}</i>]]></bottom>
+		<tag name="todo" scope="all" description="To do:"/>
+		<group title="${appName}" packages="${package}"/>
+		<link href="http://developer.java.sun.com/developer/products/xml/docs/api/"/>
+	   </javadoc>
 	</target>
 
 </project>

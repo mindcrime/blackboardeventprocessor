@@ -156,7 +156,7 @@ public interface Workspace
 	public void putOnWorkspace(String _targetName, Long _object);
 
 	/**
-	 * Puts a Integer on the workspace named by _targetName.
+	 * Puts an Integer on the workspace named by _targetName.
 	 * Integers that are placed on the workspace are visible to all
 	 * the other plans that are active on in this workspace.
 	 *
