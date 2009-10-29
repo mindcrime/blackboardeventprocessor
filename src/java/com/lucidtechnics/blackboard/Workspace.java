@@ -83,7 +83,7 @@ public interface Workspace
 
 	/**
 	 * Puts an object on the workspace named by _targetName.  Objects
-	 * that are not already target's are wrapped by an {link
+	 * that are not already target's are wrapped by an {@link
 	 * Intercepter} object that records changes to the object via its
 	 * mutator methods.  The wrapper will be a subtype of this object.
 	 * Object's that are placed on the workspace are visible to all
@@ -342,7 +342,7 @@ public interface Workspace
 	 * attribute, or no change. 
 	 *
 	 * @param _targetName the name of the target
-	 * @param _action the type of change that was applied. See {link ChangeInfo} 
+	 * @param _action the type of change that was applied. See {@link ChangeInfo} 
 	 * @return true iff and only if the action was applied to the target
 	 */
 
