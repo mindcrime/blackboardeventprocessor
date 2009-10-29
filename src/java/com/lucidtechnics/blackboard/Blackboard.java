@@ -1335,11 +1335,7 @@ public class Blackboard
 
 	protected WorkspaceConfiguration configureWorkspace(String _appName, String _workspaceName, java.io.File _eventPlanDirectory)
 	{
-		WorkspaceConfiguration workspaceConfiguration = new WorkspaceConfiguration();
-		workspaceConfiguration.setPlanSet(new java.util.HashSet<Plan>());
-		workspaceConfiguration.setDoNotPersistSet(new java.util.HashSet<String>());
-		workspaceConfiguration.setAppName(_appName);
-		workspaceConfiguration.setWorkspaceName(_workspaceName);
+		WorkspaceConfiguration workspaceConfiguration = new WorkspaceConfiguration(_appName, _workspaceName);
 
 		java.io.File[] configurationFileArray = _eventPlanDirectory.listFiles();
 		Configurator configurator = null;
@@ -1407,8 +1403,6 @@ public class Blackboard
 		plan.setPlanName("blackboard.targetspace.timeout");
 
 		WorkspaceConfiguration workspaceConfiguration = new WorkspaceConfiguration();
-		workspaceConfiguration.setPlanSet(new java.util.HashSet<Plan>());
-		workspaceConfiguration.setDoNotPersistSet(new java.util.HashSet<String>());
 
 		workspaceConfiguration.getPlanSet().add(plan);
 

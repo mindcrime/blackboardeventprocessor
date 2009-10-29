@@ -61,14 +61,142 @@ public class BlackboardConfiguration
 	public Persister getPersister() { return persister; }
 	public boolean getTimePlans() { return timePlans; }
 	public String getAppsHome() { return appsHome; }
-			
+
+
+	/**
+	 * Set the {@link ErrorManager} the {@link Blackboard} should use to manage
+	 * and report errors.
+	 * 
+	 * @param _errorManager a object that extends {@link ErrorManager}
+	 *
+	 * @see ErrorManager
+	 * @see Blackboard
+	 * 
+	 */
+
 	public void setErrorManager(ErrorManager _errorManager) { errorManager = _errorManager; }
+
+	/**
+	 * Set the maximum number of threads that should be available to
+	 * recieve new events placed on the Blackboard. As such these thread
+	 * represents the entry point for new activity for the {@link
+	 * Blackboard}.
+	 *
+	 * The default value of 1 should be sufficient for most applications. 
+	 * 
+	 * @param _maxBlackboardThread the maximum number of threads to be
+	 * made available for event reception. 
+	 *
+	 * @see Blackboard
+	 * 
+	 */
+
 	public void setMaxBlackboardThread(int _maxBlackboardThread) { maxBlackboardThread = _maxBlackboardThread; }
+
+	/**
+	 * Set the maximum number of threads that should be available to
+	 * recieve new events to be scheduled for arrival on the Blackboard.
+	 * As such these thread represents the entry point for new activity
+	 * for the {@link Blackboard}.
+	 *
+	 * The default value of 1 should be sufficient for most applications. 
+	 * 
+	 * @param _maxScheduledBlackboardThread the maximum number of threads to be
+	 * made available for scheduled event reception.
+	 *
+	 * @see Blackboard
+	 * 
+	 */
+
 	public void setMaxScheduledBlackboardThread(int _maxScheduledBlackboardThread) { maxScheduledBlackboardThread = _maxScheduledBlackboardThread; }
+
+	/**
+	 * Set the maximum number of threads that should be available to
+	 * process {@link Workspace}s.  Depending on how intensive your
+	 * application is adjusting this value may have an effect on how
+	 * your application performs.
+	 * 
+	 * @param _maxWorkspaceThread the maximum number of threads to be
+	 * made available for event reception. 
+	 *
+	 * @see Blackboard
+	 * 
+	 */
+
 	public void setMaxWorkspaceThread(int _maxWorkspaceThread) { maxWorkspaceThread = _maxWorkspaceThread; }
+
+	/**
+	 * Set the maximum number of threads that should be available to
+	 * automatically persist {@link Workspace}s upon completion.
+	 * Depending on how intensive your application is adjusting this
+	 * value may have an effect on how your application performs.
+	 * 
+	 * @param _maxPersistenceThread the maximum number of threads to be
+	 * made available for workspace persistence. 
+	 *
+	 * @see Persister
+	 * 
+	 */
+	
 	public void setMaxPersistenceThread(int _maxPersistenceThread) { maxPersistenceThread = _maxPersistenceThread; }
+
+	/**
+	 * Set the maximum number of {@link Workspace}s that should be available in
+	 * memory.  Depending on how intensive your application is adjusting this
+	 * value may have an effect on how your application performs.
+	 * Whenever the Blackboard exceeds this many workspaces, idle
+	 * workspaces may be persisted via the assigned persister.
+	 *
+	 * Only use this option if there is a memory concern.  If the
+	 * processing threads counts are adjusted accordingly, the default
+	 * value of 100000 should prove to be sufficient.
+	 * 
+	 * @param _maxWorkspaceThread the maximum number of workspaces to be
+	 * made available in memory. 
+	 *
+	 * @see Workspace
+	 * 
+	 */
+
 	public void setMaxWorkspace(int _maxWorkspace) { maxWorkspace = _maxWorkspace; }
+
+	/**
+	 * Set the {@link Persister} that should be available to
+	 * persist {@link Workspace}es.
+	 *
+	 * The Inkwell persister is already set as the default.
+	 * 
+	 * @param _persister the maximum number of threads to be
+	 * made available for event reception. 
+	 *
+	 * @see Blackboard
+	 * 
+	 */
+
 	public void setPersister(Persister _persister) { persister = _persister; }
+
+	/**
+	 * Turn on plan processing monitoring.  The times for plan
+	 * processing will be posted to a log4j file.  This should be set
+	 * to false for production support.
+	 * 
+	 * @param _timePlans set to true iff timing plans is required.
+	 *
+	 * @see Blackboard
+	 * 
+	 */
+
 	public void setTimePlans(boolean _timePlans) { timePlans = _timePlans; }
+
+	/**
+	 * The root directory for all the apps to be run by this blackboard.
+	 *  
+	 * @param _appsHome the root directory for all the applications to
+	 * be run by this Blackboard.
+	 *
+	 * @see Blackboard
+	 * 
+	 */
+
 	public void setAppsHome(String _appsHome) { appsHome = _appsHome; }
 }

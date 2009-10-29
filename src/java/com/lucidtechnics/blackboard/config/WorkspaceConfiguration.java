@@ -23,8 +23,8 @@ public class WorkspaceConfiguration
 {
 	private String appName;
 	private String workspaceName;
-	private Set planSet;
-	private Set doNotPersistSet;
+	private Set planSet = new java.util.HashSet<com.lucidtechnics.blackboard.Plan>();
+	private Set doNotPersistSet = new java.util.HashSet<String>();
 	private boolean persistChangeInfoHistory = false;
 	private Long workspaceTimeoutInSeconds = Long.MAX_VALUE;
 
@@ -35,14 +35,54 @@ public class WorkspaceConfiguration
 	public boolean getPersistChangeInfoHistory() { return persistChangeInfoHistory; }
 	public Long getWorkspaceTimeoutInSeconds() { return workspaceTimeoutInSeconds; }
 
-	public void setAppName(String _appName) { appName = _appName; }
-	public void setWorkspaceName(String _workspaceName) { workspaceName = _workspaceName; }
-	public void setPlanSet(Set _planSet) { planSet = _planSet; }
+	protected void setAppName(String _appName) { appName = _appName; }
+	protected void setWorkspaceName(String _workspaceName) { workspaceName = _workspaceName; }
+	protected void setPlanSet(Set _planSet) { planSet = _planSet; }
+
+	/**
+	 * Identify the set of targets that should not be automatically persisted when
+	 * the workspace is completed.  Targets identified in this set will
+	 * be removed from the workspace just before persistence.
+	 *  
+	 * @param _doNotPersistSet the collection of targets that should
+	 * not be automatically persisted upon workspace completion.
+	 *
+	 * @see Workspace
+	 * 
+	 */
+
 	public void setDoNotPersistSet(Set _doNotPersistSet) { doNotPersistSet = _doNotPersistSet; }
-	public void setPersistChangeInfoHistory(boolean _persistChangeInfoHistory) { persistChangeInfoHistory = _persistChangeInfoHistory; }
+
+	/**
+	 * Identify how long in seconds a workspace should remain idle in memory
+	 * before it is persisted.  Workspaces persisted in this manner are not
+	 * labled as complete, and as such will be resurrected from persistent
+	 * store should the {@link Blackboard} consider it necessary to do
+	 * so.  Note that targets identified in the do not persist set are
+	 * not removed when this temporary persistence happens.  As such
+	 * they will be available to the workspace when the workspace is
+	 * resurrected. Also all plans are restored to the same state they
+	 * were in when the workspace was persisted.
+	 *
+	 * The default setting is for the workspace to be allowed to idle for
+	 * Long.MAX_VALUE seconds.
+	 * 
+	 * @param _workspaceTimeoutInSeconds the collection of targets that should
+	 * not be automatically persisted upon workspace completion.
+	 *
+	 * @see Workspace
+	 * 
+	 */
+
 	public void setWorkspaceTimeoutInSeconds(Long _workspaceTimeoutInSeconds) { workspaceTimeoutInSeconds = _workspaceTimeoutInSeconds; }
 	
-	public WorkspaceConfiguration()
+	protected void setPersistChangeInfoHistory(boolean _persistChangeInfoHistory) { persistChangeInfoHistory = _persistChangeInfoHistory; }
+	
+	public WorkspaceConfiguration() {}
+
+	public WorkspaceConfiguration(String _appName, String _workspaceName)
 	{
+		setAppName(_appName);
+		setWorkspaceName(_workspaceName);
 	}
 }
