@@ -226,19 +226,12 @@ public interface Workspace
 	public void putOnWorkspace(String _targetName);
 
 	/**
-	 * Places an object on directly on the Blackboard.  The object must
-	 * have a {@link Event} annotation or the Blackboard will
-	 * eventually throw an Exception.
-	 *
-	 * Developer's can use this method to effectively create a whole
-	 * new workspace.  It the appName, workspaceName, name and the
-	 * value of the workspace identifier are the same as that of the
-	 * event that caused this workspace creation, if this workspace is
-	 * still active at the time of _object's arrival, the _object will
-	 * appear on this workspace.  If any of those values are different
-	 * the _object will appear on another workspace.
-	 *
+	 * Convenience method used by plans to access the same method on {@link
+	 * Blackboard}
+	 * 
 	 * @param _object the name of the target to be placed on the workspace.
+	 * 
+	 * @see Blackboard
 	 * @see Event
 	 * 
 	 */
@@ -247,16 +240,16 @@ public interface Workspace
 
 
 	/**
-	 * Places an object on directly on the Blackboard in the same
-	 * manner as placeOnBlackboard(Object _object) except that it
-	 * delays the arrival of that _object until _delay milliseconds has
-	 * passed.  The object must
-	 * have a {@link Event} annotation or the Blackboard will
-	 * eventually throw an Exception.
+	 * Convenience method used by plans to access the same method on {@link
+	 * Blackboard}
 	 * 
 	 * @param _object the name of the target to be placed on the workspace.
 	 * @param _delay the time in milliseconds that must pass before
 	 * event appears on workspace.
+	 *
+	 * @see Blackboard
+	 * @see Event
+	 * 
 	 */
 
 	public void schedulePlaceOnBlackboard(Object _object, long _delay);

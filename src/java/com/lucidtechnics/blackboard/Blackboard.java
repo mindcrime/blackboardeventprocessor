@@ -644,6 +644,24 @@ public class Blackboard
 		getBlackboardWriteLock().unlock();
 	}
 
+	/**
+	 * Places a target directly on the Blackboard.  The target must
+	 * have a {@link Event} annotation or the Blackboard will
+	 * eventually throw an Exception.
+	 *
+	 * Developer's can use this method to effectively create a whole
+	 * new workspace.  It the appName, workspaceName, name and the
+	 * value of the workspace identifier are the same as that of the
+	 * event that caused this workspace creation, if this workspace is
+	 * still active at the time of _object's arrival, the _target will
+	 * appear on this workspace.  If any of those values are different
+	 * the _target will appear on another workspace.
+	 *
+	 * @param _target the name of the target to be placed on the workspace.
+	 * @see Event
+	 * 
+	 */
+
 	public void placeOnBlackboard(Target _target)
 	{
 		if (logger.isDebugEnabled() == true)
@@ -653,6 +671,24 @@ public class Blackboard
 
 		placeOnBlackboard(_target.getBlackboardObject());
 	}
+
+	/**
+	 * Places an object directly on the Blackboard.  The object must
+	 * have a {@link Event} annotation or the Blackboard will
+	 * eventually throw an Exception.
+	 *
+	 * Developer's can use this method to effectively create a whole
+	 * new workspace.  It the appName, workspaceName, name and the
+	 * value of the workspace identifier are the same as that of the
+	 * event that caused this workspace creation, if this workspace is
+	 * still active at the time of _object's arrival, the _object will
+	 * appear on this workspace.  If any of those values are different
+	 * the _object will appear on another workspace.
+	 *
+	 * @param _object the name of the target to be placed on the workspace.
+	 * @see Event
+	 * 
+	 */
 
 	public void placeOnBlackboard(final Object _event)
 	{
@@ -682,10 +718,34 @@ public class Blackboard
 		});
 	}
 
+	/**
+	 * Places a target directly on the Blackboard in the same
+	 * manner as placeOnBlackboard(Target _target) except that it
+	 * delays the arrival of that _target until _delay milliseconds has
+	 * passed.  The target must have a {@link Event} annotation or the Blackboard
+	 * will eventually throw an Exception.
+	 * 
+	 * @param _target the name of the target to be placed on the workspace.
+	 * @param _delay the time in milliseconds that must pass before
+	 * event appears on workspace.
+	 */
+
 	public void schedulePlaceOnBlackboard(final Target _target, long _delay)
 	{
 		schedulePlaceOnBlackboard(_target.getBlackboardObject(), _delay);
 	}
+
+	/**
+	 * Places an object on directly on the Blackboard in the same
+	 * manner as placeOnBlackboard(Object _object) except that it
+	 * delays the arrival of that _object until _delay milliseconds has
+	 * passed.  The object must have a {@link Event} annotation or the Blackboard
+	 * will eventually throw an Exception.
+	 * 
+	 * @param _object the name of the target to be placed on the workspace.
+	 * @param _delay the time in milliseconds that must pass before
+	 * event appears on workspace.
+	 */
 
 	public void schedulePlaceOnBlackboard(final Object _event, long _delay)
 	{
