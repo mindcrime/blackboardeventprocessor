@@ -127,7 +127,7 @@ public class WorkspaceContext
 		return getTargetSpace().has(_targetName);
 	}
 
-	public void putOnWorkspace(String _targetName, Object _object)
+	public void put(String _targetName, Object _object)
 	{
 		if (_targetName == null) { throw new RuntimeException("Null target names are not allowed"); }
 		
@@ -135,7 +135,7 @@ public class WorkspaceContext
 		getTargetSpace().put(_targetName, _object, getPlan(), this);
 	}
 
-	public void putOnWorkspace(String _targetName, Target _target)
+	public void put(String _targetName, Target _target)
 	{
 		if (_targetName == null) { throw new RuntimeException("Null target names are not allowed"); }
 		
@@ -150,7 +150,7 @@ public class WorkspaceContext
 		getTargetSpace().put(_targetName, _target, getPlan());
 	}
 
-	public void putOnWorkspace(String _targetName, String _object)
+	public void put(String _targetName, String _object)
 	{
 		if (_targetName == null) { throw new RuntimeException("Null target names are not allowed"); }
 
@@ -158,7 +158,7 @@ public class WorkspaceContext
 		getTargetSpace().put(_targetName, _object, getPlan());
 	}
 
-	public void putOnWorkspace(String _targetName, Float _object)
+	public void put(String _targetName, Float _object)
 	{
 		if (_targetName == null) { throw new RuntimeException("Null target names are not allowed"); }
 
@@ -166,7 +166,7 @@ public class WorkspaceContext
 		getTargetSpace().put(_targetName, _object, getPlan());
 	}
 
-	public void putOnWorkspace(String _targetName, Double _object)
+	public void put(String _targetName, Double _object)
 	{
 		{
 			if (_targetName == null) { throw new RuntimeException("Null target names are not allowed"); }
@@ -176,7 +176,7 @@ public class WorkspaceContext
 		}
 	}
 
-	public void putOnWorkspace(String _targetName, Long _object)
+	public void put(String _targetName, Long _object)
 	{
 		if (_targetName == null) { throw new RuntimeException("Null target names are not allowed"); }
 
@@ -184,7 +184,7 @@ public class WorkspaceContext
 		getTargetSpace().put(_targetName, _object, getPlan());
 	}
 
-	public void putOnWorkspace(String _targetName, Integer _object)
+	public void put(String _targetName, Integer _object)
 	{
 		if (_targetName == null) { throw new RuntimeException("Null target names are not allowed"); }
 
@@ -193,7 +193,7 @@ public class WorkspaceContext
 	}
 
 
-	public void putOnWorkspace(String _targetName, Byte _object)
+	public void put(String _targetName, Byte _object)
 	{
 		if (_targetName == null) { throw new RuntimeException("Null target names are not allowed"); }
 
@@ -201,7 +201,7 @@ public class WorkspaceContext
 		getTargetSpace().put(_targetName, _object, getPlan());
 	}
 
-	public void putOnWorkspace(String _targetName, Boolean _object)
+	public void put(String _targetName, Boolean _object)
 	{
 		if (_targetName == null) { throw new RuntimeException("Null target names are not allowed"); }
 
@@ -209,7 +209,7 @@ public class WorkspaceContext
 		getTargetSpace().put(_targetName, _object, getPlan());
 	}
 
-	public void putOnWorkspace(String _targetName, Short _object)
+	public void put(String _targetName, Short _object)
 	{
 		if (_targetName == null) { throw new RuntimeException("Null target names are not allowed"); }
 
@@ -217,7 +217,7 @@ public class WorkspaceContext
 		getTargetSpace().put(_targetName, _object, getPlan());
 	}
 
-	public void putOnWorkspace(String _targetName, Character _object)
+	public void put(String _targetName, Character _object)
 	{
 		if (_targetName == null) { throw new RuntimeException("Null target names are not allowed"); }
 
@@ -225,7 +225,7 @@ public class WorkspaceContext
 		getTargetSpace().put(_targetName, _object, getPlan());
 	}
 
-	public void putOnWorkspace(String _targetName)
+	public void put(String _targetName)
 	{
 		if (_targetName == null) { throw new RuntimeException("Null target names are not allowed"); }
 

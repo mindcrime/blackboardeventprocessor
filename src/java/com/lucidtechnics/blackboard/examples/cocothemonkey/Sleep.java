@@ -48,7 +48,7 @@ public class Sleep
 		monkey.setPlaying(false);
 		monkey.setEating(false);
 
-		_workspace.putOnWorkspace("slept");
+		_workspace.put("slept");
 	}
 
 	public PlanPredicate getPlanPredicate()

@@ -34,12 +34,12 @@ public final class ReadOnlyWorkspaceContext
 		super(_targetSpace, _plan);
 	}
 	
-	public void putOnWorkspace(String _targetName, Object _target)
+	public void put(String _targetName, Object _target)
 	{
 		throw new RuntimeException("Cannot put target while expressing interest: " + _targetName + ". This workspace is read only");
 	}
 
-	public void putOnWorkspace(String _targetName, Target _target)
+	public void put(String _targetName, Target _target)
 	{
 		throw new RuntimeException("Cannot put target while expressing interest: " + _targetName + ". This workspace is read only");
 	}

@@ -22,7 +22,7 @@ if ((WORKSPACE.has("example.CocoTheMonkey.monkey") === true) && (WORKSPACE.has("
 	monkey.eating = false;
 	monkey.sleeping = false;
 
-	WORKSPACE.putOnWorkspace("example.CocoTheMonkey.played");
+	WORKSPACE.put("example.CocoTheMonkey.played");
 
 	PLAN_CONTEXT.isFinished = true;
 }

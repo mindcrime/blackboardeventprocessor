@@ -78,7 +78,7 @@ public class Eat
 		monkey.setPlaying(false);
 		monkey.setEating(true);
 		
-		_workspace.putOnWorkspace("eaten");
+		_workspace.put("eaten");
 
 		if (logger.isDebugEnabled() == true)
 		{

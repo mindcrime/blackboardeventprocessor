@@ -93,7 +93,7 @@ public interface Workspace
 	 * @param _object the Object to be put on the workspace.
 	 */
 
-	public void putOnWorkspace(String _targetName, Object _object);
+	public void put(String _targetName, Object _object);
 
 
 	/**
@@ -105,7 +105,7 @@ public interface Workspace
 	 * @param _target the Target to be put on the workspace.
 	 */
 
-	public void putOnWorkspace(String _targetName, Target _target);
+	public void put(String _targetName, Target _target);
 
 
 	/**
@@ -117,7 +117,7 @@ public interface Workspace
 	 * @param _string the String to be put on the workspace.
 	 */
 
-	public void putOnWorkspace(String _targetName, String _string);
+	public void put(String _targetName, String _object);
 
 	/**
 	 * Puts a Float on the workspace named by _targetName.
@@ -128,8 +128,7 @@ public interface Workspace
 	 * @param _float the Float to be put on the workspace.
 	 */
 
-	public void putOnWorkspace(String _targetName, Float _float);
-
+	public void put(String _targetName, Float _object);
 
 	/**
 	 * Puts a Double on the workspace named by _targetName.
@@ -140,7 +139,7 @@ public interface Workspace
 	 * @param _double the Double to be put on the workspace.
 	 */
 
-	public void putOnWorkspace(String _targetName, Double _double);
+	public void put(String _targetName, Double _object);
 
 
 	/**
@@ -152,7 +151,7 @@ public interface Workspace
 	 * @param _long the Long to be put on the workspace.
 	 */
 
-	public void putOnWorkspace(String _targetName, Long _long);
+	public void put(String _targetName, Long _object);
 
 	/**
 	 * Puts an Integer on the workspace named by _targetName.
@@ -163,7 +162,7 @@ public interface Workspace
 	 * @param _integer the Integer to be put on the workspace.
 	 */
 
-	public void putOnWorkspace(String _targetName, Integer _integer);
+	public void put(String _targetName, Integer _object);
 
 	/**
 	 * Puts a Byte on the workspace named by _targetName.
@@ -174,7 +173,7 @@ public interface Workspace
 	 * @param _byte the Byte to be put on the workspace.
 	 */
 
-	public void putOnWorkspace(String _targetName, Byte _byte);
+	public void put(String _targetName, Byte _object);
 
 	/**
 	 * Puts a Boolean on the workspace named by _targetName.
@@ -185,7 +184,7 @@ public interface Workspace
 	 * @param _boolean the Boolean to be put on the workspace.
 	 */
 
-	public void putOnWorkspace(String _targetName, Boolean _boolean);
+	public void put(String _targetName, Boolean _object);
 
 	/**
 	 * Puts a Short on the workspace named by _targetName.
@@ -196,7 +195,7 @@ public interface Workspace
 	 * @param _short the Short to be put on the workspace.
 	 */
 
-	public void putOnWorkspace(String _targetName, Short _short);
+	public void put(String _targetName, Short _object);
 
 	/**
 	 * Puts a Character on the workspace named by _targetName.
@@ -207,7 +206,7 @@ public interface Workspace
 	 * @param _character the Character to be put on the workspace.
 	 */
 
-	public void putOnWorkspace(String _targetName, Character _character);
+	public void put(String _targetName, Character _object);
 
 	/**
 	 * Creates a target with no value on the workspace.  This method
@@ -223,7 +222,7 @@ public interface Workspace
 	 * @param _targetName the name of the null value to be put on the workspace.
 	 */
 
-	public void putOnWorkspace(String _targetName);
+	public void put(String _targetName);
 
 	/**
 	 * Convenience method used by plans to access the same method on {@link
