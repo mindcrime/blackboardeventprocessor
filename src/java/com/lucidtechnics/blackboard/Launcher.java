@@ -50,10 +50,13 @@ public class Launcher
 
 					plan = new JavaScriptPlan();
 				}
-				else if (generatorArray[i].isDirectory() == false && generatorArray[i].getName().endsWith(".rb") == true)
+				else if (generatorArray[i].isDirectory() == false)
 				{
+					String[] tokenArray = generatorArray[i].getName().split("\\.");
+					String extension = tokenArray[tokenArray.length - 1];
+
 					logger.info("Executing generator: " + generatorArray[i].getName());
-					plan = new RubyPlan();
+					plan = new Jsr223Plan(extension);
 				}
 
 				if (plan != null)

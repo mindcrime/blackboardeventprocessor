@@ -144,6 +144,15 @@
 		</javac>
 	</target>
 
+	<target name="runScript">
+	   	<property name="run.class.path" refId="run.class.path"/>
+		<echo message="${run.class.path}"/>
+
+		<script language="javascript" src="src/script/javascript/${script}.js">
+		    <classpath refid="run.class.path"/>
+		</script>
+	</target>
+
 	<!-- Jar -->
 	<target name="jar" depends="compile">
 		<jar destfile="${dist}/lib/${blackboardJar}"
@@ -221,11 +230,15 @@
 
 		<!-- Copy libraries, jsp, and blackboard config and bin files -->
 		<copy todir="${dist}/blackboard/lib/core" flatten="true">
-			<fileset dir="${lib}" includes="**/*.jar" excludes="build-only/**/*.jar, **/servlet-api.jar, **/jcl.jar" />
+			<fileset dir="${lib}" includes="**/*.jar" excludes="**/js.jar, build-only/**/*.jar, **/servlet-api.jar, **/jcl.jar" />
+		</copy>
+
+		<copy todir="${dist}/blackboard/lib/engines" flatten="true">
+			<fileset dir="${lib}" includes="**/js.jar" />
 		</copy>
 
 		<copy todir="${dist}/blackboard/lib/bootstrap" flatten="true">
-			<fileset dir="${lib}" includes="**/js.jar, **/jcl.jar" />
+			<fileset dir="${lib}" includes="**/jcl.jar" />
 		</copy>
 
 		<copy todir="${dist}/blackboard/lib/bootstrap" flatten="true">
@@ -240,10 +253,7 @@
 			<fileset dir="${dist}/lib" includes="*Bootstrap*.jar" />
 		</copy>
 
-		<copy todir="${dist}/blackboard/lib/core">
-			<fileset dir="${dist}/lib" includes="*.jar" excludes="*Test*.jar, *Example*.jar, *Bootstrap*.jar" />
-		</copy>
-
+		<mkdir dir="${dist}/blackboard/lib/engines" />
 		<mkdir dir="${dist}/blackboard/lib/ext" />
 		<mkdir dir="${dist}/blackboard/blackboard/apps" />
 		<mkdir dir="${dist}/blackboard/blackboard/persistence" />

@@ -26,9 +26,11 @@ public class Bootstrap
 		try
 		{
 			JarClassLoader jarClassLoader = new JarClassLoader();
-			
-			jarClassLoader.add("lib" + java.io.File.separator + "core"); //Recursively load all jar files in the folder/sub-folder(s)
-			jarClassLoader.add("lib" + java.io.File.separator + "ext"); //Recursively load all jar files in the folder/sub-folder(s)
+
+			//Recursively load all jar files in the folder/sub-folder(s)
+			jarClassLoader.add("lib" + java.io.File.separator + "engines"); 
+			jarClassLoader.add("lib" + java.io.File.separator + "core");
+			jarClassLoader.add("lib" + java.io.File.separator + "ext");
 			
 			classLoader = jarClassLoader;
 		}

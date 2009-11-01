@@ -1318,13 +1318,17 @@ public class Blackboard
 
 				_workspaceConfiguration.getPlanSet().add(new JavaScriptPlan(planArray[i].getName(), planArray[i].getAbsolutePath()));
 			}
-			else if (planArray[i].isDirectory() == false && planArray[i].getName().endsWith(".rb") == true)
+			else if (planArray[i].isDirectory() == false)
 			{
 				if (logger.isInfoEnabled() == true)
 				{
 					logger.info("Loading plan: " + planArray[i].getName());
 				}
-				_workspaceConfiguration.getPlanSet().add(new RubyPlan(planArray[i].getName(), planArray[i].getAbsolutePath()));
+
+				String[] tokenArray = planArray[i].getName().split("\\.");
+				String extension = tokenArray[tokenArray.length - 1];
+				
+				_workspaceConfiguration.getPlanSet().add(new Jsr223Plan(planArray[i].getName(), planArray[i].getAbsolutePath(), extension));
 			}
 		}
 

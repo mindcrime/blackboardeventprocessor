@@ -107,7 +107,6 @@ public interface Workspace
 
 	public void put(String _targetName, Target _target);
 
-
 	/**
 	 * Puts a String on the workspace named by _targetName.
 	 * Strings that are placed on the workspace are visible to all
