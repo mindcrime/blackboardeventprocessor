@@ -944,95 +944,6 @@ public class Blackboard
 		}
 	}
 
-/*	protected void addToTargetSpace(WorkspaceConfiguration _workspaceConfiguration,
-									Object _workspaceIdentifier, String _eventName, Object _event)
-			throws Exception
-	{
-		try
-		{
-			if (logger.isDebugEnabled() == true)
-			{
-				logger.debug("For workspace: " + _workspaceIdentifier + " the guard was obtained for event: " + _eventName);
-			}
-
-			acquireBlackboardReadLock();
-
-			TargetSpace targetSpace = (TargetSpace) getTargetSpace(_workspaceIdentifier);
-
-				//first time seeing this target space ever ...
-				if (getTargetSpaceMap().keySet().contains(_workspaceIdentifier) == false)
-				{
-					try
-					{
-						if (getTargetSpaceMap().keySet().contains(_workspaceIdentifier) == false)
-						{
-							targetSpace = getBlackboardFactory().createTargetSpace(_workspaceConfiguration, _workspaceIdentifier);
-							String workspaceIdentifierString = (_workspaceIdentifier == null) ? "null" : _workspaceIdentifier.toString();
-							targetSpace.addPlans(_workspaceConfiguration.getPlanSet());
-						}
-					}
-					finally
-					{
-						acquireBlackboardReadLock();
-						releaseBlackboardWriteLock();						
-					}
-				}
-
-				try
-				{
-					releaseBlackboardReadLock();
-					acquireBlackboardWriteLock();
-
-
-					if (targetSpace != null)
-					{
-						targetSpace.initialize(this);
-
-						try
-						{
-							releaseBlackboardReadLock();
-							acquireBlackboardWriteLock();
-
-							getTargetSpaceMap().put(_workspaceIdentifier, targetSpace);
-
-							incrementActiveWorkspaceCount();
-						}
-						finally
-						{
-							targetSpace.put(_eventName, _event, getBlackboardActor(), null);
-						}
-					}
-				else
-				{
-					throw new RuntimeException("Unable to create or retrieve workspace for workspaceIdentifier: " + _workspaceIdentifier);
-				}
-			}
-
-			targetSpace.setDoNotPersistSet(_workspaceConfiguration.getDoNotPersistSet());
-			targetSpace.setPersistChangeInfoHistory(_workspaceConfiguration.getPersistChangeInfoHistory());
-			long currentTimeMillis = System.currentTimeMillis();
-			targetSpace.setLastActiveTime(currentTimeMillis);
-
-			if (logger.isDebugEnabled() == true)
-			{
-				logger.debug("For workspace: " + _workspaceIdentifier + " putting event " + _eventName);
-			}
-
-
-		}
-		finally
-		{
-			releaseBlackboardReadLock();
-
-			if (logger.isDebugEnabled() == true)
-			{
-				logger.debug("For workspace: " + _workspaceIdentifier + " the target space is released for event " + _eventName);
-			}
-
-			releaseTargetSpace(_workspaceIdentifier);
-		}
-	}
-	*/
 	private void incrementActiveWorkspaceCount()
 	{
 		setActiveWorkspaceCount(getActiveWorkspaceCount() + 1);
@@ -1320,15 +1231,25 @@ public class Blackboard
 			}
 			else if (planArray[i].isDirectory() == false)
 			{
-				if (logger.isInfoEnabled() == true)
-				{
-					logger.info("Loading plan: " + planArray[i].getName());
-				}
-
 				String[] tokenArray = planArray[i].getName().split("\\.");
 				String extension = tokenArray[tokenArray.length - 1];
+
+				if (Jsr223Plan.hasScriptingEngine(extension) == true)
+				{
+					if (logger.isInfoEnabled() == true)
+					{
+						logger.info("Loading plan: " + planArray[i].getName());
+					}
 				
-				_workspaceConfiguration.getPlanSet().add(new Jsr223Plan(planArray[i].getName(), planArray[i].getAbsolutePath(), extension));
+					_workspaceConfiguration.getPlanSet().add(new Jsr223Plan(planArray[i].getName(), planArray[i].getAbsolutePath(), extension));
+				}
+				else
+				{
+					if (logger.isInfoEnabled() == true)
+					{
+						logger.info("Not scriptable: " + planArray[i].getName());
+					}
+				}					
 			}
 		}
 
@@ -1357,14 +1278,17 @@ public class Blackboard
 				configurator = new JavaScriptConfigurator();
 				configuratorPath = configurationFileArray[i].getAbsolutePath();
 			}
-			else if (configurationFileArray[i].isDirectory() == false && configurationFileArray[i].getName().endsWith("workspaceConfiguration.rb") == true)
+			else if (configurationFileArray[i].isDirectory() == false && configurationFileArray[i].getName().contains("workspaceConfiguration") == true)
 			{
 				if (logger.isInfoEnabled() == true)
 				{
 					logger.info("Loading configuration: " + configurationFileArray[i].getName());
 				}
-				
-				configurator = new RubyConfigurator();
+
+				String[] tokenArray = configurationFileArray[i].getName().split("\\.");
+				String extension = tokenArray[tokenArray.length - 1];
+
+				configurator = new Jsr223Configurator(extension);
 				configuratorPath = configurationFileArray[i].getAbsolutePath();
 			}
 		}

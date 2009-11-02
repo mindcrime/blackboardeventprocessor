@@ -50,13 +50,16 @@ public class Launcher
 
 					plan = new JavaScriptPlan();
 				}
-				else if (generatorArray[i].isDirectory() == false)
+				else if (generatorArray[i].isDirectory() == false && generatorArray[i].getName().contains("blackboard.configuration") == false)
 				{
 					String[] tokenArray = generatorArray[i].getName().split("\\.");
 					String extension = tokenArray[tokenArray.length - 1];
 
-					logger.info("Executing generator: " + generatorArray[i].getName());
-					plan = new Jsr223Plan(extension);
+					if (Jsr223Plan.hasScriptingEngine(extension) == true)
+					{
+						logger.info("Executing generator: " + generatorArray[i].getName());
+						plan = new Jsr223Plan(extension);
+					}
 				}
 
 				if (plan != null)

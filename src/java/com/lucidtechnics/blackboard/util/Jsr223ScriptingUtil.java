@@ -26,6 +26,7 @@ import java.util.HashMap;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.script.ScriptEngineFactory;
 import javax.script.ScriptException;
 
 import org.apache.commons.logging.Log;
@@ -36,8 +37,27 @@ import com.lucidtechnics.blackboard.util.PropertyUtil;
 public class Jsr223ScriptingUtil
    implements ScriptingUtil
 {
+	static
+	{
+		Map<String, String> tempExtensionToEngineMap = new HashMap<String, String>();
+
+		tempExtensionToEngineMap.put("java", "com.sun.script.groovy.GroovyScriptEngineFactory");
+		tempExtensionToEngineMap.put("rb", "com.sun.script.jruby.JRubyScriptEngineFactory");
+		tempExtensionToEngineMap.put("ruby", "com.sun.script.jruby.JRubyScriptEngineFactory");
+		tempExtensionToEngineMap.put("py", "com.sun.script.jython.JythonScriptEngineFactory");
+		tempExtensionToEngineMap.put("python", "com.sun.script.jython.JythonScriptEngineFactory");
+		tempExtensionToEngineMap.put("gr", "com.sun.script.groovy.GroovyScriptEngineFactory");
+		tempExtensionToEngineMap.put("groovy", "com.sun.script.groovy.GroovyScriptEngineFactory");
+
+		extensionToEngineMap = tempExtensionToEngineMap;
+	}
+	
+	private static Map<String, String> extensionToEngineMap;
+	
 	private static Log log = LogFactory.getLog(Jsr223ScriptingUtil.class);
 
+	private static ScriptEngineManager scriptEngineManager = new ScriptEngineManager(com.lucidtechnics.blackboard.Bootstrap.getClassLoader());
+	
 	private ScriptEngine scriptEngine;
 	private Set<String> scriptResourceSet;
 	private Map<String, Object> bindingsMap;
@@ -50,17 +70,39 @@ public class Jsr223ScriptingUtil
 	private void setScriptResourceSet(Set<String> _scriptResourceSet) {  scriptResourceSet = _scriptResourceSet; }
     public void setBindingsMap(Map<String, Object> _bindingsMap) { bindingsMap = _bindingsMap; }
 
-    public Jsr223ScriptingUtil(String _engineName)
+	public static ScriptEngineManager getScriptEngineManager() { return scriptEngineManager; }
+	
+    public Jsr223ScriptingUtil(String _extension)
 	{
-		ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
-		ScriptEngine scriptEngine = scriptEngineManager.getEngineByExtension(_engineName);
+		String factoryName = null;
+		
+		try
+		{
+			factoryName = extensionToEngineMap.get(_extension);
+			if (factoryName == null) { throw new RuntimeException("Scripting not supported for files ending in: " + _extension); }
 
-		if (scriptEngine == null) { throw new RuntimeException("Unable to create script engine for: " + _engineName + ".  Is the right jar in the classpath?"); }
+			ScriptEngineFactory factory = (ScriptEngineFactory) Class.forName(factoryName).newInstance();			
+			ScriptEngine scriptEngine = factory.getScriptEngine();
 
-		setScriptEngine(scriptEngine);
-		setScriptResourceSet(new HashSet<String>());
-		setBindingsMap(new HashMap<String, Object>());
+			setScriptEngine(scriptEngine);
+			setScriptResourceSet(new HashSet<String>());
+			setBindingsMap(new HashMap<String, Object>());
+		}
+		catch(ClassNotFoundException t)
+		{
+			throw new RuntimeException("Please make sure the appropriate jar files for factory: " +
+									   factoryName + " are place in the lib/engines directory in order to run scripts of extension: " + _extension);
+		}
+		catch(Throwable t)
+		{
+			throw new RuntimeException(t);
+		}
     }
+
+	public static boolean hasScriptingEngine(String _extension)
+	{
+		return (extensionToEngineMap.containsKey(_extension) == true);
+	}
 
     public void bind(String _name, Object _value)
     {

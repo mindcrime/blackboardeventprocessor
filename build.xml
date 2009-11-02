@@ -230,11 +230,15 @@
 
 		<!-- Copy libraries, jsp, and blackboard config and bin files -->
 		<copy todir="${dist}/blackboard/lib/core" flatten="true">
-			<fileset dir="${lib}" includes="**/*.jar" excludes="**/js.jar, build-only/**/*.jar, **/servlet-api.jar, **/jcl.jar" />
+			<fileset dir="${lib}" includes="**/*.jar" excludes="**/js.jar, **/bsh*.jar, build-only/**/*.jar, **/servlet-api.jar, **/jcl.jar" />
+		</copy>
+
+		<copy todir="${dist}/blackboard/lib/core" flatten="true">
+			<fileset dir="${dist}/lib" includes="**/blackboard-*.jar" />
 		</copy>
 
 		<copy todir="${dist}/blackboard/lib/engines" flatten="true">
-			<fileset dir="${lib}" includes="**/js.jar" />
+			<fileset dir="${lib}" includes="**/js.jar, **/bsh*.jar" />
 		</copy>
 
 		<copy todir="${dist}/blackboard/lib/bootstrap" flatten="true">

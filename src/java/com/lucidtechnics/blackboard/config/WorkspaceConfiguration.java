@@ -76,7 +76,25 @@ public class WorkspaceConfiguration
 
 	public void setWorkspaceTimeoutInSeconds(Long _workspaceTimeoutInSeconds) { workspaceTimeoutInSeconds = _workspaceTimeoutInSeconds; }
 	
-	protected void setPersistChangeInfoHistory(boolean _persistChangeInfoHistory) { persistChangeInfoHistory = _persistChangeInfoHistory; }
+	/**
+	 * Identify whether or not Blackboard should automatically persist
+	 * change info history.  Developers will find this useful during
+	 * debugging as it gives a total history of all actions applied to
+	 * workspace events and targets.  In production this feature could
+	 * be turned off.
+	 * 
+	 * The default setting is for the workspace is set to automatically
+	 * persist change info history.
+	 * 
+	 * @param _persistChangeInfoHistory set to false if you do not want
+	 * change info history to be automatically persisted with the rest
+	 * of the workspace.
+	 *
+	 * @see Workspace
+	 * 
+	 */
+
+	public void setPersistChangeInfoHistory(boolean _persistChangeInfoHistory) { persistChangeInfoHistory = _persistChangeInfoHistory; }
 	
 	public WorkspaceConfiguration() {}
 

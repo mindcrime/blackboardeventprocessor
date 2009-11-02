@@ -54,6 +54,11 @@ public class Jsr223Plan
 
 	public String getEngineName() { return engineName; }
 	public void setEngineName(String _engineName) { engineName = _engineName; }
+
+	public static boolean hasScriptingEngine(String _extension)
+	{
+		return Jsr223ScriptingUtil.hasScriptingEngine(_extension);
+	}
 	
 	public boolean execute(Workspace _workspace)
 	{

@@ -20,17 +20,27 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.lucidtechnics.blackboard.util.ScriptingUtil;
-import com.lucidtechnics.blackboard.util.RubyingUtil;
+import com.lucidtechnics.blackboard.util.Jsr223ScriptingUtil;
 import com.lucidtechnics.blackboard.config.WorkspaceConfiguration;
 
-public class RubyConfigurator
+public class Jsr223Configurator
    implements Configurator
 {
-	private static Log log = LogFactory.getLog(RubyConfigurator.class);
+	private static Log log = LogFactory.getLog(Jsr223Configurator.class);
+
+	private String extension;
+
+	private String getExtension() { return extension; }
+	private void setExtension(String _extension) { extension = _extension; }
 	
+	public Jsr223Configurator(String _extension)
+	{
+		setExtension(_extension);
+	}
+
 	public void execute(WorkspaceConfiguration _workspaceConfiguration, String _path)
 	{
-		ScriptingUtil scriptingUtil = new RubyingUtil();
+		ScriptingUtil scriptingUtil = new Jsr223ScriptingUtil(getExtension());
 
 		scriptingUtil.bind("CONFIGURATION", _workspaceConfiguration);
 		scriptingUtil.bind("LOGGER", log);
@@ -41,20 +51,20 @@ public class RubyConfigurator
 
 		if (log.isDebugEnabled() == true)
 		{
-			log.debug("JRuby execution for workspace configuration: " + _path);
+			log.debug("Execution for workspace configuration: " + _path);
 		}
 		
 		scriptingUtil.executeScript(scriptResources);
 
 		if (log.isDebugEnabled() == true)
 		{
-			log.debug("Completed JRuby execution for workspace configuration: " + _path);
+			log.debug("Completed execution for workspace configuration: " + _path);
 		}
 	}
 
 	public void execute(BlackboardConfiguration _blackboardConfiguration, String _path)
 	{
-		ScriptingUtil scriptingUtil = new RubyingUtil();
+		ScriptingUtil scriptingUtil = new Jsr223ScriptingUtil(getExtension());
 
 		scriptingUtil.bind("CONFIGURATION", _blackboardConfiguration);
 		scriptingUtil.bind("LOGGER", log);
@@ -65,14 +75,14 @@ public class RubyConfigurator
 
 		if (log.isDebugEnabled() == true)
 		{
-			log.debug("JRuby execution for blackboard configuration: " + _path);
+			log.debug("Execution for blackboard configuration: " + _path);
 		}
 
 		scriptingUtil.executeScript(scriptResources);
 
 		if (log.isDebugEnabled() == true)
 		{
-			log.debug("Completed JRuby execution for blackboard configuration: " + _path);
+			log.debug("Completed execution for blackboard configuration: " + _path);
 		}
 	}
 }
