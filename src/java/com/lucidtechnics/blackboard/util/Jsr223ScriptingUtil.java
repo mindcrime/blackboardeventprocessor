@@ -25,7 +25,7 @@ import java.util.HashMap;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
+import javax.script.CompiledScript;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptException;
 
@@ -51,26 +51,21 @@ public class Jsr223ScriptingUtil
 
 		extensionToEngineMap = tempExtensionToEngineMap;
 	}
-	
-	private static Map<String, String> extensionToEngineMap;
-	
+
 	private static Log log = LogFactory.getLog(Jsr223ScriptingUtil.class);
 
-	private static ScriptEngineManager scriptEngineManager = new ScriptEngineManager(com.lucidtechnics.blackboard.Bootstrap.getClassLoader());
-	
+	private static Map<String, String> extensionToEngineMap;
+		
+	private static final Map<String, CompiledScript> scriptResourceMap = new HashMap<String, CompiledScript>();
 	private ScriptEngine scriptEngine;
-	private Set<String> scriptResourceSet;
 	private Map<String, Object> bindingsMap;
 
 	private ScriptEngine getScriptEngine() { return scriptEngine; } 
-	private Set<String> getScriptResourceSet() { return scriptResourceSet; }
+	private Map<String, CompiledScript> getScriptResourceMap() { return scriptResourceMap; }
 	private Map<String, Object> getBindingsMap() { return bindingsMap; }
 
 	private void setScriptEngine(ScriptEngine _scriptEngine) { scriptEngine = _scriptEngine; }
-	private void setScriptResourceSet(Set<String> _scriptResourceSet) {  scriptResourceSet = _scriptResourceSet; }
     public void setBindingsMap(Map<String, Object> _bindingsMap) { bindingsMap = _bindingsMap; }
-
-	public static ScriptEngineManager getScriptEngineManager() { return scriptEngineManager; }
 	
     public Jsr223ScriptingUtil(String _extension)
 	{
@@ -85,7 +80,6 @@ public class Jsr223ScriptingUtil
 			ScriptEngine scriptEngine = factory.getScriptEngine();
 
 			setScriptEngine(scriptEngine);
-			setScriptResourceSet(new HashSet<String>());
 			setBindingsMap(new HashMap<String, Object>());
 		}
 		catch(ClassNotFoundException t)
@@ -99,6 +93,37 @@ public class Jsr223ScriptingUtil
 		}
     }
 
+	public CompiledScript compileScript(String _scriptResource)
+	{
+		Reader reader = null;
+
+		try
+		{
+			if (getScriptResourceMap().containsKey(_scriptResource) == false
+			   && getScriptEngine() instanceof javax.script.Compilable)
+			{
+				reader = new InputStreamReader(findScript(_scriptResource));
+
+				CompiledScript script = ((javax.script.Compilable) getScriptEngine()).compile(reader);
+
+				synchronized(getScriptResourceMap())
+				{
+					getScriptResourceMap().put(_scriptResource, script);
+				}
+			}
+		}
+		catch(Throwable t)
+		{
+			throw new RuntimeException(t);
+		}
+		finally
+		{
+			if (reader != null) { try { reader.close(); } catch(Throwable t) {} }
+		}
+
+		return getScriptResourceMap().get(_scriptResource);
+	}
+
 	public static boolean hasScriptingEngine(String _extension)
 	{
 		return (extensionToEngineMap.containsKey(_extension) == true);
@@ -111,39 +136,7 @@ public class Jsr223ScriptingUtil
 
 	public void loadScript(String _scriptResource)
 	{
-		InputStream inputStream = null;
-		
-		try
-		{
-			inputStream = findScript(_scriptResource);
-		
-			if (getScriptResourceSet().contains(_scriptResource) == false)
-			{
-				Reader reader = new InputStreamReader(inputStream);
-
-				try
-				{
-					getScriptEngine().eval(reader, getScriptEngine().getContext());
-				}
-				catch(Throwable t)
-				{
-					t.printStackTrace();
-					throw new RuntimeException("Unable to execute script: " + _scriptResource + " for this reason: " + t.toString(), t);
-				}
-
-				getScriptResourceSet().add(_scriptResource);
-			}
-		}
-		catch(Throwable t)
-		{
-			t.printStackTrace();
-			log.error(t.toString());
-			throw new RuntimeException(t);
-		}
-		finally
-		{
-			if (inputStream != null) { try { inputStream.close(); } catch (Throwable t) {} }
-		}
+		executeScript(_scriptResource);
 	}
 
 	private InputStream findScript(String _scriptResource)
@@ -191,7 +184,16 @@ public class Jsr223ScriptingUtil
 				scriptContext.setAttribute(key, getBindingsMap().get(key), ScriptContext.ENGINE_SCOPE);
 			}
 
-			result = getScriptEngine().eval(new InputStreamReader(findScript(_scriptResource)), scriptContext);
+			CompiledScript script = compileScript(_scriptResource);
+
+			if (script != null)
+			{
+				result = script.eval(scriptContext);
+			}
+			else
+			{
+				result = getScriptEngine().eval(new InputStreamReader(findScript(_scriptResource)), scriptContext);
+			}
 		}
 		catch(Throwable t)
 		{
@@ -218,7 +220,16 @@ public class Jsr223ScriptingUtil
 			
 			for (i = 0; i < _scriptResources.length; i++)
 			{
-				result = getScriptEngine().eval(new InputStreamReader(findScript(_scriptResources[i])), scriptContext);
+				CompiledScript script = compileScript(_scriptResources[i]);
+
+				if (script != null)
+				{
+					result = script.eval(scriptContext);
+				}
+				else
+				{
+					result = getScriptEngine().eval(new InputStreamReader(findScript(_scriptResources[i])), scriptContext);
+				}
 			}
 		}
 		catch(Throwable t)

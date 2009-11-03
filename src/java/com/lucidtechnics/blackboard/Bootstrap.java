@@ -49,7 +49,7 @@ public class Bootstrap
 		try
 		{
 			JclObjectFactory factory = JclObjectFactory.getInstance();
-			final Object launcher = factory.create	(getClassLoader(), "com.lucidtechnics.blackboard.Launcher");
+			final Object launcher = factory.create (getClassLoader(), "com.lucidtechnics.blackboard.Launcher");
 
 			Class launcherClass = getClassLoader().loadClass("com.lucidtechnics.blackboard.Launcher");
 			java.lang.reflect.Method method = launcherClass.getMethod("launch");			
