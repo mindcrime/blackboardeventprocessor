@@ -36,7 +36,7 @@ public final class Guard
 	private Map getIdMap() { return idMap; }
 	private void setIdMap(Map _idMap) { idMap = _idMap; }
 	
-	public boolean acquireLock(Object _id, boolean _blockUntilAcquired)
+	public boolean acquireLock(Object _id, Object _object, boolean _blockUntilAcquired)
 	{
 		if (logger.isDebugEnabled() == true)
 		{
@@ -49,11 +49,17 @@ public final class Guard
 		
 		do
 		{
-			synchronized(this)
+			synchronized(_object)
 			{				
 				if (getIdMap().containsKey(_id) == false)
 				{
-					getIdMap().put(_id, new GuardState(_id));
+					synchronized(this)
+					{
+						if (getIdMap().containsKey(_id) == false)
+						{
+							getIdMap().put(_id, new GuardState(_id));
+						}
+					}
 				}
 
 				GuardState guardState = (GuardState) getIdMap().get(_id);
@@ -66,7 +72,7 @@ public final class Guard
 					{
 						logger.debug("Waiting to acquire lock on id: " + _id);
 					}
-					try { wait(); } catch (InterruptedException e) {}
+					try { _object.wait(); } catch (InterruptedException e) {}
 				}
 			}
 		}
@@ -80,8 +86,10 @@ public final class Guard
 		return acquiredLock;
 	}
 
-	public void releaseLock(Object _id)
+	public boolean releaseLock(Object _id, Object _object)
 	{
+		boolean releasedLock = false;
+		
 		if (logger.isDebugEnabled() == true)
 		{
 			logger.debug("releasing guard for id: " + _id);
@@ -91,12 +99,18 @@ public final class Guard
 
 		if (guardState != null)
 		{
-			synchronized(this)
+			synchronized(_object)
 			{
-				if (guardState.releaseLock() == true)
+				releasedLock = guardState.releaseLock();
+				
+				if (releasedLock == true )
 				{
-					getIdMap().remove(_id);
-					notifyAll();
+					synchronized(this)
+					{
+						getIdMap().remove(_id);
+					}
+					
+					_object.notifyAll();
 
 					if (logger.isDebugEnabled() == true)
 					{
@@ -107,7 +121,7 @@ public final class Guard
 				{
 					if (logger.isDebugEnabled() == true)
 					{
-						logger.debug("Guard is still in place for id: " + _id);
+						logger.warn("Tried to release lock but it is not owned by this thread for id: " + _id);
 					}
 				}
 			}
@@ -119,6 +133,8 @@ public final class Guard
 				logger.warn("Guard is still in place for id: " + _id);
 			}
 		}
+
+		return releasedLock;
 	}
 
 	private final class GuardState

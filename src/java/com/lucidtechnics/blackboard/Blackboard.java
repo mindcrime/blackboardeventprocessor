@@ -313,7 +313,7 @@ public class Blackboard
 						}
 					}
 
-					acquireLock = guardTargetSpace(_targetSpace.getWorkspaceIdentifier(), false);
+					acquireLock = guardTargetSpace(_targetSpace.getWorkspaceIdentifier(), _targetSpace, false);
 
 					if (getTimePlans() == true)
 					{
@@ -607,7 +607,7 @@ public class Blackboard
 							logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() + " the guard was released.");
 						}
 
-						releaseTargetSpace(_targetSpace.getWorkspaceIdentifier());
+						releaseTargetSpace(_targetSpace.getWorkspaceIdentifier(), _targetSpace);
 					}
 
 					if (getTimePlans() == true)
@@ -868,10 +868,10 @@ public class Blackboard
 									Object _workspaceIdentifier, String _eventName, Object _event)
 			throws Exception
 	{
+		TargetSpace targetSpace = null;
+		
 		try
 		{
-			guardTargetSpace(_workspaceIdentifier);
-
 			if (logger.isDebugEnabled() == true)
 			{
 				logger.debug("For workspace: " + _workspaceIdentifier + " the guard was obtained for event: " + _eventName);
@@ -879,7 +879,7 @@ public class Blackboard
 
 			acquireBlackboardReadLock();
 
-			TargetSpace targetSpace = (TargetSpace) getTargetSpaceMap().get(_workspaceIdentifier);
+			targetSpace = (TargetSpace) getTargetSpaceMap().get(_workspaceIdentifier);
 
 			if (targetSpace == null)
 			{
@@ -898,14 +898,21 @@ public class Blackboard
 				{
 					targetSpace.initialize(this);
 
+					targetSpace.setDoNotPersistSet(_workspaceConfiguration.getDoNotPersistSet());
+					targetSpace.setPersistChangeInfoHistory(_workspaceConfiguration.getPersistChangeInfoHistory());
+					long currentTimeMillis = System.currentTimeMillis();
+					targetSpace.setLastActiveTime(currentTimeMillis);
+
 					try
 					{
 						releaseBlackboardReadLock();
 						acquireBlackboardWriteLock();
 
-						getTargetSpaceMap().put(_workspaceIdentifier, targetSpace);
-
-						incrementActiveWorkspaceCount();
+						if (getTargetSpaceMap().containsKey(_workspaceIdentifier) == false)
+						{
+							getTargetSpaceMap().put(_workspaceIdentifier, targetSpace);
+							incrementActiveWorkspaceCount();
+						}
 					}
 					finally
 					{
@@ -918,18 +925,27 @@ public class Blackboard
 					throw new RuntimeException("Unable to create or retrieve workspace for workspaceIdentifier: " + _workspaceIdentifier);
 				}
 			}
-			
-			targetSpace.setDoNotPersistSet(_workspaceConfiguration.getDoNotPersistSet());
-			targetSpace.setPersistChangeInfoHistory(_workspaceConfiguration.getPersistChangeInfoHistory());
-			long currentTimeMillis = System.currentTimeMillis();
-			targetSpace.setLastActiveTime(currentTimeMillis);
 
 			if (logger.isDebugEnabled() == true)
 			{
 				logger.debug("For workspace: " + _workspaceIdentifier + " putting event " + _eventName);
 			}
 
-			targetSpace.put(_eventName, _event, getBlackboardActor(), null);
+			targetSpace = getTargetSpaceMap().get(_workspaceIdentifier);
+
+			guardTargetSpace(_workspaceIdentifier, targetSpace);
+
+			if (getTargetSpaceMap().containsKey(_workspaceIdentifier) == false)
+			{
+				//Someone persisted or terminated this events workspace
+				//so put event back in the queue and start over.
+				
+				placeOnBlackboard(_event);
+			}
+			else
+			{
+				targetSpace.put(_eventName, _event, getBlackboardActor(), null);
+			}
 		}
 		finally
 		{
@@ -940,7 +956,7 @@ public class Blackboard
 				logger.debug("For workspace: " + _workspaceIdentifier + " the target space is released for event " + _eventName);
 			}
 
-			releaseTargetSpace(_workspaceIdentifier);
+			releaseTargetSpace(_workspaceIdentifier, targetSpace);
 		}
 	}
 
@@ -1026,7 +1042,7 @@ public class Blackboard
 					  targetSpace.isTerminated() == false &&
 					  targetSpace.isExecuting() == false)
 				{
-					boolean acquiredLock = guardTargetSpace(targetSpace.getWorkspaceIdentifier(), false);
+					boolean acquiredLock = guardTargetSpace(targetSpace.getWorkspaceIdentifier(), targetSpace, false);
 
 					if (acquiredLock == true)
 					{
@@ -1052,7 +1068,7 @@ public class Blackboard
 						finally
 						{
 							releaseBlackboardWriteLock();
-							releaseTargetSpace(targetSpace.getWorkspaceIdentifier());
+							releaseTargetSpace(targetSpace.getWorkspaceIdentifier(), targetSpace);
 						}
 					}
 				}
@@ -1124,31 +1140,31 @@ public class Blackboard
 					logger.debug("Target space about to be retired.");
 				}
 
-				guardTargetSpace(_targetSpace.getWorkspaceIdentifier());
-
 				if (logger.isDebugEnabled() == true)
 				{
 					logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() + " for retiring the guard was obtained.");
 				}
 
-				_targetSpace.setRetired();
-				_targetSpace.setPersisted();
-				_targetSpace.setRetireDate(new Date());
-
-				TargetSpace targetSpace = _targetSpace.prepareForRetirement();
-
 				try
 				{
+					guardTargetSpace(_targetSpace.getWorkspaceIdentifier(), _targetSpace);
+
+					_targetSpace.setRetired();
+					_targetSpace.setPersisted();
+					_targetSpace.setRetireDate(new Date());
+
+					TargetSpace targetSpace = _targetSpace.prepareForRetirement();
+
 					persistTargetSpace(targetSpace);
 				}
 				finally
 				{
+					releaseTargetSpace(_targetSpace.getWorkspaceIdentifier(), _targetSpace);
+					
 					if (logger.isDebugEnabled() == true)
 					{
 						logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() + " for retiring the guard was released.");
 					}
-
-					releaseTargetSpace(_targetSpace.getWorkspaceIdentifier());
 				}
 				
 				if (logger.isDebugEnabled() == true)
@@ -1188,22 +1204,27 @@ public class Blackboard
 		}
 	}
 
-	protected boolean guardTargetSpace(Object _id, boolean _blockUntilAcquired)
+	protected boolean guardTargetSpace(Object _id, Object _object, boolean _blockUntilAcquired)
 	{
 		//get Target space
 		//ask for write lock on that space.
 		
-		return getTargetSpaceGuard().acquireLock(_id, _blockUntilAcquired);
+		return getTargetSpaceGuard().acquireLock(_id, _object, _blockUntilAcquired);
 	}
 
-	private void guardTargetSpace(Object _id)
+	private void guardTargetSpace(Object _id, Object _object)
 	{
-		getTargetSpaceGuard().acquireLock(_id, true);
+		getTargetSpaceGuard().acquireLock(_id, _object, true);
 	}
 
-	protected void releaseTargetSpace(Object _id)
+	protected void releaseTargetSpace(Object _id, Object _object)
 	{
-		getTargetSpaceGuard().releaseLock(_id);
+		if (_object == null)
+		{
+			throw new RuntimeException("Tried to release target space lock on null object with id: " + _id);
+		}
+		
+		getTargetSpaceGuard().releaseLock(_id, _object);
 	}
 
 	protected void processEventPlans(String _appName, String _workspaceName, WorkspaceConfiguration _workspaceConfiguration, java.io.File _eventPlanDirectory)

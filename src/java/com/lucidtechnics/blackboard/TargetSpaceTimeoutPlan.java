@@ -65,7 +65,7 @@ public class TargetSpaceTimeoutPlan
 
 				try
 				{
-					targetSpaceGuarded = blackboard.guardTargetSpace(targetSpace.getWorkspaceIdentifier(), false);
+					targetSpaceGuarded = blackboard.guardTargetSpace(targetSpace.getWorkspaceIdentifier(), targetSpace, false);
 
 					if (targetSpaceGuarded == true)
 					{
@@ -113,7 +113,7 @@ public class TargetSpaceTimeoutPlan
 				}
 				finally
 				{
-					if (targetSpaceGuarded == true) { blackboard.releaseTargetSpace(targetSpace.getWorkspaceIdentifier()); }
+					if (targetSpaceGuarded == true) { blackboard.releaseTargetSpace(targetSpace.getWorkspaceIdentifier(), targetSpace); }
 				}
 			}
 
