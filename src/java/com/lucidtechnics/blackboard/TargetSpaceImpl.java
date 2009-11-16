@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class TargetSpaceImpl
    extends TargetSpace
+   implements java.io.Serializable
 {
 	private final static Log logger = LogFactory.getLog(TargetSpaceImpl.class);
 	

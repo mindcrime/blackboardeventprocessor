@@ -166,6 +166,12 @@
 			   update="true"
 		  />
 
+		<jar destfile="${dist}/lib/${blackboardJar}"
+		       basedir="${src.cfg}"
+			   includes="**\blackboard.ccf"
+			   update="true"
+		  />
+
 		<jar destfile="${dist}/lib/${blackboardExamplesJar}"
 			   basedir="${classes}"
 			   includes="**\examples\**\*.class"

@@ -61,7 +61,7 @@ public class TargetConstructor
 		return (isFinal == false && isArray == false && isEnum == false);
 	}
 	
-	public synchronized static final Target constructTarget(String _targetName, Class _class)
+	public static final Target constructTarget(String _targetName, Class _class)
 	{
 		Target target = null;
 
@@ -71,9 +71,12 @@ public class TargetConstructor
 
 			if (targetClass == null)
 			{
-				byte[] classByteArray = createWrapperObjectByteArray(_targetName, _class);
-				targetClass = loadClass(classByteArray);
-				generatedClassMap.put(_class, targetClass);
+				synchronized(generatedClassMap)
+				{
+					byte[] classByteArray = createWrapperObjectByteArray(_targetName, _class);
+					targetClass = loadClass(classByteArray);
+					generatedClassMap.put(_class, targetClass);
+				}
 			}
 
 			target = (Target) targetClass.newInstance();

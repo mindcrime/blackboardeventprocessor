@@ -1,0 +1,41 @@
+#These values are set to support in memory caching
+
+jcs.default=DefaultCache
+jcs.default.cacheattributes=org.apache.jcs.engine.CompositeCacheAttributes
+jcs.default.cacheattributes.MaxObjects=100000
+jcs.default.cacheattributes.MemoryCacheName=org.apache.jcs.engine.memory.lru.LRUMemoryCache
+
+#Turn these values on to support disk based caching.										
+
+jcs.auxiliary.DefaultCache=org.apache.jcs.auxiliary.disk.indexed.IndexedDiskCacheFactory
+jcs.auxiliary.DefaultCache.attributes=org.apache.jcs.auxiliary.disk.indexed.IndexedDiskCacheAttributes
+jcs.auxiliary.DefaultCache.attributes.DiskPath=./blackboard/persistence
+jcs.auxiliary.DefaultCache.attributes.MaxKeySize=100000
+jcs.auxiliary.DefaultCache.attributes.MaxPurgatorySize=10000
+jcs.auxiliary.DefaultCache.attributes.MaxRecycleBinSize=10000
+jcs.auxiliary.DefaultCache.attributes.OptimizeAtRemoveCount=30000
+
+#Here are attribute level configuration parameters
+
+jcs.default.elementattributes=org.apache.jcs.engine.ElementAttributes
+jcs.default.elementattributes.IsEternal=true
+jcs.default.elementattributes.IsSpool=true
+jcs.default.elementattributes.IsRemote=true
+jcs.default.elementattributes.IsLateral=true
+
+#Cache configuration for main region Blackboard
+
+jcs.region.blackboard=DefaultCache
+jcs.region.blackboard.cacheattributes=org.apache.jcs.engine.CompositeCacheAttributes
+jcs.region.blackboard.cacheattributes.MaxObjects=100000
+jcs.region.blackboard.cacheattributes.MemoryCacheName=org.apache.jcs.engine.memory.lru.LRUMemoryCache
+
+#If your app needs JCS you can add it here like CocoTheMonkey
+#Just replace CocoTheMonkey with your apps name.
+#JCS supports multiple caching regions so you can add as many
+#regions as you have applications.
+
+#jcs.region.CocoTheMonkey=DefaultCache
+#jcs.region.CocoTheMonkey.cacheattributes=org.apache.jcs.engine.CompositeCacheAttributes
+#jcs.region.CocoTheMonkey.cacheattributes.MaxObjects=100000
+#jcs.region.CocoTheMonkey.cacheattributes.MemoryCacheName=org.apache.jcs.engine.memory.lru.LRUMemoryCache
