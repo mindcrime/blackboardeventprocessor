@@ -85,241 +85,97 @@ public class TargetSpaceImpl
 
 	protected final void put(String _targetName, Target _target, Actor _actor)
 	{
-		boolean updatedTarget = true;
-
-		try
-		{
-			getWorkspaceWriteLock().lock();
-			
-			updatedTarget =  getTargetMap().containsKey(_targetName);
-			getTargetMap().put(_targetName, _target);
-		}
-		finally
-		{
-			getWorkspaceWriteLock().unlock();
-
-			int action = (updatedTarget == true) ? ChangeInfo.TARGET_UPDATED : ChangeInfo.TARGET_ADDED;
-			notifyPlans(new ChangeInfo(action, _actor, getName(), getWorkspaceIdentifier(), _targetName, _target));
-		}
+		boolean updatedTarget =  getTargetMap().containsKey(_targetName);
+		getTargetMap().put(_targetName, _target);
+		int action = (updatedTarget == true) ? ChangeInfo.TARGET_UPDATED : ChangeInfo.TARGET_ADDED;
+		notifyPlans(new ChangeInfo(action, _actor, getName(), getWorkspaceIdentifier(), _targetName, _target));
 	}
 
 	protected final void put(String _targetName, String _target, Actor _actor)
 	{
-		boolean updatedTarget = true;
-
-		try
-		{
-			getWorkspaceWriteLock().lock();
-
-			updatedTarget =  getTargetMap().containsKey(_targetName);
-			getTargetMap().put(_targetName, _target);
-		}
-		finally
-		{
-			getWorkspaceWriteLock().unlock();
-
-			int action = (updatedTarget == true) ? ChangeInfo.TARGET_UPDATED : ChangeInfo.TARGET_ADDED;
-			notifyPlans(new ChangeInfo(action, _actor, getName(), getWorkspaceIdentifier(), _targetName, _target));
-		}
+		boolean updatedTarget = getTargetMap().containsKey(_targetName);
+		getTargetMap().put(_targetName, _target);
+		int action = (updatedTarget == true) ? ChangeInfo.TARGET_UPDATED : ChangeInfo.TARGET_ADDED;
+		notifyPlans(new ChangeInfo(action, _actor, getName(), getWorkspaceIdentifier(), _targetName, _target));
 	}
 
 	protected final void put(String _targetName, Integer _target, Actor _actor)
 	{
-		boolean updatedTarget = true;
-
-		try
-		{
-			getWorkspaceWriteLock().lock();
-
-			updatedTarget =  getTargetMap().containsKey(_targetName);
-			getTargetMap().put(_targetName, _target);
-		}
-		finally
-		{
-			getWorkspaceWriteLock().unlock();
-
-			int action = (updatedTarget == true) ? ChangeInfo.TARGET_UPDATED : ChangeInfo.TARGET_ADDED;
-			notifyPlans(new ChangeInfo(action, _actor, getName(), getWorkspaceIdentifier(), _targetName, _target));
-		}
+		boolean updatedTarget =  getTargetMap().containsKey(_targetName);
+		getTargetMap().put(_targetName, _target);
+		int action = (updatedTarget == true) ? ChangeInfo.TARGET_UPDATED : ChangeInfo.TARGET_ADDED;
+		notifyPlans(new ChangeInfo(action, _actor, getName(), getWorkspaceIdentifier(), _targetName, _target));
 	}
 
 	protected final void put(String _targetName, Long _target, Actor _actor)
 	{
-		boolean updatedTarget = true;
-
-		try
-		{
-			getWorkspaceWriteLock().lock();
-
-			updatedTarget =  getTargetMap().containsKey(_targetName);
-			getTargetMap().put(_targetName, _target);
-		}
-		finally
-		{
-			getWorkspaceWriteLock().unlock();
-
-			int action = (updatedTarget == true) ? ChangeInfo.TARGET_UPDATED : ChangeInfo.TARGET_ADDED;
-			notifyPlans(new ChangeInfo(action, _actor, getName(), getWorkspaceIdentifier(), _targetName, _target));
-		}
+		boolean updatedTarget =  getTargetMap().containsKey(_targetName);
+		getTargetMap().put(_targetName, _target);
+		int action = (updatedTarget == true) ? ChangeInfo.TARGET_UPDATED : ChangeInfo.TARGET_ADDED;
+		notifyPlans(new ChangeInfo(action, _actor, getName(), getWorkspaceIdentifier(), _targetName, _target));
 	}
 
 	protected final void put(String _targetName, Character _target, Actor _actor)
 	{
-		boolean updatedTarget = true;
-
-		try
-		{
-			getWorkspaceWriteLock().lock();
-
-			updatedTarget =  getTargetMap().containsKey(_targetName);
-			getTargetMap().put(_targetName, _target);
-		}
-		finally
-		{
-			getWorkspaceWriteLock().unlock();
-
-			int action = (updatedTarget == true) ? ChangeInfo.TARGET_UPDATED : ChangeInfo.TARGET_ADDED;
-			notifyPlans(new ChangeInfo(action, _actor, getName(), getWorkspaceIdentifier(), _targetName, _target));
-		}
+		boolean updatedTarget =  getTargetMap().containsKey(_targetName);
+		getTargetMap().put(_targetName, _target);
+		int action = (updatedTarget == true) ? ChangeInfo.TARGET_UPDATED : ChangeInfo.TARGET_ADDED;
+		notifyPlans(new ChangeInfo(action, _actor, getName(), getWorkspaceIdentifier(), _targetName, _target));
 	}
 
 	protected final void put(String _targetName, Short _target, Actor _actor)
 	{
-		boolean updatedTarget = true;
-
-		try
-		{
-			getWorkspaceWriteLock().lock();
-
-			updatedTarget =  getTargetMap().containsKey(_targetName);
-			getTargetMap().put(_targetName, _target);
-		}
-		finally
-		{
-			getWorkspaceWriteLock().unlock();
-
-			int action = (updatedTarget == true) ? ChangeInfo.TARGET_UPDATED : ChangeInfo.TARGET_ADDED;
-			notifyPlans(new ChangeInfo(action, _actor, getName(), getWorkspaceIdentifier(), _targetName, _target));
-		}
+		boolean updatedTarget =  getTargetMap().containsKey(_targetName);
+		getTargetMap().put(_targetName, _target);
+		int action = (updatedTarget == true) ? ChangeInfo.TARGET_UPDATED : ChangeInfo.TARGET_ADDED;
+		notifyPlans(new ChangeInfo(action, _actor, getName(), getWorkspaceIdentifier(), _targetName, _target));
 	}
 
 	protected final void put(String _targetName, Boolean _target, Actor _actor)
 	{
-		boolean updatedTarget = true;
-
-		try
-		{
-			getWorkspaceWriteLock().lock();
-
-			updatedTarget =  getTargetMap().containsKey(_targetName);
-			getTargetMap().put(_targetName, _target);
-		}
-		finally
-		{
-			getWorkspaceWriteLock().unlock();
-
-			int action = (updatedTarget == true) ? ChangeInfo.TARGET_UPDATED : ChangeInfo.TARGET_ADDED;
-			notifyPlans(new ChangeInfo(action, _actor, getName(), getWorkspaceIdentifier(), _targetName, _target));
-		}
+		boolean updatedTarget =  getTargetMap().containsKey(_targetName);
+		getTargetMap().put(_targetName, _target);
+		int action = (updatedTarget == true) ? ChangeInfo.TARGET_UPDATED : ChangeInfo.TARGET_ADDED;
+		notifyPlans(new ChangeInfo(action, _actor, getName(), getWorkspaceIdentifier(), _targetName, _target));
 	}
 
 	protected final void put(String _targetName, Byte _target, Actor _actor)
 	{
-		boolean updatedTarget = true;
-
-		try
-		{
-			getWorkspaceWriteLock().lock();
-
-			updatedTarget =  getTargetMap().containsKey(_targetName);
-			getTargetMap().put(_targetName, _target);
-		}
-		finally
-		{
-			getWorkspaceWriteLock().unlock();
-
-			int action = (updatedTarget == true) ? ChangeInfo.TARGET_UPDATED : ChangeInfo.TARGET_ADDED;
-			notifyPlans(new ChangeInfo(action, _actor, getName(), getWorkspaceIdentifier(), _targetName, _target));
-		}
+		boolean updatedTarget =  getTargetMap().containsKey(_targetName);
+		getTargetMap().put(_targetName, _target);
+		int action = (updatedTarget == true) ? ChangeInfo.TARGET_UPDATED : ChangeInfo.TARGET_ADDED;
+		notifyPlans(new ChangeInfo(action, _actor, getName(), getWorkspaceIdentifier(), _targetName, _target));
 	}
 
 	protected final void put(String _targetName, Double _target, Actor _actor)
 	{
-		boolean updatedTarget = true;
-
-		try
-		{
-			getWorkspaceWriteLock().lock();
-
-			updatedTarget =  getTargetMap().containsKey(_targetName);
-			getTargetMap().put(_targetName, _target);
-		}
-		finally
-		{
-			getWorkspaceWriteLock().unlock();
-
-			int action = (updatedTarget == true) ? ChangeInfo.TARGET_UPDATED : ChangeInfo.TARGET_ADDED;
-			notifyPlans(new ChangeInfo(action, _actor, getName(), getWorkspaceIdentifier(), _targetName, _target));
-		}
+		boolean updatedTarget =  getTargetMap().containsKey(_targetName);
+		getTargetMap().put(_targetName, _target);
+		int action = (updatedTarget == true) ? ChangeInfo.TARGET_UPDATED : ChangeInfo.TARGET_ADDED;
+		notifyPlans(new ChangeInfo(action, _actor, getName(), getWorkspaceIdentifier(), _targetName, _target));
 	}
 
 	protected final void put(String _targetName, Float _target, Actor _actor)
 	{
-		boolean updatedTarget = true;
-
-		try
-		{
-			getWorkspaceWriteLock().lock();
-
-			updatedTarget =  getTargetMap().containsKey(_targetName);
-			getTargetMap().put(_targetName, _target);
-		}
-		finally
-		{
-			getWorkspaceWriteLock().unlock();
-
-			int action = (updatedTarget == true) ? ChangeInfo.TARGET_UPDATED : ChangeInfo.TARGET_ADDED;
-			notifyPlans(new ChangeInfo(action, _actor, getName(), getWorkspaceIdentifier(), _targetName, _target));
-		}
+		boolean updatedTarget =  getTargetMap().containsKey(_targetName);
+		getTargetMap().put(_targetName, _target);
+		int action = (updatedTarget == true) ? ChangeInfo.TARGET_UPDATED : ChangeInfo.TARGET_ADDED;
+		notifyPlans(new ChangeInfo(action, _actor, getName(), getWorkspaceIdentifier(), _targetName, _target));
 	}
 
 	protected final void putNull(String _targetName, Actor _actor)
 	{
-		boolean updatedTarget = true;
-
-		try
-		{
-			getWorkspaceWriteLock().lock();
-
-			updatedTarget =  getTargetMap().containsKey(_targetName);
-			getTargetMap().put(_targetName, null);
-		}
-		finally
-		{
-			getWorkspaceWriteLock().unlock();
-
-			int action = (updatedTarget == true) ? ChangeInfo.TARGET_UPDATED : ChangeInfo.TARGET_ADDED;
-			notifyPlans(new ChangeInfo(action, _actor, getName(), getWorkspaceIdentifier(), _targetName, null));
-		}
+		boolean updatedTarget =  getTargetMap().containsKey(_targetName);
+		getTargetMap().put(_targetName, null);
+		int action = (updatedTarget == true) ? ChangeInfo.TARGET_UPDATED : ChangeInfo.TARGET_ADDED;
+		notifyPlans(new ChangeInfo(action, _actor, getName(), getWorkspaceIdentifier(), _targetName, null));
 	}
 	
 	protected Target remove(String _targetName, Actor _actor)
 	{
-		Target target = null;
-		
-		try
-		{
-			getWorkspaceWriteLock().lock();
-			
-			target = (Target) getTargetMap().get(_targetName);
-
-			getTargetMap().remove(_targetName);
-		}
-		finally
-		{
-			getWorkspaceWriteLock().unlock();
-			notifyPlans(new ChangeInfo(ChangeInfo.TARGET_REMOVED, _actor, getName(), getWorkspaceIdentifier(), _targetName, target));
-		}
+		Target target = (Target) getTargetMap().get(_targetName);
+		getTargetMap().remove(_targetName);
+		notifyPlans(new ChangeInfo(ChangeInfo.TARGET_REMOVED, _actor, getName(), getWorkspaceIdentifier(), _targetName, target));
 
 		return target;
 	}

@@ -36,7 +36,7 @@ public final class Guard
 	private Map getIdMap() { return idMap; }
 	private void setIdMap(Map _idMap) { idMap = _idMap; }
 	
-	public boolean acquireLock(Object _id, Object _object, boolean _blockUntilAcquired)
+	public boolean acquireLock(Object _id, boolean _blockUntilAcquired)
 	{
 		if (logger.isDebugEnabled() == true)
 		{
@@ -49,16 +49,13 @@ public final class Guard
 		
 		do
 		{
-			synchronized(_object)
+			synchronized(this)
 			{				
 				if (getIdMap().containsKey(_id) == false)
 				{
-					synchronized(this)
+					if (getIdMap().containsKey(_id) == false)
 					{
-						if (getIdMap().containsKey(_id) == false)
-						{
-							getIdMap().put(_id, new GuardState(_id));
-						}
+						getIdMap().put(_id, new GuardState(_id));
 					}
 				}
 
@@ -72,7 +69,7 @@ public final class Guard
 					{
 						logger.debug("Waiting to acquire lock on id: " + _id);
 					}
-					try { _object.wait(); } catch (InterruptedException e) {}
+					try { wait(); } catch (InterruptedException e) {}
 				}
 			}
 		}
@@ -86,7 +83,7 @@ public final class Guard
 		return acquiredLock;
 	}
 
-	public boolean releaseLock(Object _id, Object _object)
+	public boolean releaseLock(Object _id)
 	{
 		boolean releasedLock = false;
 		
@@ -99,18 +96,15 @@ public final class Guard
 
 		if (guardState != null)
 		{
-			synchronized(_object)
+			synchronized(this)
 			{
 				releasedLock = guardState.releaseLock();
 				
 				if (releasedLock == true )
 				{
-					synchronized(this)
-					{
-						getIdMap().remove(_id);
-					}
-					
-					_object.notifyAll();
+					getIdMap().remove(_id);
+
+					notifyAll();
 
 					if (logger.isDebugEnabled() == true)
 					{

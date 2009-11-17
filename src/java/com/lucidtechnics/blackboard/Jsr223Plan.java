@@ -95,4 +95,24 @@ public class Jsr223Plan
 
 		return planContext.getIsFinished();
 	}
+
+	@Override
+	public int hashCode()
+	{
+		return getPath().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object _object)
+	{
+		boolean equals = false;
+
+		if (_object instanceof Jsr223Plan)
+		{
+			Jsr223Plan plan = (Jsr223Plan) _object;
+			equals = getPath().equals(plan.getPath());
+		}
+
+		return equals;
+	}
 }

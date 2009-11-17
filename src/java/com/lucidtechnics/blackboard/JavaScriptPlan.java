@@ -79,4 +79,24 @@ public class JavaScriptPlan
 
 		return planContext.getIsFinished();
 	}
+
+	@Override
+	public int hashCode()
+	{
+		return getPath().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object _object)
+	{
+		boolean equals = false;
+
+		if (_object instanceof JavaScriptPlan)
+		{
+			JavaScriptPlan plan = (JavaScriptPlan) _object;
+			equals = getPath().equals(plan.getPath());
+		}
+
+		return equals;
+	}
 }

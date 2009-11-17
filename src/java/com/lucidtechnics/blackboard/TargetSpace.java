@@ -16,6 +16,8 @@
 
 package com.lucidtechnics.blackboard;
 
+import com.lucidtechnics.blackboard.config.WorkspaceConfiguration;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.HashMap;
@@ -37,29 +39,24 @@ public abstract class TargetSpace
 	
 	private String name;
 	private String appName;
-	private transient Blackboard blackboard;
 	private Object workspaceIdentifier;
 	private Map targetMap;
 	private Map planStateMap;
-	private transient Set doNotPersistSet;
 	private Set exceptionSet;
-	private transient Set eventNameSet;
-	private transient ReentrantReadWriteLock workspaceReadWriteLock;
-	private transient Lock workspaceReadLock;
-	private transient Lock workspaceWriteLock;
 	private ChangeInfoHistory changeInfoHistory;
-	private transient boolean terminateOnError;
 	private int state;
-	private transient long lastUsedTimestamp;
-	private transient boolean persistChangeInfoHistory;
 	private Date createDate;
 	private Date retireDate;
+
+	private transient WorkspaceConfiguration workspaceConfiguration;
+	private transient Set doNotPersistSet;
+	private transient Blackboard blackboard;
+	private transient Set eventNameSet;
+	private transient boolean terminateOnError;
+	private transient long lastUsedTimestamp;
+	private transient boolean persistChangeInfoHistory;
 	private transient long lastActiveTime;
 	
-	private transient ReentrantReadWriteLock workspaceExclusivityReadWriteLock;
-	private transient Lock workspaceExclusivityReadLock;
-	private transient Lock workspaceExclusivityWriteLock;
-
 	public String getName() { return name; }
 	public String getAppName() { return appName; }
 	protected Blackboard getBlackboard() { return blackboard; }
@@ -68,12 +65,6 @@ public abstract class TargetSpace
 	protected Map getPlanStateMap() { return planStateMap; }
 	protected Set getDoNotPersistSet() { return doNotPersistSet; }
 	protected Set getExceptionSet() { return exceptionSet; }
-	protected ReentrantReadWriteLock getWorkspaceReadWriteLock() { return workspaceReadWriteLock; }
-	protected Lock getWorkspaceReadLock() { return workspaceReadLock; }
-	protected Lock getWorkspaceWriteLock() { return workspaceWriteLock; }
-	protected ReentrantReadWriteLock getWorkspaceExclusivityReadWriteLock() { return workspaceExclusivityReadWriteLock; }
-	protected Lock getWorkspaceExclusivityReadLock() { return workspaceExclusivityReadLock; }
-	protected Lock getWorkspaceExclusivityWriteLock() { return workspaceExclusivityWriteLock; }
 	protected ChangeInfoHistory getChangeInfoHistory() { return changeInfoHistory; }
 	protected int getState() { return state; }
 	protected boolean getTerminateOnError() { return terminateOnError; }
@@ -82,6 +73,7 @@ public abstract class TargetSpace
 	protected Date getCreateDate() { return createDate; }
 	protected Date getRetireDate() { return retireDate; }
 	protected long getLastActiveTime() { return lastActiveTime; }
+	protected WorkspaceConfiguration getWorkspaceConfiguration()  { return workspaceConfiguration; }
 	
 	protected void setName(String _name) { name = _name; }
 	protected void setAppName(String _appName) { appName = _appName; }
@@ -91,12 +83,6 @@ public abstract class TargetSpace
 	protected void setPlanStateMap(Map _planStateMap) { planStateMap = _planStateMap; }
 	protected void setDoNotPersistSet(Set _doNotPersistSet) { doNotPersistSet = _doNotPersistSet; }
 	protected void setExceptionSet(Set _exceptionSet) { exceptionSet = _exceptionSet; }
-	protected void setWorkspaceReadWriteLock(ReentrantReadWriteLock _workspaceReadWriteLock) { workspaceReadWriteLock = _workspaceReadWriteLock; }
-	protected void setWorkspaceReadLock(Lock _workspaceReadLock) { workspaceReadLock = _workspaceReadLock; }
-	protected void setWorkspaceWriteLock(Lock _workspaceWriteLock) { workspaceWriteLock = _workspaceWriteLock; }
-	protected void setWorkspaceExclusivityReadWriteLock(ReentrantReadWriteLock _workspaceExclusivityReadWriteLock) { workspaceExclusivityReadWriteLock = _workspaceExclusivityReadWriteLock; }
-	protected void setWorkspaceExclusivityReadLock(Lock _workspaceExclusivityReadLock) { workspaceExclusivityReadLock = _workspaceExclusivityReadLock; }
-	protected void setWorkspaceExclusivityWriteLock(Lock _workspaceExclusivityWriteLock) { workspaceExclusivityWriteLock = _workspaceExclusivityWriteLock; }
 	protected void setChangeInfoHistory(ChangeInfoHistory _changeInfoHistory) { changeInfoHistory = _changeInfoHistory; }
 	protected void setState(int _state) { state = _state; }
 	protected void setTerminateOnError(boolean _terminateOnError) { terminateOnError = _terminateOnError; }
@@ -105,6 +91,7 @@ public abstract class TargetSpace
 	protected void setCreateDate(Date _createDate) { createDate = _createDate; }
 	protected void setRetireDate(Date _retireDate) { retireDate = _retireDate; }
 	protected void setLastActiveTime(long _lastActiveTime) { lastActiveTime = _lastActiveTime; }
+	protected void setWorkspaceConfiguration(WorkspaceConfiguration _workspaceConfiguration) { workspaceConfiguration = _workspaceConfiguration; }
 	
 	protected abstract void monitor(String _superClassName, String _subClassName, String _methodName, String _targetName, Object _target, Object _value, Actor _actor);
 	protected abstract void monitor(String _superClassName, String _subClassName, String _methodName, String _targetName, Object _target, int _value, Actor _actor);
@@ -146,15 +133,7 @@ public abstract class TargetSpace
 
 	protected void initialize(Blackboard _blackboard)
 	{
-		setWorkspaceReadWriteLock(new ReentrantReadWriteLock());
-		setWorkspaceReadLock(getWorkspaceReadWriteLock().readLock());
-		setWorkspaceWriteLock(getWorkspaceReadWriteLock().writeLock());
-		setWorkspaceExclusivityReadWriteLock(new ReentrantReadWriteLock());
-		setWorkspaceExclusivityReadLock(getWorkspaceExclusivityReadWriteLock().readLock());
-		setWorkspaceExclusivityWriteLock(getWorkspaceExclusivityReadWriteLock().writeLock());
-
 		setState(TargetSpaceState.ACTIVE);
-		
 		setBlackboard(_blackboard);
 	}
 	
@@ -162,38 +141,18 @@ public abstract class TargetSpace
 	{
 		Object target = null;
 
-		try
-		{
-			getWorkspaceReadLock().lock();
-
-			target = getTargetMap().get(_targetName);
-		}
-		finally
-		{
-			getWorkspaceReadLock().unlock();
-		}
-
-		return target;
+		return getTargetMap().get(_targetName);
 	}
 
 	protected List getAllTargets(String _targetName)
 	{
 		List targetList  = new ArrayList();
 
-		try
-		{
-			getWorkspaceReadLock().lock();
+		List tempEventList = (List) getTargetMap().get(_targetName);
 
-			List tempEventList = (List) getTargetMap().get(_targetName);
-
-			if (tempEventList != null)
-			{
-				targetList.addAll(tempEventList);
-			}
-		}
-		finally
+		if (tempEventList != null)
 		{
-			getWorkspaceReadLock().unlock();
+			targetList.addAll(tempEventList);
 		}
 
 		return targetList;
@@ -201,70 +160,22 @@ public abstract class TargetSpace
 
 	protected boolean has(String _targetName)
 	{
-		boolean has = false;
-
-		try
-		{
-			getWorkspaceReadLock().lock();
-			has =  getTargetMap().containsKey(_targetName);
-		}
-		finally
-		{
-			getWorkspaceReadLock().unlock();
-		}
-
-		return has;
+		return getTargetMap().containsKey(_targetName);
 	}
 
 	protected boolean isEmpty()
 	{
-		boolean isEmpty = true;
-
-		try
-		{
-			getWorkspaceReadLock().lock();
-			isEmpty =  getTargetMap().isEmpty();
-		}
-		finally
-		{
-			getWorkspaceReadLock().unlock();
-		}
-
-		return isEmpty;
+		return getTargetMap().isEmpty();
 	}
 
 	protected int size()
 	{
-		int size = 0;
-
-		try
-		{
-			getWorkspaceReadLock().lock();
-			size =  getTargetMap().keySet().size();
-		}
-		finally
-		{
-			getWorkspaceReadLock().unlock();
-		}
-
-		return size;
+		return getTargetMap().keySet().size();
 	}
 
 	protected boolean hasTarget(String _targetName)
 	{
-		boolean hasTarget = true;
-
-		try
-		{
-			getWorkspaceReadLock().lock();
-			hasTarget = getTargetMap().containsKey(_targetName);
-		}
-		finally
-		{
-			getWorkspaceReadLock().unlock();
-		}
-
-		return hasTarget;
+		return getTargetMap().containsKey(_targetName);
 	}
 
 	protected boolean hasTargetAction(String _targetName, int _action)
@@ -279,36 +190,12 @@ public abstract class TargetSpace
 
 	protected List getTargetHistory(String _targetName)
 	{
-		List targetHistory = new ArrayList();
-		
-		try
-		{
-			getWorkspaceReadLock().lock();
-			targetHistory = getChangeInfoHistory().getTargetHistory(_targetName);
-		}
-		finally
-		{
-			getWorkspaceReadLock().unlock();
-		}
-
-		return targetHistory;
+		return getChangeInfoHistory().getTargetHistory(_targetName);
 	}
 
 	protected List getAttributeHistory(String _targetName, String _attributeName)
 	{
-		List attributeHistory = new ArrayList();
-
-		try
-		{
-			getWorkspaceReadLock().lock();
-			attributeHistory = getChangeInfoHistory().getAttributeHistory(_targetName, _attributeName);
-		}
-		finally
-		{
-			getWorkspaceReadLock().unlock();
-		}
-
-		return attributeHistory;
+		return getChangeInfoHistory().getAttributeHistory(_targetName, _attributeName);
 	}
 	
 	protected void addPlan(Plan _plan)
@@ -344,55 +231,23 @@ public abstract class TargetSpace
 	
 	protected void clear(Actor _actor)
 	{
-		try
-		{
-			getWorkspaceWriteLock().lock();
-			getTargetMap().clear();
-		}
-		finally
-		{
-			getWorkspaceWriteLock().unlock();
-			notifyPlans(new ChangeInfo(ChangeInfo.WORKSPACE_CLEARED, _actor, getName(), getWorkspaceIdentifier()));
-		}
+		getTargetMap().clear();
+		notifyPlans(new ChangeInfo(ChangeInfo.WORKSPACE_CLEARED, _actor, getName(), getWorkspaceIdentifier()));
 	}
 
 	protected void clearAllHistory()
 	{
-		try
-		{
-			getWorkspaceWriteLock().lock();
-			setChangeInfoHistory(new ChangeInfoHistory());
-		}
-		finally
-		{
-			getWorkspaceWriteLock().unlock();
-		}
+		setChangeInfoHistory(new ChangeInfoHistory());
 	}
 
 	protected void clearTargetHistory(String _targetName)
 	{
-		try
-		{
-			getWorkspaceWriteLock().lock();
-			getChangeInfoHistory().eraseTargetHistory(_targetName);
-		}
-		finally
-		{
-			getWorkspaceWriteLock().unlock();
-		}
+		getChangeInfoHistory().eraseTargetHistory(_targetName);
 	}
 
 	protected void clearAttributeHistory(String _targetName, String _attributeName)
 	{
-		try
-		{
-			getWorkspaceWriteLock().lock();
-			getChangeInfoHistory().eraseAttributeHistory(_targetName, _attributeName);
-		}
-		finally
-		{
-			getWorkspaceWriteLock().unlock();
-		}
+		getChangeInfoHistory().eraseAttributeHistory(_targetName, _attributeName);
 	}
 
 	protected void schedulePlaceOnBlackboard(Object _object, long _delay)
@@ -463,18 +318,13 @@ public abstract class TargetSpace
 
 			try
 			{
-				acquireWorkspaceWriteLock();
 				setExecuting();
-				getBlackboard().executePlans(this, new ArrayList(getPlanStateMap().keySet()));
+				getBlackboard().executePlans(this, getWorkspaceConfiguration().getPlanSet());
 			}
 			catch(Throwable t)
 			{
 				setTerminated();
 				throw new RuntimeException(t);
-			}
-			finally
-			{
-				releaseWorkspaceWriteLock();
 			}
 		}
 	}
@@ -659,26 +509,6 @@ public abstract class TargetSpace
 	{
 		setState(TargetSpaceState.setRetired(getState()));
 	}	
-
-	protected void acquireWorkspaceReadLock()
-	{
-		getWorkspaceExclusivityReadLock().lock();
-	}
-
-	protected void releaseWorkspaceReadLock()
-	{
-		getWorkspaceExclusivityReadLock().unlock();
-	}
-
-	protected void acquireWorkspaceWriteLock()
-	{
-		getWorkspaceExclusivityWriteLock().lock();
-	}
-
-	protected void releaseWorkspaceWriteLock()
-	{
-		getWorkspaceExclusivityWriteLock().unlock();
-	}
 
 	protected TargetSpace prepareForPersistence()
 	{
