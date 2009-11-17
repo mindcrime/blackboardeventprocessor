@@ -50,8 +50,8 @@ public class Blackboard
 
 	private ErrorManager errorManager;
 	private BlackboardActor blackboardActor;
-	private int maxBlackboardThread;
-	private int maxScheduledBlackboardThread;
+	private int maxBlackboardThread = 1;
+	private int maxScheduledBlackboardThread = 1;
 	private int maxWorkspaceThread;
 	private int maxPersistenceThread;
 	private int maxWorkspace;
@@ -61,15 +61,11 @@ public class Blackboard
 	private ThreadPoolExecutor workspaceExecutor;
 	private ThreadPoolExecutor persistenceExecutor;
 	private Map<String, WorkspaceConfiguration> eventToWorkspaceMap;
-	private Guard targetSpaceGuard;
-	private boolean managingBlackboard;
 	private Persister persister;
 	private boolean timePlans;
 	private String appsHome;
-
-	private ReentrantReadWriteLock blackboardReadWriteLock;
-	private Lock blackboardReadLock;
-	private Lock blackboardWriteLock;
+	private Map<Integer, ThreadPoolExecutor> workspaceExecutorMap;
+	private int currentWorkspaceExecutor = 0;
 
 	private ErrorManager getErrorManager() { return errorManager; }
 	private BlackboardActor getBlackboardActor() { return blackboardActor; }
@@ -81,17 +77,12 @@ public class Blackboard
 	private int getActiveWorkspaceCount() { return activeWorkspaceCount; }
 	private ThreadPoolExecutor getBlackboardExecutor() { return blackboardExecutor; }
 	private ScheduledThreadPoolExecutor getScheduledBlackboardExecutor() { return scheduledBlackboardExecutor; }
-	private ThreadPoolExecutor getWorkspaceExecutor() { return workspaceExecutor; }
 	private ThreadPoolExecutor getPersistenceExecutor() { return persistenceExecutor; }
 	private Map<String, WorkspaceConfiguration> getEventToWorkspaceMap() { return eventToWorkspaceMap; }
-	private ReentrantReadWriteLock getBlackboardReadWriteLock() { return blackboardReadWriteLock; }
-	private Lock getBlackboardReadLock() { return blackboardReadLock; }
-	private Lock getBlackboardWriteLock() { return blackboardWriteLock; }
-	private Guard getTargetSpaceGuard() { return targetSpaceGuard; }
-	private boolean getManagingBlackboard() { return managingBlackboard; }
 	private Persister getPersister() { return persister; }
 	private boolean getTimePlans() { return timePlans; }
 	private String getAppsHome() { return appsHome; }
+	private Map<Integer, ThreadPoolExecutor> getWorkspaceExecutorMap() { return workspaceExecutorMap; }
 	
 	private void setErrorManager(ErrorManager _errorManager) { errorManager = _errorManager; }
 	private void setBlackboardActor(BlackboardActor _blackboardActor) { blackboardActor = _blackboardActor; }
@@ -103,17 +94,12 @@ public class Blackboard
 	private void setActiveWorkspaceCount(int _activeWorkspaceCount) { activeWorkspaceCount = _activeWorkspaceCount; }
 	private void setBlackboardExecutor(ThreadPoolExecutor _blackboardExecutor) { blackboardExecutor = _blackboardExecutor; }
 	private void setScheduledBlackboardExecutor(ScheduledThreadPoolExecutor _scheduledBlackboardExecutor) { scheduledBlackboardExecutor = _scheduledBlackboardExecutor; }
-	private void setWorkspaceExecutor(ThreadPoolExecutor _workspaceExecutor) { workspaceExecutor = _workspaceExecutor; }
 	private void setPersistenceExecutor(ThreadPoolExecutor _persistenceExecutor) { persistenceExecutor = _persistenceExecutor; }
 	private void setEventToWorkspaceMap(Map<String, WorkspaceConfiguration> _eventToWorkspaceMap) { eventToWorkspaceMap = _eventToWorkspaceMap; }
-	private void setBlackboardReadWriteLock(ReentrantReadWriteLock _blackboardReadWriteLock) { blackboardReadWriteLock = _blackboardReadWriteLock; }
-	private void setBlackboardReadLock(Lock _blackboardReadLock) { blackboardReadLock = _blackboardReadLock; }
-	private void setBlackboardWriteLock(Lock _blackboardWriteLock) { blackboardWriteLock = _blackboardWriteLock; }
-	private void setTargetSpaceGuard(Guard _targetSpaceGuard) { targetSpaceGuard = _targetSpaceGuard; }
-	private void setManagingBlackboard(boolean _managingBlackboard) { managingBlackboard = _managingBlackboard; }
 	private void setPersister(Persister _persister) { persister = _persister; } 
 	private void setTimePlans(boolean _timePlans) { timePlans = _timePlans; }
 	private void setAppsHome(String _appsHome) { appsHome = _appsHome; }
+	private void setWorkspaceExecutorMap(Map<Integer, ThreadPoolExecutor> _workspaceExecutorMap) { workspaceExecutorMap = _workspaceExecutorMap; }
 
 	public Blackboard(BlackboardConfiguration _blackboardConfiguration)
 	{
@@ -121,11 +107,8 @@ public class Blackboard
 
 		setBlackboardActor(new BlackboardActor("Blackboard"));
 		setEventToWorkspaceMap(new HashMap());
-		setBlackboardReadWriteLock(new ReentrantReadWriteLock());
-		setBlackboardReadLock(getBlackboardReadWriteLock().readLock());
-		setBlackboardWriteLock(getBlackboardReadWriteLock().writeLock());
-		setTargetSpaceGuard(new Guard());
-
+		setWorkspaceExecutorMap(new HashMap<Integer, ThreadPoolExecutor>());
+		
 		init();
 	}
 
@@ -219,13 +202,16 @@ public class Blackboard
 			logger.info("Loaded event configurations: " + getEventToWorkspaceMap());
 		}
 		
-		setBlackboardExecutor(new ThreadPoolExecutor(getMaxBlackboardThread(), getMaxBlackboardThread(), 100, TimeUnit.SECONDS,
+		setBlackboardExecutor(new ThreadPoolExecutor(1, 1, 100, TimeUnit.SECONDS,
 			new LinkedBlockingQueue()));
 
 		setScheduledBlackboardExecutor(new ScheduledThreadPoolExecutor(getMaxScheduledBlackboardThread()));
-
-		setWorkspaceExecutor(new ThreadPoolExecutor(getMaxWorkspaceThread(), getMaxWorkspaceThread(), 100, TimeUnit.SECONDS,
-			new LinkedBlockingQueue()));
+		
+		for (int i = 0; i > getMaxWorkspaceThread(); i++)
+		{
+			getWorkspaceExecutorMap().put(i, new ThreadPoolExecutor(1, 1, 100, TimeUnit.SECONDS,
+				new LinkedBlockingQueue()));
+		}
 
 		setPersistenceExecutor(new ThreadPoolExecutor(getMaxPersistenceThread(), getMaxPersistenceThread(), 100, TimeUnit.SECONDS,
 			new LinkedBlockingQueue(	)));
@@ -244,69 +230,30 @@ public class Blackboard
 
 	protected void executePlans(final TargetSpace _targetSpace, final java.util.Collection<Plan> _planList)
 	{
-		getWorkspaceExecutor().execute(new Runnable() {
+		WorkspaceExecutionContext workspaceExecutionContext = get(_targetSpace.getWorkspaceIdentifier());
+		ThreadPoolExecutor workspaceExecutor = getWorkspaceExecutorMap().get(workspaceExecutionContext.getWorkspaceExecutorName());
+		
+		workspaceExecutor.execute(new Runnable()
+		{
 			public void run()
 			{
 				long startWorkspaceRun = 0l;
 				long endWorkspaceRun = 0l;
-				
+
 				if (getTimePlans() == true)
 				{
 					startWorkspaceRun = System.currentTimeMillis();
 				}
-				
+
 				WorkspaceContext workspaceContext = null;
 				Plan plan = null;
 				Map planToChangeInfoCountMap = new HashMap();
 				boolean notifyPlans = false;
 				Set activePlanSet = new HashSet();
 				boolean acquireLock = true;
-				
+
 				try
 				{
-					if (getTimePlans() == true)
-					{
-						endWorkspaceRun = System.currentTimeMillis();
-
-						if (logger.isInfoEnabled() == true)
-						{
-							logger.info("Processing target space time before guardTargetSpace lock: " + (endWorkspaceRun - startWorkspaceRun));
-						}
-					}
-
-					acquireLock = guardTargetSpace(_targetSpace.getWorkspaceIdentifier(), false);
-
-					if (getTimePlans() == true)
-					{
-						endWorkspaceRun = System.currentTimeMillis();
-
-						if (logger.isInfoEnabled() == true)
-						{
-							logger.info("Processing target space time after guardTargetSpace lock: " + (endWorkspaceRun - startWorkspaceRun));
-						}
-					}
-
-					if (acquireLock == false)
-					{
-						//don't have this thread wait ....
-						//instead put target space back in queue and
-						//free this thread to process another target
-						//space.
-						executePlans(_targetSpace, _planList);
-
-						if (getTimePlans() == true)
-						{
-							endWorkspaceRun = System.currentTimeMillis();
-
-							if (logger.isInfoEnabled() == true)
-							{
-								logger.info("Processing target space time after executePlans: " + (endWorkspaceRun - startWorkspaceRun));
-							}
-						}
-
-						return;
-					}
-
 					if (logger.isDebugEnabled() == true)
 					{
 						logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() + " the guard was obtained.");
@@ -317,7 +264,7 @@ public class Blackboard
 					for (Plan executingPlan: _planList)
 					{
 						plan = executingPlan;
-						
+
 						if (_targetSpace.isTerminated() == false &&
 							  _targetSpace.isActive(plan) == true)
 						{
@@ -507,59 +454,40 @@ public class Blackboard
 				}
 				finally
 				{
-					if (acquireLock == true)
+					if (getTimePlans() == true)
 					{
-						if (getTimePlans() == true)
-						{
-							endWorkspaceRun = System.currentTimeMillis();
+						endWorkspaceRun = System.currentTimeMillis();
 
-							if (logger.isInfoEnabled() == true)
-							{
-								logger.info("Processing target space time at beginning of finally: " + (endWorkspaceRun - startWorkspaceRun));
-							}
+						if (logger.isInfoEnabled() == true)
+						{
+							logger.info("Processing target space time at beginning of finally: " + (endWorkspaceRun - startWorkspaceRun));
+						}
+					}
+
+					if (((_targetSpace.isCompleted() == true)  || _targetSpace.isTerminated() == true) &&
+						  _targetSpace.isPersisted() == false)
+					{
+						remove(_targetSpace.getWorkspaceIdentifier());
+						retireTargetSpace(_targetSpace);
+					}
+					else if (notifyPlans == true)
+					{
+						if (logger.isDebugEnabled() == true)
+						{
+							logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() + " execute plan will notify plans.");
 						}
 
-						if (((_targetSpace.isCompleted() == true)  || _targetSpace.isTerminated() == true) &&
-							  _targetSpace.isPersisted() == false)
-						{
-							try
-							{
-								acquireBlackboardWriteLock();
-								remove(_targetSpace.getWorkspaceIdentifier());
-							}
-							finally
-							{
-								releaseBlackboardWriteLock();
-							}
-
-							retireTargetSpace(_targetSpace);
-						}
-						else if (notifyPlans == true)
-						{
-							if (logger.isDebugEnabled() == true)
-							{
-								logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() + " execute plan will notify plans.");
-							}
-
-							_targetSpace.setActive();
-							_targetSpace.notifyPlans();
-						}
-						else
-						{
-							_targetSpace.setActive();
-
-							if (logger.isDebugEnabled() == true)
-							{
-								logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() + " execute plan will NOT notify plans");
-							}
-						}
+						_targetSpace.setActive();
+						_targetSpace.notifyPlans();
+					}
+					else
+					{
+						_targetSpace.setActive();
 
 						if (logger.isDebugEnabled() == true)
 						{
-							logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() + " the guard was released.");
+							logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() + " execute plan will NOT notify plans");
 						}
-
-						releaseTargetSpace(_targetSpace.getWorkspaceIdentifier());
 					}
 
 					if (getTimePlans() == true)
@@ -574,26 +502,6 @@ public class Blackboard
 				}
 			}
 		});
-	}
-
-	private void acquireBlackboardReadLock()
-	{
-		getBlackboardReadLock().lock();
-	}
-
-	private void releaseBlackboardReadLock()
-	{
-		getBlackboardReadLock().unlock();
-	}
-
-	protected void acquireBlackboardWriteLock()
-	{
-		getBlackboardWriteLock().lock();
-	}
-
-	protected void releaseBlackboardWriteLock()
-	{
-		getBlackboardWriteLock().unlock();
 	}
 
 	/**
@@ -820,53 +728,26 @@ public class Blackboard
 									Object _workspaceIdentifier, String _eventName, Object _event)
 			throws Exception
 	{
-		try
+		TargetSpace targetSpace = retrieveTargetSpace(_workspaceIdentifier, _workspaceConfiguration);
+
+		if (logger.isDebugEnabled() == true)
 		{
-			if (logger.isDebugEnabled() == true)
-			{
-				logger.debug("For workspace: " + _workspaceIdentifier + " the guard was obtained for event: " + _eventName);
-			}
-
-			guardTargetSpace(_workspaceIdentifier);
-
-			TargetSpace targetSpace = retrieveTargetSpace(_workspaceIdentifier, _workspaceConfiguration);
-			
-			if (logger.isDebugEnabled() == true)
-			{
-				logger.debug("For workspace: " + _workspaceIdentifier + " putting event " + _eventName);
-			}
-
-			targetSpace.put(_eventName, _event, getBlackboardActor(), null);
+			logger.debug("For workspace: " + _workspaceIdentifier + " putting event " + _eventName);
 		}
-		finally
-		{
-			if (logger.isDebugEnabled() == true)
-			{
-				logger.debug("For workspace: " + _workspaceIdentifier + " the target space is released for event " + _eventName);
-			}
 
-			releaseTargetSpace(_workspaceIdentifier);
-		}
+		targetSpace.put(_eventName, _event, getBlackboardActor(), null);
 	}
 
 	private TargetSpace retrieveTargetSpace(Object _workspaceIdentifier, WorkspaceConfiguration _workspaceConfiguration)
 	{
-		TargetSpace targetSpace = get(_workspaceIdentifier);
+		WorkspaceExecutionContext workspaceExecutionContext = get(_workspaceIdentifier);
+		TargetSpace targetSpace = workspaceExecutionContext.getTargetSpace();
 
 		if (targetSpace == null)
 		{
 			targetSpace = new TargetSpaceImpl(_workspaceIdentifier);
 			targetSpace.addPlans(_workspaceConfiguration.getPlanSet());
-
-			try
-			{
-				acquireBlackboardWriteLock();
-				put(_workspaceIdentifier, targetSpace);
-			}
-			finally
-			{
-				releaseBlackboardWriteLock();
-			}
+			workspaceExecutionContext.setTargetSpace(targetSpace);
 		}
 
 		if (targetSpace.getBlackboard() == null)
@@ -911,42 +792,13 @@ public class Blackboard
 		getPersistenceExecutor().execute(new Runnable() {
 			public void run()
 			{
-				if (logger.isDebugEnabled() == true)
-				{
-					logger.debug("x");
-				}
-
-				if (logger.isDebugEnabled() == true)
-				{
-					logger.debug("Target space about to be retired.");
-				}
-
-				guardTargetSpace(_targetSpace.getWorkspaceIdentifier());
-
-				if (logger.isDebugEnabled() == true)
-				{
-					logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() + " for retiring the guard was obtained.");
-				}
-
 				_targetSpace.setRetired();
 				_targetSpace.setPersisted();
 				_targetSpace.setRetireDate(new Date());
 
 				TargetSpace targetSpace = _targetSpace.prepareForRetirement();
 
-				try
-				{
-					persistTargetSpace(targetSpace);
-				}
-				finally
-				{
-					if (logger.isDebugEnabled() == true)
-					{
-						logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() + " for retiring the guard was released.");
-					}
-
-					releaseTargetSpace(_targetSpace.getWorkspaceIdentifier());
-				}
+				persistTargetSpace(targetSpace);
 				
 				if (logger.isDebugEnabled() == true)
 				{
@@ -961,24 +813,6 @@ public class Blackboard
 	{
 		TargetSpace targetSpace = _targetSpace.prepareForPersistence();
 		getPersister().put(_targetSpace);		
-	}
-
-	protected boolean guardTargetSpace(Object _id, boolean _blockUntilAcquired)
-	{
-		//get Target space
-		//ask for write lock on that space.
-		
-		return getTargetSpaceGuard().acquireLock(_id, _blockUntilAcquired);
-	}
-
-	private void guardTargetSpace(Object _id)
-	{
-		getTargetSpaceGuard().acquireLock(_id, true);
-	}
-
-	protected void releaseTargetSpace(Object _id)
-	{
-		getTargetSpaceGuard().releaseLock(_id);
 	}
 
 	protected void processEventPlans(String _appName, String _workspaceName, WorkspaceConfiguration _workspaceConfiguration, java.io.File _eventPlanDirectory)
@@ -1108,12 +942,12 @@ public class Blackboard
 		return tokenArray[tokenArray.length - 1];
 	}
 
-	private void put(Object _workspaceIdentifier, TargetSpace _targetSpace)
+	private void put(Object _workspaceIdentifier, WorkspaceExecutionContext _workspaceExecutionContext)
 	{
 		try
 		{
 			org.apache.jcs.JCS jcs = org.apache.jcs.JCS.getInstance("blackboard");
-			jcs.put(_workspaceIdentifier, _targetSpace);
+			jcs.put(_workspaceIdentifier, _workspaceExecutionContext);
 			incrementActiveWorkspaceCount();
 		}
 		catch(Throwable t)
@@ -1122,17 +956,35 @@ public class Blackboard
 		}
 	}
 
-	private TargetSpace get(Object _workspaceIdentifier)
+	private WorkspaceExecutionContext get(Object _workspaceIdentifier)
 	{
+		WorkspaceExecutionContext workspaceExecutionContext = null;
+		
 		try
 		{
 			org.apache.jcs.JCS jcs = org.apache.jcs.JCS.getInstance("blackboard");
-			return (TargetSpace) jcs.get(_workspaceIdentifier);
+			workspaceExecutionContext = (WorkspaceExecutionContext) jcs.get(_workspaceIdentifier);
+
+			if (workspaceExecutionContext == null)
+			{
+				if (currentWorkspaceExecutor >= getMaxWorkspaceThread())
+				{
+					currentWorkspaceExecutor = 0;
+				}
+
+				workspaceExecutionContext = new WorkspaceExecutionContext(_workspaceIdentifier, currentWorkspaceExecutor);
+				
+				currentWorkspaceExecutor++;
+
+				put(_workspaceIdentifier, workspaceExecutionContext);
+			}
 		}
 		catch(Throwable t)
 		{
 			throw new RuntimeException(t);
 		}
+
+		return workspaceExecutionContext;
 	}
 
 	private boolean contains(Object _workspaceIdentifier)

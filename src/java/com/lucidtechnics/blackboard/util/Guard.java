@@ -50,13 +50,15 @@ public final class Guard
 		do
 		{
 			synchronized(this)
-			{				
+			{
+				if (logger.isInfoEnabled() == true)
+				{
+					logger.info("synced on object: " + _id);
+				}
+
 				if (getIdMap().containsKey(_id) == false)
 				{
-					if (getIdMap().containsKey(_id) == false)
-					{
-						getIdMap().put(_id, new GuardState(_id));
-					}
+					getIdMap().put(_id, new GuardState(_id));
 				}
 
 				GuardState guardState = (GuardState) getIdMap().get(_id);
@@ -65,19 +67,20 @@ public final class Guard
 				
 				if (acquiredLock == false && _blockUntilAcquired == true)
 				{
-					if (logger.isDebugEnabled() == true)
+					if (logger.isInfoEnabled() == true)
 					{
-						logger.debug("Waiting to acquire lock on id: " + _id);
+						logger.info("Waiting to acquire lock on id: " + _id);
 					}
+
 					try { wait(); } catch (InterruptedException e) {}
 				}
 			}
 		}
 		while (acquiredLock == false && _blockUntilAcquired == true);
 
-		if (logger.isDebugEnabled() == true)
+		if (logger.isInfoEnabled() == true)
 		{
-			logger.debug("For id: " + _id + ". Acquired lock is: " + acquiredLock);
+			logger.info("For id: " + _id + ". Acquired lock is: " + acquiredLock);
 		}
 		
 		return acquiredLock;
