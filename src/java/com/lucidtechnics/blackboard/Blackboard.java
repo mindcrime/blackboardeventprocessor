@@ -30,13 +30,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.lucidtechnics.blackboard.config.WorkspaceConfiguration;
 import com.lucidtechnics.blackboard.config.EventConfiguration;
 
-import com.lucidtechnics.blackboard.util.Guard;
 import com.lucidtechnics.blackboard.util.error.ErrorManager;
 import com.lucidtechnics.blackboard.util.PropertyUtil;
 
@@ -207,7 +204,7 @@ public class Blackboard
 
 		setScheduledBlackboardExecutor(new ScheduledThreadPoolExecutor(getMaxScheduledBlackboardThread()));
 		
-		for (int i = 0; i > getMaxWorkspaceThread(); i++)
+		for (int i = 0; i <= getMaxWorkspaceThread(); i++)
 		{
 			getWorkspaceExecutorMap().put(i, new ThreadPoolExecutor(1, 1, 100, TimeUnit.SECONDS,
 				new LinkedBlockingQueue()));
@@ -236,7 +233,7 @@ public class Blackboard
 		workspaceExecutor.execute(new Runnable()
 		{
 			public void run()
-			{
+			{				
 				long startWorkspaceRun = 0l;
 				long endWorkspaceRun = 0l;
 
@@ -250,15 +247,9 @@ public class Blackboard
 				Map planToChangeInfoCountMap = new HashMap();
 				boolean notifyPlans = false;
 				Set activePlanSet = new HashSet();
-				boolean acquireLock = true;
 
 				try
 				{
-					if (logger.isDebugEnabled() == true)
-					{
-						logger.debug("For workspace: " + _targetSpace.getWorkspaceIdentifier() + " the guard was obtained.");
-					}
-
 					_targetSpace.setExecuting();
 
 					for (Plan executingPlan: _planList)
@@ -291,7 +282,7 @@ public class Blackboard
 
 											if (logger.isInfoEnabled() == true)
 											{
-												logger.info("Processing target space time before target space lock: " + (endWorkspaceRun - startWorkspaceRun));
+												logger.info("Processing target space time: " + (endWorkspaceRun - startWorkspaceRun));
 											}
 										}
 
@@ -496,7 +487,7 @@ public class Blackboard
 
 						if (logger.isInfoEnabled() == true)
 						{
-							logger.info("Processing target space time including Blackboard lock: " + (endWorkspaceRun - startWorkspaceRun));
+							logger.info("Processing target space time: " + (endWorkspaceRun - startWorkspaceRun));
 						}
 					}
 				}
@@ -567,7 +558,22 @@ public class Blackboard
 						logger.debug("o");
 					}
 
-					add(_event);
+					if (_event instanceof WorkspaceExecutionContext)
+					{
+						Object workspaceIdentifier = ((WorkspaceExecutionContext) _event).getWorkspaceIdentifier();
+						
+						if (logger.isTraceEnabled() == true)
+						{
+							logger.trace("Cleaning up context for workspace identified by: " + workspaceIdentifier);
+						}
+
+						remove(workspaceIdentifier);
+					}
+					else
+					{
+						add(_event);
+
+					}
 				}
 				catch (Throwable t)
 				{
@@ -799,6 +805,15 @@ public class Blackboard
 				TargetSpace targetSpace = _targetSpace.prepareForRetirement();
 
 				persistTargetSpace(targetSpace);
+
+				//Placing the workspaceExcutionContext on the
+				//blackboard, signals the blackboard execution
+				//thread that this workspace execution is finished
+				//and has been retired. The workspace is then removed
+				//from the cache.  This avoids the need to establish a
+				//lock for the critical cache region. 
+				WorkspaceExecutionContext workSpaceExecutionContext = get(_targetSpace.getWorkspaceIdentifier());
+				placeOnBlackboard(workSpaceExecutionContext);
 				
 				if (logger.isDebugEnabled() == true)
 				{
@@ -854,9 +869,9 @@ public class Blackboard
 				}
 				else
 				{
-					if (logger.isInfoEnabled() == true)
+					if (logger.isWarnEnabled() == true)
 					{
-						logger.info("Not scriptable: " + planArray[i].getName());
+						logger.warn("Not scriptable: " + planArray[i].getName());
 					}
 				}					
 			}
@@ -1007,6 +1022,11 @@ public class Blackboard
 			org.apache.jcs.JCS jcs = org.apache.jcs.JCS.getInstance("blackboard");
 			jcs.remove(_workspaceIdentifier);
 			decrementActiveWorkspaceCount();
+
+			if (logger.isTraceEnabled() == true)
+			{
+				logger.trace("Active workspace count is now: " + getActiveWorkspaceCount());
+			}
 		}
 		catch(Throwable t)
 		{
