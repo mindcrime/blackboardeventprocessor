@@ -3,7 +3,7 @@ appName=Blackboard
 rootDir=.
 rootDeployDir=${rootDir}/deploy
 
-version=beta-0.30
+version=beta-0.40
 blackboardDeployDir=${rootDeployDir}
 config=${blackboardDeployDir}/cfg
 log=${blackboardDeployDir}/log
