@@ -45,8 +45,8 @@ public class BlackboardConfiguration
 	private ErrorManager errorManager = com.lucidtechnics.blackboard.util.error.ErrorManager.getInstance();
 	private int maxBlackboardThread = 1;
 	private int maxScheduledBlackboardThread = 1;
-	private int maxWorkspaceThread = 40;
-	private int maxPersistenceThread = 60;
+	private int maxWorkspaceThread = 2;
+	private int maxPersistenceThread = 2;
 	private int maxWorkspace = 100000;
 	private Persister persister = new InkwellPersister("." + java.io.File.separator + "blackboard" + java.io.File.separator + "persistence");
 	private boolean timePlans = true;
