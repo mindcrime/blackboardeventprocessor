@@ -393,6 +393,8 @@ public abstract class TargetSpace
 
 	public String toJson()
 	{
+		logger.info("Here is the target map: " + getTargetMap());
+		
 		return new com.google.gson.Gson().toJson(this);
 	}
 	

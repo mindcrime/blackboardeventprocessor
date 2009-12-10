@@ -297,8 +297,33 @@ public class Blackboard
 											startTime = System.currentTimeMillis();
 										}
 
+										boolean exceptionThrown = false;
 										//Execute the plan
-										_targetSpace.setPlanState(plan, plan.execute(workspaceContext));
+										try
+										{
+											_targetSpace.setPlanState(plan, plan.execute(workspaceContext));
+										}
+										catch(Throwable t)
+										{
+											//If a plan self destructs
+											//the whole target space is
+											//considered compromised.
+											//The target space is
+											//retired and the target
+											//clean up.  This is to
+											//prevent inadvertant
+											//memory leaks. Plan
+											//operators should strive
+											//to not have there plans
+											//throw errant exceptions.
+											exceptionThrown = true;
+
+											if (_targetSpace.getTerminateOnError() == true)
+											{
+												logger.error(t.toString());
+												_targetSpace.setTerminated();
+											}
+										}
 
 										if (getTimePlans() == true)
 										{
@@ -764,6 +789,7 @@ public class Blackboard
 			targetSpace.setName(_workspaceConfiguration.getWorkspaceName());
 			targetSpace.setDoNotPersistSet(_workspaceConfiguration.getDoNotPersistSet());
 			targetSpace.setPersistChangeInfoHistory(_workspaceConfiguration.getPersistChangeInfoHistory());
+			targetSpace.setTerminateOnError(_workspaceConfiguration.getTerminateOnError());
 			targetSpace.setWorkspaceConfiguration(_workspaceConfiguration);
 
 			long currentTimeMillis = System.currentTimeMillis();

@@ -1,8 +1,9 @@
 Simply unzip this zip file and go to the root directory.
 
-To execute the blackboard CocoTheMonkey demo simply type "java -jar blackboard-alpha-0.1.jar" 
+To execute the blackboard CocoTheMonkey demo, copy the driver file CocoTheMonkey.js from blackboard/apps/examples/CocoTheMonkey
+ to the same directory as the Bootstrap.jar file.  Simply type "java -jar Bootstrap.jar" 
 at the command line.  This will execute any ruby or javascript driver files in the blackboard 
-directory.
+directory, and so CocoTheMonkey will begin to run.
 
 Driver files generate blackboard events and place them on the blackboard. The "CocoTheMonkey.js" 
 JavaScript file is an example of a driver file.  The blackboard will process each one of the 

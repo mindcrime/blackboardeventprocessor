@@ -27,6 +27,7 @@ public class WorkspaceConfiguration
 	private Set doNotPersistSet = new java.util.HashSet<String>();
 	private boolean persistChangeInfoHistory = false;
 	private Long workspaceTimeoutInSeconds = Long.MAX_VALUE;
+	private boolean terminateOnError = true;
 
 	public String getAppName() { return appName; }
 	public String getWorkspaceName() { return workspaceName; }
@@ -34,7 +35,8 @@ public class WorkspaceConfiguration
 	public Set getDoNotPersistSet() { return doNotPersistSet; }
 	public boolean getPersistChangeInfoHistory() { return persistChangeInfoHistory; }
 	public Long getWorkspaceTimeoutInSeconds() { return workspaceTimeoutInSeconds; }
-
+	public boolean getTerminateOnError() { return terminateOnError; }
+			
 	protected void setAppName(String _appName) { appName = _appName; }
 	protected void setWorkspaceName(String _workspaceName) { workspaceName = _workspaceName; }
 	protected void setPlanSet(Set _planSet) { planSet = _planSet; }
@@ -95,6 +97,21 @@ public class WorkspaceConfiguration
 	 */
 
 	public void setPersistChangeInfoHistory(boolean _persistChangeInfoHistory) { persistChangeInfoHistory = _persistChangeInfoHistory; }
+
+	/**
+	 * Identify whether or not Blackboard should automatically
+	 * terminate this workspace if any plan throws an exception on
+	 * execution.
+	 * 
+	 * @param _terminateOnError set to false if you do not want
+	 * blackboard to be automatically terminate a workspace upon the
+	 * detection of an exception due to any one plan's execution.
+	 *
+	 * @see Workspace
+	 * 
+	 */
+
+	public void setTerminateOnError(boolean _terminateOnError) { terminateOnError = _terminateOnError; }
 	
 	public WorkspaceConfiguration() {}
 
