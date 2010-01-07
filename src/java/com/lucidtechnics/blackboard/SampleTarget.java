@@ -59,4 +59,11 @@ public class SampleTarget
 	}
 
 	public SampleTarget() { }
+
+	public SampleTarget(Integer _attribute2, long _attributeLong)
+			throws Exception
+	{
+		setAttribute2(_attribute2);
+		setAttributeLong(_attributeLong);
+	}
 }

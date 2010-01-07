@@ -21,7 +21,7 @@ public class PlanContext
 	private String name;
 	private boolean isFinished;
 
-	protected PlanContext(String _name)
+	public PlanContext(String _name)
 	{
 		setName(_name);
 		setIsFinished(false);

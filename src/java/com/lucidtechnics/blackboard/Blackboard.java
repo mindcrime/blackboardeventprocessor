@@ -217,7 +217,7 @@ public class Blackboard
 		{
 			logger.info("Blackboard Workspace Server Initialization Inception.");
 			logger.info("Apache 2.0 Open Source License.");
-			logger.info("Copyright Owner - LucidTechnics, LLC.");
+			logger.info("Copyright Owner - Lucid Technics, LLC.");
 			logger.info("Authors - Bediako Ntodi George and David Yuctan Hodge.");
 			logger.info("Initialization was successful.");
 		}
@@ -314,14 +314,18 @@ public class Blackboard
 											//prevent inadvertant
 											//memory leaks. Plan
 											//operators should strive
-											//to not have there plans
-											//throw errant exceptions.
+											//to not have their plans
+											//throw unhandled exceptions.
 											exceptionThrown = true;
 
 											if (_targetSpace.getTerminateOnError() == true)
 											{
-												logger.error(t.toString());
+												getErrorManager().logException(t, logger);
 												_targetSpace.setTerminated();
+											}
+											else
+											{
+												getErrorManager().warnException(t, logger);
 											}
 										}
 
@@ -836,8 +840,8 @@ public class Blackboard
 				//blackboard, signals the blackboard execution
 				//thread that this workspace execution is finished
 				//and has been retired. The workspace is then removed
-				//from the cache.  This avoids the need to establish a
-				//lock for the critical cache region. 
+				//from the cache.  This avoids the need to establish an
+				//additional lock for the critical cache region. 
 				WorkspaceExecutionContext workSpaceExecutionContext = get(_targetSpace.getWorkspaceIdentifier());
 				placeOnBlackboard(workSpaceExecutionContext);
 				

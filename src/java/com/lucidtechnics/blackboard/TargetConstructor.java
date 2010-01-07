@@ -48,7 +48,7 @@ public class TargetConstructor
 {
 	private static Log logger = LogFactory.getLog(TargetConstructor.class);
 
-	private static final Map generatedClassMap = new HashMap();
+	private static final Map<Class, Class>  generatedClassMap = new HashMap<Class, Class>();
 	
 	public TargetConstructor() {}
 
@@ -73,10 +73,14 @@ public class TargetConstructor
 			{
 				synchronized(generatedClassMap)
 				{
-					byte[] classByteArray = createWrapperObjectByteArray(_targetName, _class);
-					targetClass = loadClass(classByteArray);
-					generatedClassMap.put(_class, targetClass);
+					if (generatedClassMap.containsKey(_class) == false)
+					{
+						byte[] classByteArray = createWrapperObjectByteArray(_targetName, _class);
+						generatedClassMap.put(_class, loadClass(classByteArray));
+					}
 				}
+
+				targetClass = generatedClassMap.get(_class);
 			}
 
 			target = (Target) targetClass.newInstance();
@@ -178,7 +182,10 @@ public class TargetConstructor
 			methodVisitor.visitEnd();
 		}
 
+		//Constructors
 		{
+			//Hmmm ... shouldn't we wrap all constructors of an object
+			//just like other methods?
 			methodVisitor = classWriter.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
 			methodVisitor.visitCode();
 			methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
@@ -413,6 +420,31 @@ public class TargetConstructor
 		}
 
 		return exceptionTypeArray;
+	}
+
+	private final static List findCollectionMutatingMethods(Class _class)
+	{
+		List methodList = new ArrayList();
+
+		Enhancer.getMethods(_class, null, methodList);
+
+		Predicate mutatorPredicate = new Predicate() {
+			public boolean evaluate(Object _object)
+			{
+				Method method = (Method) _object;
+
+				boolean startsWithSet = (method.getName().startsWith("set") == true);
+				boolean returnTypeIsVoid = ("void".equals(method.getReturnType().getName()) == true);
+				boolean parameterTypeCountIsOne = (method.getParameterTypes().length == 1);
+				boolean isPublic = (Modifier.isPublic(method.getModifiers()) == true);
+
+				return startsWithSet && returnTypeIsVoid && parameterTypeCountIsOne && isPublic;
+			}
+		};
+
+		CollectionUtils.filter(methodList, mutatorPredicate);
+
+		return methodList;
 	}
 
 	private final static List findMutatorMethods(Class _class)
