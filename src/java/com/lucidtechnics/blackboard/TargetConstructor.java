@@ -579,7 +579,7 @@ public class TargetConstructor
 		return classLoader;
 	}
 
-	private static final Class loadClass (byte[] _byteArray)
+	public static final Class loadClass (byte[] _byteArray)
 		throws Exception
 	{
 		//override classDefine (as it is protected) and define the class.
