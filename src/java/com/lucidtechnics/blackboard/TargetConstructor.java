@@ -95,7 +95,7 @@ public class TargetConstructor
 
 	private static final byte[] createWrapperObjectByteArray(String _targetName, Class _class)
 	{
-		ClassWriter classWriter = new ClassWriter(true);
+/*		ClassWriter classWriter = new ClassWriter(true);
 		
 		FieldVisitor fieldVisitor;
 		MethodVisitor methodVisitor;
@@ -373,6 +373,10 @@ public class TargetConstructor
 		}
 
 		return classWriter.toByteArray();
+
+		*/
+
+		return new byte[10];
 	}
 
 	private final static void loadParameters(MethodVisitor _methodVisitor, Type[] _typeArray)
