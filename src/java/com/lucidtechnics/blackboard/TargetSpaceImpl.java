@@ -91,6 +91,22 @@ public class TargetSpaceImpl
 		notifyPlans(new ChangeInfo(action, _actor, getName(), getWorkspaceIdentifier(), _targetName, _target));
 	}
 
+	protected final void put(String _targetName, java.util.Collection _target, Actor _actor)
+	{
+		boolean updatedTarget = getTargetMap().containsKey(_targetName);
+		getTargetMap().put(_targetName, _target);
+		int action = (updatedTarget == true) ? ChangeInfo.TARGET_UPDATED : ChangeInfo.TARGET_ADDED;
+		notifyPlans(new ChangeInfo(action, _actor, getName(), getWorkspaceIdentifier(), _targetName, _target));
+	}
+
+	protected final void put(String _targetName, java.util.Map _target, Actor _actor)
+	{
+		boolean updatedTarget = getTargetMap().containsKey(_targetName);
+		getTargetMap().put(_targetName, _target);
+		int action = (updatedTarget == true) ? ChangeInfo.TARGET_UPDATED : ChangeInfo.TARGET_ADDED;
+		notifyPlans(new ChangeInfo(action, _actor, getName(), getWorkspaceIdentifier(), _targetName, _target));
+	}
+
 	protected final void put(String _targetName, String _target, Actor _actor)
 	{
 		boolean updatedTarget = getTargetMap().containsKey(_targetName);

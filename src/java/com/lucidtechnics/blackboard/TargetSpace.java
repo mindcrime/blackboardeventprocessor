@@ -113,6 +113,8 @@ public abstract class TargetSpace
 
 	protected abstract void put(String _targetName, Object _object, Actor _actor, Intercepter _intercepter);
 	protected abstract void put(String _targetName, Target _target, Actor _actor);
+	protected abstract void put(String _targetName, java.util.Collection _target, Actor _actor);
+	protected abstract void put(String _targetName, java.util.Map _target, Actor _actor);
 	protected abstract void put(String _targetName, String _target, Actor _actor);
 	protected abstract void put(String _targetName, Integer _target, Actor _actor);
 	protected abstract void put(String _targetName, Long _target, Actor _actor);

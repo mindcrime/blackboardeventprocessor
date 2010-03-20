@@ -57,7 +57,7 @@ public class TargetConstructor
 		boolean isFinal = Modifier.isFinal(_class.getModifiers());
 		boolean isArray = _class.isArray();
 		boolean isEnum = _class.isEnum();
-
+							   
 		return (isFinal == false && isArray == false && isEnum == false);
 	}
 	
