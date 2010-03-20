@@ -48,7 +48,7 @@ public class TargetConstructor
 {
 	private static Log logger = LogFactory.getLog(TargetConstructor.class);
 
-	private static final Map<Class, Class>  generatedClassMap = new HashMap<Class, Class>();
+	private static final Map generatedClassMap = new HashMap();
 	
 	public TargetConstructor() {}
 
@@ -73,14 +73,10 @@ public class TargetConstructor
 			{
 				synchronized(generatedClassMap)
 				{
-					if (generatedClassMap.containsKey(_class) == false)
-					{
-						byte[] classByteArray = createWrapperObjectByteArray(_targetName, _class);
-						generatedClassMap.put(_class, loadClass(classByteArray));
-					}
+					byte[] classByteArray = createWrapperObjectByteArray(_targetName, _class);
+					targetClass = loadClass(classByteArray);
+					generatedClassMap.put(_class, targetClass);
 				}
-
-				targetClass = generatedClassMap.get(_class);
 			}
 
 			target = (Target) targetClass.newInstance();
@@ -95,7 +91,7 @@ public class TargetConstructor
 
 	private static final byte[] createWrapperObjectByteArray(String _targetName, Class _class)
 	{
-/*		ClassWriter classWriter = new ClassWriter(true);
+		ClassWriter classWriter = new ClassWriter(true);
 		
 		FieldVisitor fieldVisitor;
 		MethodVisitor methodVisitor;
@@ -182,10 +178,7 @@ public class TargetConstructor
 			methodVisitor.visitEnd();
 		}
 
-		//Constructors
 		{
-			//Hmmm ... shouldn't we wrap all constructors of an object
-			//just like other methods?
 			methodVisitor = classWriter.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
 			methodVisitor.visitCode();
 			methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
@@ -373,10 +366,6 @@ public class TargetConstructor
 		}
 
 		return classWriter.toByteArray();
-
-		*/
-
-		return new byte[10];
 	}
 
 	private final static void loadParameters(MethodVisitor _methodVisitor, Type[] _typeArray)
@@ -424,31 +413,6 @@ public class TargetConstructor
 		}
 
 		return exceptionTypeArray;
-	}
-
-	private final static List findCollectionMutatingMethods(Class _class)
-	{
-		List methodList = new ArrayList();
-
-		Enhancer.getMethods(_class, null, methodList);
-
-		Predicate mutatorPredicate = new Predicate() {
-			public boolean evaluate(Object _object)
-			{
-				Method method = (Method) _object;
-
-				boolean startsWithSet = (method.getName().startsWith("set") == true);
-				boolean returnTypeIsVoid = ("void".equals(method.getReturnType().getName()) == true);
-				boolean parameterTypeCountIsOne = (method.getParameterTypes().length == 1);
-				boolean isPublic = (Modifier.isPublic(method.getModifiers()) == true);
-
-				return startsWithSet && returnTypeIsVoid && parameterTypeCountIsOne && isPublic;
-			}
-		};
-
-		CollectionUtils.filter(methodList, mutatorPredicate);
-
-		return methodList;
 	}
 
 	private final static List findMutatorMethods(Class _class)
@@ -579,7 +543,7 @@ public class TargetConstructor
 		return classLoader;
 	}
 
-	public static final Class loadClass (byte[] _byteArray)
+	private static final Class loadClass (byte[] _byteArray)
 		throws Exception
 	{
 		//override classDefine (as it is protected) and define the class.

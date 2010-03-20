@@ -46,7 +46,7 @@ public class WorkspaceContext
 	protected void setIsExpired(boolean _isExpired) { isExpired = _isExpired; }
 	public void setInterceptedTargetSet(Set _interceptedTargetSet) { interceptedTargetSet = _interceptedTargetSet; }
 	
-	public WorkspaceContext(TargetSpace _targetSpace, Plan _plan)
+	protected WorkspaceContext(TargetSpace _targetSpace, Plan _plan)
 	{
 		setTargetSpace(_targetSpace);
 		setPlan(_plan);

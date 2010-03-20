@@ -66,7 +66,6 @@ public class Jsr223Plan
 
 		ScriptingUtil scriptingUtil = new Jsr223ScriptingUtil(getEngineName());
 
-		scriptingUtil.bind("SCRIPT_UTIL", scriptingUtil);
 		scriptingUtil.bind("PLAN_CONTEXT", planContext);
 		scriptingUtil.bind("WORKSPACE", _workspace);
 		scriptingUtil.bind("LOGGER", log);

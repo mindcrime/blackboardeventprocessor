@@ -386,7 +386,6 @@ public interface Workspace
 
 	/**
 	 * Returns a string representation of this workspace
-	 *
 	 * 
 	 * @return a string representation of this workspace
 	 */

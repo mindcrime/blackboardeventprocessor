@@ -103,34 +103,6 @@ public final class ErrorManager
 		throw _r;
 	}
 
-	public void warnException(Throwable _throwable, Log _logger)
-	{
-		PrintWriter printWriter = null;
-		StringWriter stringWriter = null;
-
-		try
-		{
-			_logger.warn("Encountered exception with message: " + _throwable.getMessage());
-			_logger.warn("WITH JAVA STACK TRACE:\n");
-
-			stringWriter = new StringWriter(); 
-			printWriter = new PrintWriter(stringWriter);
-
-			_throwable.printStackTrace(printWriter);
-
-			_logger.error(stringWriter.toString());
-		}
-		catch(Exception e)
-		{
-
-		}
-		finally
-		{
-			if (stringWriter != null) { try { stringWriter.close(); } catch(Exception e) {} }
-			if (printWriter != null) { try { printWriter.close(); } catch(Exception e) {} }
-		}
-	}
-
 	public void warn(String _message, Log _logger)
 	{
 		_logger.warn(_message);

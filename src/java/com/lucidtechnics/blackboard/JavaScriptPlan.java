@@ -30,9 +30,9 @@ public class JavaScriptPlan
 	private String name;
 	private String path;
 
-	public JavaScriptPlan() {}
+	protected JavaScriptPlan() {}
 	
-	public JavaScriptPlan(String _name, String _path)
+	protected JavaScriptPlan(String _name, String _path)
 	{
 		setName(_name);
 		setPath(_path);
@@ -50,7 +50,6 @@ public class JavaScriptPlan
 
 		JavascriptingUtil scriptingUtil = new JavascriptingUtil();
 
-		scriptingUtil.bind("SCRIPT_UTIL", scriptingUtil);
 		scriptingUtil.bind("PLAN_CONTEXT", planContext);
 		scriptingUtil.bind("WORKSPACE", _workspace);
 		scriptingUtil.bind("LOGGER", log);

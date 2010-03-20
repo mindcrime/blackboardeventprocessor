@@ -42,7 +42,6 @@ public class Jsr223ScriptingUtil
 		Map<String, String> tempExtensionToEngineMap = new HashMap<String, String>();
 
 		tempExtensionToEngineMap.put("bsh", "bsh.engine.BshScriptEngineFactory");
-
 		tempExtensionToEngineMap.put("java", "com.sun.script.groovy.GroovyScriptEngineFactory");
 		tempExtensionToEngineMap.put("rb", "com.sun.script.jruby.JRubyScriptEngineFactory");
 		tempExtensionToEngineMap.put("ruby", "com.sun.script.jruby.JRubyScriptEngineFactory");
