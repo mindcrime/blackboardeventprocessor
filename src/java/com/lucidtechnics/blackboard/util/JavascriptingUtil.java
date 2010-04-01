@@ -32,8 +32,6 @@ import org.mozilla.javascript.ScriptableObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.lucidtechnics.blackboard.util.PropertyUtil;
-
 public class JavascriptingUtil
    implements ScriptingUtil
 {
